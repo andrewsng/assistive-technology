@@ -11,6 +11,16 @@ Demonstrates morse code (https://en.wikipedia.org/wiki/Morse_code) in Python.
 import morse_talk as mtalk
 import pyttsx3
 
+version_number = "2023"
+
+
+def introduction():
+    """
+    At program startup, read the default welcome message.
+    The software version is in YYYY format.
+    """
+    pyttsx3.speak("Virtual Morse - Version" + version_number)
+
 
 def project_description(input):
     """First attempt at morse code in Python."""
@@ -28,6 +38,7 @@ def reverse_morse():
             command_mode = False
         else:
             print(mtalk.decode(command))
+
 
 def tts():
     """Text to speech."""
@@ -50,7 +61,7 @@ if __name__ == "__main__":
         "Assistive Technology",
     ]
 
+    introduction()
     # project_description(message[0])
     # reverse_morse()
     tts()
-
