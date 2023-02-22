@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 morse-talk = "*"
+tk = "*"
 
 [dev-packages]
 black = "*"

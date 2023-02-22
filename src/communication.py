@@ -9,12 +9,29 @@ Demonstrates morse code in Python.
 """
 
 import morse_talk as mtalk
+from tkinter import *
+from tkinter import ttk
 
 
 def project_description(input):
     """First attempt at morse code in Python."""
     sample = mtalk.encode(input)
     print(f"Example program run: {sample}")
+
+
+def new_input_window():
+    """Spawn a Notepad to record user input."""
+    example_text = message[1] + " → " + message[2]
+    print(f"Example program run: {example_text}")
+
+    root = Tk()
+    root.title("Virtual Morse 2023")
+    root.geometry("500x500")
+
+    frm = ttk.Frame(root, padding=10)
+    frm.grid()
+    ttk.Label(frm, text=example_text).grid(row=0, column=0, sticky="w")
+    root.mainloop()
 
 
 if __name__ == "__main__":
@@ -25,5 +42,4 @@ if __name__ == "__main__":
         "Assistive Technology",
     ]
 
-    # TODO: Specify case-sensitive input?
-    project_description(message[2])
+    new_input_window()
