@@ -15,7 +15,7 @@ Senior Capstone project from the Spring 2023 semester at UAF.
 - `dev` → testing changes to be merged into `main`.
 
 ## TinkerCad Link 
- -https://www.tinkercad.com/things/jOTVMvbrAmM
+ - https://www.tinkercad.com/things/jOTVMvbrAmM
 
 ## Architecture Diagram
 
