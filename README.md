@@ -14,6 +14,9 @@ Senior Capstone project from the Spring 2023 semester at UAF.
 - `main` → production ready environment.
 - `dev` → testing changes to be merged into `main`.
 
+## TinkerCad Link 
+ -https://www.tinkercad.com/things/jOTVMvbrAmM
+
 ## Architecture Diagram
 
 - TODO
