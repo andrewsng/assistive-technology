@@ -1,5 +1,12 @@
 // C++ code
-//
+// Travis Winterton
+// Arduino Morse Code Exploration
+// 03/03/23
+
+//Small arduino code to read in morse code via switch connected to 
+// Digital Pin and 5v
+
+
 
 
 //Pins
@@ -12,6 +19,8 @@ String code = "";
 char morse[4];
 int counter = 0;
 
+
+//Startup function when code runs 
 void setup()
 {
   pinMode(LED_PIN, OUTPUT);
@@ -24,6 +33,7 @@ void setup()
 
 
 
+//Main Code Body 
 void loop()
 {
   
@@ -41,8 +51,7 @@ void loop()
   // Check seginal_len for eitehr dot or dash
   //store dot or dash into char array 
   //ummmmmmmmmmmmmmmmmmm
-  //still trying to figure out what do after that but it's a start
-  
+  //I know it's not perfect but it's a starting point
   if(signal_len <= 100 && counter != 3)
   {
       morse[counter] = '.';
@@ -58,6 +67,9 @@ void loop()
       counter++;
   }
   
+  
+  //Check if counter reaches 3, print out morse code
+  // and reset counter 
   if(counter == 3)
   {
    	for(int i = 0; i < 4; i++)
