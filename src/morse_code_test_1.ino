@@ -9,6 +9,8 @@
 //Global Variables
 unsigned long signal_len, t1, t2;
 String code = "";
+char morse[4];
+int counter = 0;
 
 void setup()
 {
@@ -28,23 +30,46 @@ void loop()
   //Start timer when button pushed (t1)
   //keep track of time untill BUTTON_PIN = low (t2)
   //Find total signal length to determin dot or dash
-  while(!digitalRead(BUTTON_PIN)){};
+  while(!digitalRead(BUTTON_PIN)){digitalWrite(LED_PIN, LOW);};
   t1 = millis();
-  while(digitalRead(BUTTON_PIN)){};
+  while(digitalRead(BUTTON_PIN)){digitalWrite(LED_PIN, HIGH);};
   t2 = millis();
   
   signal_len = t2 - t1;
   
-  if(signal_len <= 100)
+  
+  // Check seginal_len for eitehr dot or dash
+  //store dot or dash into char array 
+  //ummmmmmmmmmmmmmmmmmm
+  //still trying to figure out what do after that but it's a start
+  
+  if(signal_len <= 100 && counter != 3)
   {
-   Serial.print("."); 
+      morse[counter] = '.';
+      counter++;
+    
+  } 
+  
+  
+  if(signal_len >= 300 && counter != 3)
+  {
+  
+      morse[counter] = '-';
+      counter++;
   }
   
-  if(signal_len >= 300)
+  if(counter == 3)
   {
-    Serial.print("-");
+   	for(int i = 0; i < 4; i++)
+    {
+      Serial.print(morse[i]);
+    }
+    counter = 0;
+    Serial.println("");
+    Serial.println("reseting");
   }
   
-
-  	
+  delay(500);
+  
+  
 }
