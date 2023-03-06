@@ -16,7 +16,7 @@
 //Global Variables
 unsigned long signal_len, t1, t2;
 String code = "";
-char morse[4];
+char morse[5];
 int counter = 0;
 
 
@@ -52,7 +52,7 @@ void loop()
   //store dot or dash into char array 
   //ummmmmmmmmmmmmmmmmmm
   //I know it's not perfect but it's a starting point
-  if(signal_len <= 100 && counter != 3)
+  if(signal_len <= 100 && counter != 4)
   {
       morse[counter] = '.';
       counter++;
@@ -60,7 +60,7 @@ void loop()
   } 
   
   
-  if(signal_len >= 300 && counter != 3)
+  if(signal_len >= 300 && counter != 4)
   {
   
       morse[counter] = '-';
@@ -70,9 +70,9 @@ void loop()
   
   //Check if counter reaches 3, print out morse code
   // and reset counter 
-  if(counter == 3)
+  if(counter == 4)
   {
-   	for(int i = 0; i < 4; i++)
+   	for(int i = 0; i < 5; i++)
     {
       Serial.print(morse[i]);
     }
