@@ -8,7 +8,7 @@ namespace VirtualMorse
 {
     public class FunctionKeyInput
     {
-        public event EventHandler KeyPressed;
+        public event EventHandler<SwitchInputEventArgs> KeyPressed;
 
         public HashSet<Keys> targetKeys = new HashSet<Keys>()
         {
@@ -33,7 +33,7 @@ namespace VirtualMorse
                     e.SuppressKeyPress = true;
                 }
                 Console.WriteLine("F Key pressed");
-                KeyPressed?.Invoke(this, e);
+                KeyPressed?.Invoke(this, new SwitchInputEventArgs());
             }
         }
     }

@@ -10,9 +10,9 @@ namespace VirtualMorse
     {
         public event EventHandler InputReceived;
 
-        public void DeviceInputReceived(object sender, EventArgs e)
+        public void DeviceInputReceived(object sender, SwitchInputEventArgs e)
         {
-            Console.WriteLine("Received input in handler");
+            Console.WriteLine("Received input in handler - Switch " + e.switchNum.ToString());
             InputReceived?.Invoke(sender, e);
         }
     }
