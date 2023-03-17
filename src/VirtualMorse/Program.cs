@@ -26,6 +26,7 @@ namespace VirtualMorse
             textBox.Dock = DockStyle.Fill;
             textBox.SelectionFont = new Font("Arial", 12, FontStyle.Regular);
             textBox.SelectionColor = Color.Black;
+            textBox.AutoWordSelection = false;
             textBox.KeyDown += fKeys.TextBox_KeyDown;
 
             this.Text = versionStr;
