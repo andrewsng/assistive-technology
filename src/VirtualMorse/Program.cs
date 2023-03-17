@@ -16,6 +16,8 @@ namespace VirtualMorse
         public RichTextBox textBox;
         static String versionStr = "Virtual Morse 2023";
 
+        private bool commandMode = false;
+
         public ProgramForm()
         {
             fKeys.KeyPressed += handler.DeviceInputReceived;
@@ -37,7 +39,66 @@ namespace VirtualMorse
 
         public void Handler_InputReceived(object sender, SwitchInputEventArgs e)
         {
-            Console.WriteLine($"Received input in form - {e.switchInput}");
+            Switch input = e.switchInput;
+            Console.WriteLine($"Received input in form - {input}");
+            if (input == Switch.Switch1 ||  input == Switch.Switch9)
+            {
+                commandMode = true;
+            }
+            else if (input == Switch.Switch2)
+            {
+                if (commandMode)
+                {
+                    // PRINT PAGE
+                    commandMode = false;
+                }
+                else
+                {
+                    // SHIFT
+                }
+            }
+            else if (input == Switch.Switch3)
+            {
+                if (commandMode)
+                {
+                    // CLEAR DOCUMENT
+                    commandMode = false;
+                }
+                else
+                {
+                    // SAVE
+                }
+            }
+            else if (input == Switch.Switch4)
+            {
+                // SPACE & ADD WORD
+            }
+            else if (input == Switch.Switch5)
+            {
+                // DOT
+            }
+            else if (input == Switch.Switch6)
+            {
+                // DASH
+            }
+            else if (input == Switch.Switch7)
+            {
+                // ENTER LETTER
+                //
+                // If Command Mode:
+                //   'l' -> Reads last sentence.
+                //   'g' -> Checks email.
+                //   'd' -> Deletes email.
+                //   'h' -> Reads email headers.
+                //   'r' -> Reads email.
+                //   'y' -> Replies to email. (Not working in current)
+                //   'n' -> Adds email address nickname.
+                //   'a' -> Ties email address to nickname.
+            }
+            else if (input == Switch.Switch8)
+            {
+                // BACKSPACE
+            }
         }
 
         [STAThread]
