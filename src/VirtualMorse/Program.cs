@@ -30,6 +30,7 @@ namespace VirtualMorse
 
             this.Text = versionStr;
             this.StartPosition = FormStartPosition.CenterScreen;
+            this.KeyPreview = true;
             this.Controls.Add(textBox);
         }
 
