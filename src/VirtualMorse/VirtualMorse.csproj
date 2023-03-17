@@ -48,6 +48,8 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FunctionKeyInput.cs" />
+    <Compile Include="InputHandler.cs" />
     <Compile Include="Program.cs">
       <SubType>Form</SubType>
     </Compile>
