@@ -34,9 +34,9 @@ namespace VirtualMorse
             this.Controls.Add(textBox);
         }
 
-        public void Handler_InputReceived(object sender, EventArgs e)
+        public void Handler_InputReceived(object sender, SwitchInputEventArgs e)
         {
-            Console.WriteLine("Received input in form");
+            Console.WriteLine($"Received input in form - {e.switchInput}");
         }
 
         [STAThread]

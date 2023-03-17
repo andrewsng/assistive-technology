@@ -10,18 +10,18 @@ namespace VirtualMorse
     {
         public event EventHandler<SwitchInputEventArgs> KeyPressed;
 
-        public Dictionary<Keys, int> targetKeys = new Dictionary<Keys, int>()
+        public Dictionary<Keys, Switch> targetKeys = new Dictionary<Keys, Switch>()
         {
-            { Keys.F1, 1 },
-            { Keys.F2, 2 },
-            { Keys.F3, 3 },
-            { Keys.F4, 4 },
-            { Keys.F5, 5 },
-            { Keys.F6, 6 },
-            { Keys.F7, 7 },
-            { Keys.F8, 8 },
-            { Keys.F9, 9 },
-            { Keys.F10, 10 },
+            { Keys.F1, Switch.Switch1 },
+            { Keys.F2, Switch.Switch2 },
+            { Keys.F3, Switch.Switch3 },
+            { Keys.F4, Switch.Switch4 },
+            { Keys.F5, Switch.Switch5 },
+            { Keys.F6, Switch.Switch6 },
+            { Keys.F7, Switch.Switch7 },
+            { Keys.F8, Switch.Switch8 },
+            { Keys.F9, Switch.Switch9 },
+            { Keys.F10, Switch.Switch10 },
         };
 
         public void TextBox_KeyDown(object sender, KeyEventArgs e)

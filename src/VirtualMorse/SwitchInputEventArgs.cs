@@ -7,11 +7,11 @@ namespace VirtualMorse
 {
     public class SwitchInputEventArgs : EventArgs
     {
-        public int switchNum;
+        public Switch switchInput;
 
-        public SwitchInputEventArgs(int switchNumber)
+        public SwitchInputEventArgs(Switch switchActivated)
         {
-            this.switchNum = switchNumber;
+            this.switchInput = switchActivated;
         }
     }
 }
