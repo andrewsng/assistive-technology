@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33414.496
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VirtualMorse", "VirtualMorse.csproj", "{7E682FCD-E1E9-41D9-A13A-29503BF2FA99}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7E682FCD-E1E9-41D9-A13A-29503BF2FA99}.Debug|x86.ActiveCfg = Debug|x86
+		{7E682FCD-E1E9-41D9-A13A-29503BF2FA99}.Debug|x86.Build.0 = Debug|x86
+		{7E682FCD-E1E9-41D9-A13A-29503BF2FA99}.Release|x86.ActiveCfg = Release|x86
+		{7E682FCD-E1E9-41D9-A13A-29503BF2FA99}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {187DEF8E-AD2A-474F-9F2C-B6DBA445262F}
+	EndGlobalSection
+EndGlobal
