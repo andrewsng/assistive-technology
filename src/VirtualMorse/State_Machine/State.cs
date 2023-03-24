@@ -28,12 +28,12 @@ public class State
 
     public virtual void dot()
     {
-        Console.WriteLine("dot not implemented correct");
+
     }
 
     public virtual void dash()
     {
-        Console.WriteLine("dash not implemented correct");
+
     }
 
     public virtual void enter()
@@ -44,6 +44,21 @@ public class State
     public virtual void backspace()
     {
 
+    }
+
+    public virtual string getCurrentWord()
+    {
+        return "ERROR: GETCURRENTWORD NOT IMPLEMENTED IN CURRENT STATE";
+    }
+
+    public virtual string getCurrentLetter()
+    {
+        return "ERROR: GETCURRENTLETTERNOT IMPLEMENTED IN CURRENT STATE";
+    }
+
+    public virtual string getFile()
+    {
+        return "ERROR: GETFILE NOT IMPLEMENT IN CURRENT STATE";
     }
 
 }
