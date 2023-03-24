@@ -104,12 +104,58 @@ namespace VirtualMorse
         [STAThread]
         public static void Main(string[] args)
         {
+            /*
             SpeechSynthesizer synth = new SpeechSynthesizer();
             synth.SetOutputToDefaultAudioDevice();
             synth.Speak(versionStr);
 
             Application.EnableVisualStyles();
             Application.Run(new ProgramForm());
+            */
+            StateMachine stateMachine = new StateMachine();
+
+            stateMachine.dot();
+            stateMachine.dash();
+            stateMachine.enter();
+            Console.WriteLine();
+
+            stateMachine.dot();
+            stateMachine.enter();
+            Console.WriteLine();
+
+            stateMachine.dash();
+            stateMachine.dash();
+            stateMachine.dash();
+            stateMachine.shift();
+            stateMachine.shift();
+            stateMachine.shift();
+            stateMachine.enter();
+            Console.WriteLine();
+
+            stateMachine.backspace();
+            Console.WriteLine("current letter: '" + stateMachine.getCurrentLetter() + "'");
+            Console.WriteLine("current word: '" + stateMachine.getCurrentWord() + "'");
+            Console.WriteLine("current document: '" + stateMachine.getFile() + "'");
+
+
+            stateMachine.space();
+            stateMachine.space();
+            Console.WriteLine();
+
+            stateMachine.dash();
+            stateMachine.dash();
+            stateMachine.dash();
+            stateMachine.enter();
+            stateMachine.space();
+            stateMachine.space();
+            Console.WriteLine();
+
+            Console.WriteLine();
+            Console.WriteLine("current letter: '" + stateMachine.getCurrentLetter() + "'");
+            Console.WriteLine("current word: '" + stateMachine.getCurrentWord() + "'");
+            Console.WriteLine("current document: '" + stateMachine.getFile() + "'");
+            Console.ReadLine();
+
         }
     }
 }
