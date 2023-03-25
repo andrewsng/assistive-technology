@@ -38,7 +38,6 @@ namespace VirtualMorse
         public void Handler_InputReceived(object sender, SwitchInputEventArgs e)
         {
             Switch input = e.switchInput;
-            Console.WriteLine($"Received input in form - {input}");
             switch (input)
             {
                 // COMMAND MODE
@@ -95,6 +94,7 @@ namespace VirtualMorse
             Console.WriteLine("current letter: '" + stateMachine.getCurrentLetter() + "'");
             Console.WriteLine("current word: '" + stateMachine.getCurrentWord() + "'");
             Console.WriteLine("current document: '" + stateMachine.getFile() + "'");
+            Console.WriteLine();
         }
 
         [STAThread]

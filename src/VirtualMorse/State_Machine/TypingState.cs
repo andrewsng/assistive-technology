@@ -91,7 +91,6 @@ public class TypingState : State
     {
 		Console.WriteLine("save text doc as is");
 		Console.WriteLine("says 'now saving'");
-		Console.WriteLine();
     }
 
     public override void command()
