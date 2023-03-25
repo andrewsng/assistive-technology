@@ -4,9 +4,9 @@ public class TypingState : State
 {
 	StateMachine stateMachine;
 
-	string current_letter;
-	string current_word;
-	string text_file;
+	string current_letter = "";
+	string current_word = "";
+	string text_file = "";
 	bool is_Capitalized = false;
 
 	//state functions
@@ -71,13 +71,13 @@ public class TypingState : State
     public override void backspace()
     {
 	
-		if (current_word != "")
+		if (current_word.Length > 0)
 		{
 			current_word = current_word.Remove(current_word.Length - 1, 1);
 			clearLetter();
 			Console.WriteLine("Deleting last letter of current word");
 		}
-		else
+		else if (text_file.Length > 0)
 		{
 			text_file = text_file.Remove(text_file.Length - 1, 1);
 			string[] words = text_file.Split(' ');
