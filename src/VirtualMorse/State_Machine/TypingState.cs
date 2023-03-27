@@ -2,9 +2,9 @@
 
 public class TypingState : State
 {
-	StateMachine stateMachine;
+	protected StateMachine stateMachine;
 
-	string current_letter = "";
+	protected string current_letter = "";
 	string current_word = "";
 	string text_file = "";
 	bool is_Capitalized = false;
@@ -96,7 +96,7 @@ public class TypingState : State
     public override void command()
     {
 		Console.WriteLine("move to command state");
-		//stateMachine.setState(stateMachine.getCommandState());
+		stateMachine.setState(stateMachine.getCommandState());
     }
 
 	public override string getCurrentWord()

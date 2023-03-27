@@ -1,4 +1,5 @@
 ﻿using System;
+using VirtualMorse.State_Machine;
 
 public class StateMachine
 {
@@ -11,9 +12,10 @@ public class StateMachine
 	public StateMachine()
 	{
 		typingState = new TypingState(this);
+        commandState = new CommandState(this);
 
-		//set initial state
-		state = typingState;
+        //set initial state
+        state = typingState;
 	}
 
 	//Initialize States

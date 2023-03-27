@@ -55,6 +55,7 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="State_Machine\CommandState.cs" />
     <Compile Include="State_Machine\State.cs" />
     <Compile Include="State_Machine\StateMachine.cs" />
     <Compile Include="State_Machine\TypingState.cs" />
