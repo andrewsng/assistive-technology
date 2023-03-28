@@ -32,7 +32,6 @@ namespace VirtualMorse
                 {
                     e.SuppressKeyPress = true;
                 }
-                Console.WriteLine("F Key pressed");
                 KeyPressed?.Invoke(this, new SwitchInputEventArgs(targetKeys[e.KeyCode]));
             }
         }

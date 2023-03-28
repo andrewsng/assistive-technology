@@ -1,0 +1,76 @@
+﻿using System;
+using System.Collections.Generic;
+
+public static class Function
+{
+    static Dictionary<string, string> morse_map = new Dictionary<string, string>() {
+    {".-", "a"},
+    {"-...", "b"},
+    {"-.-.", "c"},
+    {"-..", "d"},
+    {".", "e"},
+    {"..-.", "f"},
+    {"--.", "g"},
+    {"....", "h"},
+    {"..", "i"},
+    {".---", "j"},
+    {"-.-", "k"},
+    {".-..", "l"},
+    {"--", "m"},
+    {"-.", "n"},
+    {"---", "o"},
+    {".--.", "p"},
+    {"--.-", "q"},
+    {".-.", "r"},
+    {"...", "s"},
+    {"-", "t"},
+    {"..-", "u"},
+    {"...-", "v"},
+    {".--", "w"},
+    {"-..-", "x"},
+    {"-.--", "y"},
+    {"--..", "z"}
+    };
+
+    public static string morseToText(string morse)
+    {
+        if (morse_map.ContainsKey(morse))
+            return morse_map[morse];
+        else
+            return "";
+    }
+
+    public static void parseCommand(string command)
+    {
+        switch (command)
+        {
+            case "l":
+                Console.WriteLine("read last sentence");
+                break;
+            case "g":
+                Console.WriteLine("checks email");
+                break;
+            case "d":
+                Console.WriteLine("deletes email");
+                break;
+            case "h":
+                Console.WriteLine("read email headers");
+                break;
+            case "r":
+                Console.WriteLine("reads email");
+                break;
+            case "y":
+                Console.WriteLine("reply to email");
+                break;
+            case "n":
+                Console.WriteLine("adds email address nickname");
+                break;
+            case "a":
+                Console.WriteLine("ties email address to nickname");
+                break;
+            default:
+                Console.WriteLine("invalid command");
+                break;
+        }
+    }
+}

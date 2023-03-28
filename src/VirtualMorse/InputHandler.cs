@@ -12,7 +12,6 @@ namespace VirtualMorse
 
         public void DeviceInputReceived(object sender, SwitchInputEventArgs e)
         {
-            Console.WriteLine($"Received input in handler - {e.switchInput}");
             InputReceived?.Invoke(sender, e);
         }
     }

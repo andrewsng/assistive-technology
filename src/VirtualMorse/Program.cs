@@ -11,18 +11,16 @@ namespace VirtualMorse
 {
     public class ProgramForm : Form
     {
+        public StateMachine stateMachine = new StateMachine();
         public FunctionKeyInput fKeys = new FunctionKeyInput();
         public InputHandler handler = new InputHandler();
         public RichTextBox textBox;
         static String versionStr = "Virtual Morse 2023";
 
-        private bool commandMode = false;
-
         public ProgramForm()
         {
             fKeys.KeyPressed += handler.DeviceInputReceived;
             handler.InputReceived += Handler_InputReceived;
-
 
             textBox = new RichTextBox();
             textBox.Dock = DockStyle.Fill;
@@ -40,49 +38,39 @@ namespace VirtualMorse
         public void Handler_InputReceived(object sender, SwitchInputEventArgs e)
         {
             Switch input = e.switchInput;
-            Console.WriteLine($"Received input in form - {input}");
-            if (input == Switch.Switch1 ||  input == Switch.Switch9)
+            switch (input)
             {
-                commandMode = true;
-            }
-            else if (input == Switch.Switch2)
-            {
-                if (commandMode)
-                {
-                    // PRINT PAGE
-                    commandMode = false;
-                }
-                else
-                {
-                    // SHIFT
-                }
-            }
-            else if (input == Switch.Switch3)
-            {
-                if (commandMode)
-                {
-                    // CLEAR DOCUMENT
-                    commandMode = false;
-                }
-                else
-                {
-                    // SAVE
-                }
-            }
-            else if (input == Switch.Switch4)
-            {
-                // SPACE & ADD WORD
-            }
-            else if (input == Switch.Switch5)
-            {
+                // COMMAND MODE
+                case Switch.Switch1:  // Fall through
+                case Switch.Switch9:
+                    stateMachine.command();
+                    break;
+
+                // SHIFT [PRINT PAGE]
+                case Switch.Switch2:
+                    stateMachine.shift();
+                    break;
+
+                // SAVE [CLEAR DOCUMENT]
+                case Switch.Switch3:
+                    stateMachine.save();
+                    break;
+
+                // SPACE (ADD WORD)
+                case Switch.Switch4:
+                    stateMachine.space();
+                    break;
+
                 // DOT
-            }
-            else if (input == Switch.Switch6)
-            {
+                case Switch.Switch5:
+                    stateMachine.dot();
+                    break;
+
                 // DASH
-            }
-            else if (input == Switch.Switch7)
-            {
+                case Switch.Switch6:
+                    stateMachine.dash();
+                    break;
+
                 // ENTER LETTER
                 //
                 // If Command Mode:
@@ -94,11 +82,19 @@ namespace VirtualMorse
                 //   'y' -> Replies to email. (Not working in current)
                 //   'n' -> Adds email address nickname.
                 //   'a' -> Ties email address to nickname.
-            }
-            else if (input == Switch.Switch8)
-            {
+                case Switch.Switch7:
+                    stateMachine.enter();
+                    break;
+
                 // BACKSPACE
+                case Switch.Switch8:
+                    stateMachine.backspace();
+                    break;
             }
+            Console.WriteLine("current letter: '" + stateMachine.getCurrentLetter() + "'");
+            Console.WriteLine("current word: '" + stateMachine.getCurrentWord() + "'");
+            Console.WriteLine("current document: '" + stateMachine.getFile() + "'");
+            Console.WriteLine();
         }
 
         [STAThread]
