@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 public class TypingState : State
 {
@@ -6,13 +7,23 @@ public class TypingState : State
 
 	protected string current_letter = "";
 	string current_word = "";
-	string text_file = "";
+	string current_text_file = "";
 	bool is_Capitalized = false;
+	string directory;
+	string file = "test.txt";
+
+
 
 	//state functions
 	public TypingState(StateMachine stateMachine)
 	{
 		this.stateMachine = stateMachine;
+
+		directory = AppDomain.CurrentDomain.BaseDirectory;
+		directory = directory.Replace("bin\\Debug\\", "Text_documents\\");
+		current_text_file = Function.readFullFile(directory, file)[0];
+		string[] words = current_text_file.Split(' ');
+		current_word = words[words.Length - 1];
 	}
 
 	public override void dot()
@@ -31,15 +42,22 @@ public class TypingState : State
     {
 		if(current_word != "")
         {
-			text_file += current_word;
+			current_text_file += current_word;
 			Console.WriteLine("added word to file: " + current_word);
+			string file = "test.txt";
+			using (StreamWriter writer = new StreamWriter(directory + file))
+			{
+				writer.WriteLine(directory);
+				writer.WriteLine("it do");
+			}
 			clearWord();
         }
         else
         {
-			text_file += " ";
+			current_text_file += " ";
 			Console.WriteLine("SPACE added to file");
         }
+		Function.addToFile(directory, file, current_text_file);
 	}
 
     public override void shift()
@@ -77,12 +95,12 @@ public class TypingState : State
 			clearLetter();
 			Console.WriteLine("Deleting last letter of current word");
 		}
-		else if (text_file.Length > 0)
+		else if (current_text_file.Length > 0)
 		{
-			text_file = text_file.Remove(text_file.Length - 1, 1);
-			string[] words = text_file.Split(' ');
+			current_text_file = current_text_file.Remove(current_text_file.Length - 1, 1);
+			string[] words = current_text_file.Split(' ');
 			current_word = words[words.Length - 1];
-			text_file = text_file.Remove(text_file.Length - current_word.Length, current_word.Length);
+			current_text_file = current_text_file.Remove(current_text_file.Length - current_word.Length, current_word.Length);
 			Console.WriteLine("Backspace");
 		}
 	}
@@ -111,7 +129,7 @@ public class TypingState : State
 
 	public override string getFile()
 	{
-		return text_file;
+		return current_text_file;
 	}
 
 	//helper functions
