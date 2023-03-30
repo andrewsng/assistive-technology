@@ -65,6 +65,9 @@
   <ItemGroup>
     <Folder Include=".vs\VirtualMorse\v17\" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Text_documents\test.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
   <ProjectExtensions>
     <VisualStudio AllowExistingFolder="true" />
