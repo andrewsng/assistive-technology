@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 
 public static class Function
 {
@@ -72,5 +73,27 @@ public static class Function
                 Console.WriteLine("invalid command");
                 break;
         }
+    }
+
+    public static void addToFile(string directory, string file, string text)
+    {
+
+        using (StreamWriter writer = new StreamWriter(directory + file))
+        {
+            writer.WriteLine(text);
+        }
+    }
+    public static List<string> readFullFile(string directory, string file)
+    {
+        List<string> return_string = new List<string>();
+        using (StreamReader reader = new StreamReader(directory + file))
+        {
+            string line;
+            while((line = reader.ReadLine()) != null)
+            {
+                return_string.Add(line);
+            }
+        }
+        return return_string;
     }
 }
