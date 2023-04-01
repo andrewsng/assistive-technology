@@ -97,11 +97,14 @@ public class TypingState : State
 
     public override void backspace()
     {
-	
-		if (current_word.Length > 0)
+		if (current_letter.Length > 0)
+		{
+			clearLetter();
+            Console.WriteLine("Clearing morse string");
+        }
+		else if (current_word.Length > 0)
 		{
 			current_word = current_word.Remove(current_word.Length - 1, 1);
-			clearLetter();
 			Console.WriteLine("Deleting last letter of current word");
 		}
 		else if (current_text_file.Length > 0)
