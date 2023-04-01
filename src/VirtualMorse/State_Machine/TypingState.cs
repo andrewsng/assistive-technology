@@ -3,15 +3,15 @@ using System.IO;
 
 public class TypingState : State
 {
-	protected StateMachine stateMachine;
+	protected WritingContext context;
 
     string lastLetter = "";
 	bool isCapitalized = false;
 
 	//state functions
-	public TypingState(StateMachine stateMachine)
+	public TypingState(WritingContext context)
 	{
-		this.stateMachine = stateMachine;
+		this.context = context;
 	}
 
 	public override void dot()
@@ -28,15 +28,15 @@ public class TypingState : State
 
     public override void space()
     {
-		if(stateMachine.currentWord != "")
+		if(context.currentWord != "")
         {
-			stateMachine.appendToDocument(stateMachine.currentWord);
+			context.appendToDocument(context.currentWord);
 			clearWord();
-            Console.WriteLine("added word to file: " + stateMachine.currentWord);
+            Console.WriteLine("added word to file: " + context.currentWord);
         }
         else
         {
-            stateMachine.appendToDocument(" ");
+            context.appendToDocument(" ");
             Console.WriteLine("SPACE added to file");
         }
 	}
@@ -49,14 +49,14 @@ public class TypingState : State
 
     public override void enter()
     {
-		if (stateMachine.currentLetter == "" && lastLetter != "")
+		if (context.currentLetter == "" && lastLetter != "")
 		{
             addLetterToWord(lastLetter);
             Console.WriteLine("added letter: " + lastLetter);
         }
 		else
         {
-            string c = Function.morseToText(stateMachine.currentLetter);
+            string c = Function.morseToText(context.currentLetter);
             if (c != "")
             {
                 if (isCapitalized)
@@ -77,19 +77,19 @@ public class TypingState : State
 
     public override void backspace()
     {
-		if (stateMachine.currentLetter.Length > 0)
+		if (context.currentLetter.Length > 0)
 		{
 			clearLetter();
             Console.WriteLine("Clearing morse symbols");
         }
-		else if (stateMachine.currentWord.Length > 0)
+		else if (context.currentWord.Length > 0)
 		{
-			stateMachine.currentWord = stateMachine.currentWord.Remove(stateMachine.currentWord.Length - 1, 1);
+			context.currentWord = context.currentWord.Remove(context.currentWord.Length - 1, 1);
 			Console.WriteLine("Delete");
 		}
 		else
 		{
-			stateMachine.backspaceDocument();
+			context.backspaceDocument();
 			Console.WriteLine("Backspace");
 		}
 	}
@@ -98,40 +98,40 @@ public class TypingState : State
     {
 		Console.WriteLine("save text doc as is");
 		Console.WriteLine("says 'now saving'");
-		stateMachine.saveDocumentFile();
+		context.saveDocumentFile();
     }
 
     public override void command()
     {
 		Console.WriteLine("move to command state");
-		stateMachine.setState(stateMachine.getCommandState());
+		context.setState(context.getCommandState());
     }
 
 	//helper functions
 	public void addDot()
 	{
-		stateMachine.currentLetter += '.';
+		context.currentLetter += '.';
 	}
 
 	public void addDash()
 	{
-		stateMachine.currentLetter += '-';
+		context.currentLetter += '-';
 	}
 
 	public void clearLetter()
 	{
-		stateMachine.currentLetter = "";
+		context.currentLetter = "";
 	}
 
 	public void addLetterToWord(string c)
 	{
-		stateMachine.currentWord += c;
+		context.currentWord += c;
 		lastLetter = c;
 		clearLetter();
 	}
 	public void clearWord()
 	{
-		stateMachine.currentWord = "";
+		context.currentWord = "";
 	}
 
 	public void toggleCapitalized()

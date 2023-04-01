@@ -7,7 +7,7 @@ namespace VirtualMorse.State_Machine
 {
     public class CommandState : TypingState
     {
-        public CommandState(StateMachine stateMachine) : base(stateMachine)
+        public CommandState(WritingContext context) : base(context)
         {
         }
 
@@ -33,7 +33,7 @@ namespace VirtualMorse.State_Machine
 
         public override void enter()
         {
-            string c = Function.morseToText(stateMachine.currentLetter);
+            string c = Function.morseToText(context.currentLetter);
             if (c != "")
             {
                 Console.WriteLine("Valid letter");
@@ -50,7 +50,7 @@ namespace VirtualMorse.State_Machine
         {
             Console.WriteLine("move to typing state");
             clearLetter();
-            stateMachine.setState(stateMachine.getTypingState());
+            context.setState(context.getTypingState());
         }
     }
 }

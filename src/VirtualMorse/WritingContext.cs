@@ -5,7 +5,7 @@ using System.Windows.Forms;
 using VirtualMorse;
 using VirtualMorse.State_Machine;
 
-public class StateMachine
+public class WritingContext
 {
     RichTextBox textBox;
 
@@ -24,7 +24,7 @@ public class StateMachine
     string directory;
     string file = "test.txt";
 
-    public StateMachine()
+    public WritingContext()
     {
         textBox = new RichTextBox();
         textBox.Dock = DockStyle.Fill;

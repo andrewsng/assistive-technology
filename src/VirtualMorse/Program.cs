@@ -9,18 +9,18 @@ namespace VirtualMorse
 {
     public class Program : Form
     {
-        public StateMachine stateMachine;
+        public WritingContext context;
         public static string programName = "Virtual Morse";
         public static string programVersion = "2023";
 
         public Program()
         {
-            stateMachine = new StateMachine();
+            context = new WritingContext();
 
             this.Text = programName + " " + programVersion;
             this.StartPosition = FormStartPosition.CenterScreen;
             this.KeyPreview = true;
-            this.Controls.Add(stateMachine.getTextBox());
+            this.Controls.Add(context.getTextBox());
         }
 
         [STAThread]
