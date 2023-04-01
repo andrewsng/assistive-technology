@@ -21,8 +21,6 @@ public class TypingState : State
 		directory = AppDomain.CurrentDomain.BaseDirectory;
 		directory = directory.Replace("bin\\Debug\\", "Text_documents\\");
 		stateMachine.currentDocument = Function.readFullFile(directory, file)[0];
-		string[] words = stateMachine.currentDocument.Split(' ');
-		stateMachine.currentWord = words[words.Length - 1];
 	}
 
 	public override void dot()
@@ -42,21 +40,14 @@ public class TypingState : State
 		if(stateMachine.currentWord != "")
         {
 			stateMachine.currentDocument += stateMachine.currentWord;
-			Console.WriteLine("added word to file: " + stateMachine.currentWord);
-			string file = "test.txt";
-			using (StreamWriter writer = new StreamWriter(directory + file))
-			{
-				writer.WriteLine(directory);
-				writer.WriteLine("it do");
-			}
 			clearWord();
+            Console.WriteLine("added word to file: " + stateMachine.currentWord);
         }
         else
         {
 			stateMachine.currentDocument += " ";
 			Console.WriteLine("SPACE added to file");
         }
-		Function.addToFile(directory, file, stateMachine.currentDocument);
 	}
 
     public override void shift()
@@ -116,6 +107,7 @@ public class TypingState : State
     {
 		Console.WriteLine("save text doc as is");
 		Console.WriteLine("says 'now saving'");
+        Function.addToFile(directory, file, stateMachine.currentDocument);
     }
 
     public override void command()
