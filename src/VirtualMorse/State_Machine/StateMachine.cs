@@ -1,15 +1,22 @@
 ﻿using System;
 using System.Drawing;
+using System.Speech.Synthesis;
 using System.Windows.Forms;
+using VirtualMorse;
 using VirtualMorse.State_Machine;
 
 public class StateMachine
 {
     RichTextBox textBox;
 
+    FunctionKeyInput functionKeys;
+    // ArduinoInput arduino;
+
+    public SpeechSynthesizer speaker;
+
     State typingState;
 	State commandState;
-	State state;
+	State currentState;
 
     public string currentLetter = "";
     public string currentWord = "";
@@ -17,71 +24,90 @@ public class StateMachine
     string directory;
     string file = "test.txt";
 
-    public StateMachine(RichTextBox textBoxRef)
+    public StateMachine()
     {
-        textBox = textBoxRef;  // must be before typingState is constructed
+        textBox = new RichTextBox();
+        textBox.Dock = DockStyle.Fill;
+        textBox.SelectionFont = new Font("Arial", 16, FontStyle.Regular);
+        textBox.SelectionColor = Color.Black;
+        textBox.AutoWordSelection = false;
+        textBox.SelectionChanged += TextBox_SelectionChanged;
+
+        functionKeys = new FunctionKeyInput();
+        functionKeys.KeyPressed += Handler_InputReceived;
+        textBox.KeyDown += functionKeys.TextBox_KeyDown;
+
+        speaker = new SpeechSynthesizer();
+        speaker.SetOutputToDefaultAudioDevice();
+        speaker.SpeakAsync(Program.programName + " " + Program.programVersion);
 
         typingState = new TypingState(this);
         commandState = new CommandState(this);
-
-        //set initial state
-        state = typingState;
+        currentState = typingState;  //set initial state
 
         directory = AppDomain.CurrentDomain.BaseDirectory;
         directory = directory.Replace("bin\\Debug\\", "Text_documents\\");
         setDocument(( Function.readFullFile(directory, file) )[0]);
     }
 
-	//Initialize States
-	public void dot()
+    private void Handler_InputReceived(object sender, SwitchInputEventArgs e)
     {
-		state.dot();
+        Switch input = e.switchInput;
+        switch (input)
+        {
+            case Switch.Switch1:  // Fall through
+            case Switch.Switch9:
+                currentState.command();
+                break;
+            case Switch.Switch2:
+                currentState.shift();
+                break;
+            case Switch.Switch3:
+                currentState.save();
+                break;
+            case Switch.Switch4:
+                currentState.space();
+                break;
+            case Switch.Switch5:
+                currentState.dot();
+                break;
+            case Switch.Switch6:
+                currentState.dash();
+                break;
+            case Switch.Switch7:
+                currentState.enter();
+                break;
+            case Switch.Switch8:
+                currentState.backspace();
+                break;
+        }
+        Console.WriteLine("current letter: '" + getCurrentLetter() + "'");
+        Console.WriteLine("current word: '" + getCurrentWord() + "'");
+        Console.WriteLine("current document: '" + getDocument() + "'");
+        Console.WriteLine();
     }
 
-	public void dash()
+    private void TextBox_SelectionChanged(Object sender, EventArgs e)
     {
-		state.dash();
+        textBox.SelectionFont = new Font("Arial", 16, FontStyle.Regular);
+        textBox.SelectionColor = Color.Black;
     }
 
-	public void space()
+    //fetching / setting functions
+
+    public RichTextBox getTextBox()
     {
-		state.space();
+        return textBox;
     }
 
-	public void shift()
+    public void setState(State state)
     {
-		state.shift();
-    }
-
-	public void enter()
-    {
-		state.enter();
-    }
-
-	public void backspace()
-    {
-		state.backspace();
-    }
-
-	public void save()
-    {
-		state.save();
-    }
-
-	public void command()
-    {
-		state.command();
-    }
-
-	//fetching / setting functions for states
-	public void setState(State state)
-    {
-		this.state = state;
+		this.currentState = state;
     }
 
 	public State getState()
     {
-		return state;
+		return currentState;
     }
 
 	public State getTypingState()
