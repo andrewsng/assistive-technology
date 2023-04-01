@@ -5,11 +5,9 @@ public class TypingState : State
 {
 	protected StateMachine stateMachine;
 
-	protected string current_letter = "";
-    string last_letter = "";
-    string current_word = "";
-	string current_text_file = "";
-	bool is_Capitalized = false;
+    string lastLetter = "";
+    
+	bool isCapitalized = false;
 	string directory;
 	string file = "test.txt";
 
@@ -22,9 +20,9 @@ public class TypingState : State
 
 		directory = AppDomain.CurrentDomain.BaseDirectory;
 		directory = directory.Replace("bin\\Debug\\", "Text_documents\\");
-		current_text_file = Function.readFullFile(directory, file)[0];
-		string[] words = current_text_file.Split(' ');
-		current_word = words[words.Length - 1];
+		stateMachine.currentDocument = Function.readFullFile(directory, file)[0];
+		string[] words = stateMachine.currentDocument.Split(' ');
+		stateMachine.currentWord = words[words.Length - 1];
 	}
 
 	public override void dot()
@@ -41,10 +39,10 @@ public class TypingState : State
 
     public override void space()
     {
-		if(current_word != "")
+		if(stateMachine.currentWord != "")
         {
-			current_text_file += current_word;
-			Console.WriteLine("added word to file: " + current_word);
+			stateMachine.currentDocument += stateMachine.currentWord;
+			Console.WriteLine("added word to file: " + stateMachine.currentWord);
 			string file = "test.txt";
 			using (StreamWriter writer = new StreamWriter(directory + file))
 			{
@@ -55,34 +53,34 @@ public class TypingState : State
         }
         else
         {
-			current_text_file += " ";
+			stateMachine.currentDocument += " ";
 			Console.WriteLine("SPACE added to file");
         }
-		Function.addToFile(directory, file, current_text_file);
+		Function.addToFile(directory, file, stateMachine.currentDocument);
 	}
 
     public override void shift()
     {
 		toggleCapitalized();
-		Console.WriteLine("capitalization set to: " + is_Capitalized);
+		Console.WriteLine("capitalization set to: " + isCapitalized);
 	}
 
     public override void enter()
     {
-		if (current_letter == "" && last_letter != "")
+		if (stateMachine.currentLetter == "" && lastLetter != "")
 		{
-            addLetterToWord(last_letter);
-            Console.WriteLine("added letter: " + last_letter);
+            addLetterToWord(lastLetter);
+            Console.WriteLine("added letter: " + lastLetter);
         }
 		else
         {
-            string c = Function.morseToText(current_letter);
+            string c = Function.morseToText(stateMachine.currentLetter);
             if (c != "")
             {
-                if (is_Capitalized)
+                if (isCapitalized)
                 {
                     c = c.ToUpper();
-                    is_Capitalized = false;
+                    isCapitalized = false;
                 }
                 addLetterToWord(c);
                 Console.WriteLine("added letter: " + c);
@@ -97,19 +95,19 @@ public class TypingState : State
 
     public override void backspace()
     {
-		if (current_letter.Length > 0)
+		if (stateMachine.currentLetter.Length > 0)
 		{
 			clearLetter();
             Console.WriteLine("Clearing morse symbols");
         }
-		else if (current_word.Length > 0)
+		else if (stateMachine.currentWord.Length > 0)
 		{
-			current_word = current_word.Remove(current_word.Length - 1, 1);
+			stateMachine.currentWord = stateMachine.currentWord.Remove(stateMachine.currentWord.Length - 1, 1);
 			Console.WriteLine("Delete");
 		}
-		else if (current_text_file.Length > 0)
+		else if (stateMachine.currentDocument.Length > 0)
 		{
-			current_text_file = current_text_file.Remove(current_text_file.Length - 1, 1);
+			stateMachine.currentDocument = stateMachine.currentDocument.Remove(stateMachine.currentDocument.Length - 1, 1);
 			Console.WriteLine("Backspace");
 		}
 	}
@@ -128,44 +126,44 @@ public class TypingState : State
 
 	public override string getCurrentWord()
 	{
-		return current_word;
+		return stateMachine.currentWord;
 	}
 
 	public override string getCurrentLetter()
 	{
-		return current_letter;
+		return stateMachine.currentLetter;
 	}
 
 	public override string getFile()
 	{
-		return current_text_file;
+		return stateMachine.currentDocument;
 	}
 
 	//helper functions
 	public void addDot()
 	{
-		current_letter += '.';
+		stateMachine.currentLetter += '.';
 	}
 
 	public void addDash()
 	{
-		current_letter += '-';
+		stateMachine.currentLetter += '-';
 	}
 
 	public void clearLetter()
 	{
-		current_letter = "";
+		stateMachine.currentLetter = "";
 	}
 
 	public void addLetterToWord(string c)
 	{
-		current_word += c;
-		last_letter = c;
+		stateMachine.currentWord += c;
+		lastLetter = c;
 		clearLetter();
 	}
 	public void clearWord()
 	{
-		current_word = "";
+		stateMachine.currentWord = "";
 	}
 
 	//retrival / setting functions for member variables
@@ -173,6 +171,6 @@ public class TypingState : State
 
 	public void toggleCapitalized()
 	{
-		is_Capitalized = !is_Capitalized;
+		isCapitalized = !isCapitalized;
 	}
 }

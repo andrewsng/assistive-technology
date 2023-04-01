@@ -33,7 +33,7 @@ namespace VirtualMorse.State_Machine
 
         public override void enter()
         {
-            string c = Function.morseToText(current_letter);
+            string c = Function.morseToText(stateMachine.currentLetter);
             if (c != "")
             {
                 Console.WriteLine("Valid letter");

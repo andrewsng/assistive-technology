@@ -8,8 +8,11 @@ public class StateMachine
 
 	State state;
 
-	
-	public StateMachine()
+    public string currentLetter = "";
+    public string currentWord = "";
+    public string currentDocument = "";
+
+    public StateMachine()
 	{
 		typingState = new TypingState(this);
         commandState = new CommandState(this);
