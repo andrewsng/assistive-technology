@@ -11,7 +11,7 @@ namespace VirtualMorse
 {
     public class ProgramForm : Form
     {
-        public StateMachine stateMachine = new StateMachine();
+        public StateMachine stateMachine;
         public FunctionKeyInput fKeys = new FunctionKeyInput();
         public InputHandler handler = new InputHandler();
         public RichTextBox textBox;
@@ -24,10 +24,13 @@ namespace VirtualMorse
 
             textBox = new RichTextBox();
             textBox.Dock = DockStyle.Fill;
-            textBox.SelectionFont = new Font("Arial", 12, FontStyle.Regular);
+            textBox.SelectionFont = new Font("Arial", 16, FontStyle.Regular);
             textBox.SelectionColor = Color.Black;
             textBox.AutoWordSelection = false;
             textBox.KeyDown += fKeys.TextBox_KeyDown;
+            textBox.SelectionChanged += TextBox_SelectionChanged;
+
+            stateMachine = new StateMachine(textBox);
 
             this.Text = versionStr;
             this.StartPosition = FormStartPosition.CenterScreen;
@@ -95,6 +98,12 @@ namespace VirtualMorse
             Console.WriteLine("current word: '" + stateMachine.getCurrentWord() + "'");
             Console.WriteLine("current document: '" + stateMachine.getFile() + "'");
             Console.WriteLine();
+        }
+
+        private void TextBox_SelectionChanged(Object sender, EventArgs e)
+        {
+            textBox.SelectionFont = new Font("Arial", 16, FontStyle.Regular);
+            textBox.SelectionColor = Color.Black;
         }
 
         [STAThread]

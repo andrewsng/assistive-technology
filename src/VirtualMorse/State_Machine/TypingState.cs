@@ -20,7 +20,7 @@ public class TypingState : State
 
 		directory = AppDomain.CurrentDomain.BaseDirectory;
 		directory = directory.Replace("bin\\Debug\\", "Text_documents\\");
-		stateMachine.currentDocument = Function.readFullFile(directory, file)[0];
+		stateMachine.setDocument(( Function.readFullFile(directory, file) )[0]);
 	}
 
 	public override void dot()
@@ -39,14 +39,14 @@ public class TypingState : State
     {
 		if(stateMachine.currentWord != "")
         {
-			stateMachine.currentDocument += stateMachine.currentWord;
+			stateMachine.appendToDocument(stateMachine.currentWord);
 			clearWord();
             Console.WriteLine("added word to file: " + stateMachine.currentWord);
         }
         else
         {
-			stateMachine.currentDocument += " ";
-			Console.WriteLine("SPACE added to file");
+            stateMachine.appendToDocument(" ");
+            Console.WriteLine("SPACE added to file");
         }
 	}
 
@@ -96,9 +96,9 @@ public class TypingState : State
 			stateMachine.currentWord = stateMachine.currentWord.Remove(stateMachine.currentWord.Length - 1, 1);
 			Console.WriteLine("Delete");
 		}
-		else if (stateMachine.currentDocument.Length > 0)
+		else
 		{
-			stateMachine.currentDocument = stateMachine.currentDocument.Remove(stateMachine.currentDocument.Length - 1, 1);
+			stateMachine.backspaceDocument();
 			Console.WriteLine("Backspace");
 		}
 	}

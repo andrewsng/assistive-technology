@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Drawing;
+using System.Windows.Forms;
 using VirtualMorse.State_Machine;
 
 public class StateMachine
@@ -8,13 +10,17 @@ public class StateMachine
 
 	State state;
 
+	RichTextBox textBox;
+
     public string currentLetter = "";
     public string currentWord = "";
     public string currentDocument = "";
 
-    public StateMachine()
-	{
-		typingState = new TypingState(this);
+    public StateMachine(RichTextBox textBoxRef)
+    {
+        textBox = textBoxRef;  // must be before typingState is constructed
+
+        typingState = new TypingState(this);
         commandState = new CommandState(this);
 
         //set initial state
@@ -98,6 +104,31 @@ public class StateMachine
 		return state.getFile();
 	}
 
+	public void setDocument(string text)
+	{
+        textBox.Focus();
+        textBox.SelectionStart = 0;
+        textBox.SelectionLength = textBox.TextLength;
+        textBox.SelectedText = text;
+    }
 
+	public void appendToDocument(string text)
+	{
+		textBox.Focus();
+		textBox.SelectionStart = textBox.TextLength;
+		textBox.SelectionLength = 0;
+        textBox.SelectedText = text;
+	}
+
+    public void backspaceDocument()
+    {
+        if (textBox.TextLength > 0)
+        {
+            textBox.Focus();
+            textBox.SelectionStart = textBox.TextLength - 1;
+            textBox.SelectionLength = 1;
+            textBox.SelectedText = "";
+        }
+    }
 
 }
