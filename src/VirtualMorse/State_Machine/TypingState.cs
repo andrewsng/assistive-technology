@@ -6,21 +6,12 @@ public class TypingState : State
 	protected StateMachine stateMachine;
 
     string lastLetter = "";
-    
 	bool isCapitalized = false;
-	string directory;
-	string file = "test.txt";
-
-
 
 	//state functions
 	public TypingState(StateMachine stateMachine)
 	{
 		this.stateMachine = stateMachine;
-
-		directory = AppDomain.CurrentDomain.BaseDirectory;
-		directory = directory.Replace("bin\\Debug\\", "Text_documents\\");
-		stateMachine.setDocument(( Function.readFullFile(directory, file) )[0]);
 	}
 
 	public override void dot()
@@ -107,7 +98,7 @@ public class TypingState : State
     {
 		Console.WriteLine("save text doc as is");
 		Console.WriteLine("says 'now saving'");
-        Function.addToFile(directory, file, stateMachine.getDocument());
+		stateMachine.saveDocumentFile();
     }
 
     public override void command()
@@ -142,9 +133,6 @@ public class TypingState : State
 	{
 		stateMachine.currentWord = "";
 	}
-
-	//retrival / setting functions for member variables
-
 
 	public void toggleCapitalized()
 	{

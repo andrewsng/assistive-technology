@@ -5,15 +5,17 @@ using VirtualMorse.State_Machine;
 
 public class StateMachine
 {
-	State typingState;
+    RichTextBox textBox;
+
+    State typingState;
 	State commandState;
-
 	State state;
-
-	RichTextBox textBox;
 
     public string currentLetter = "";
     public string currentWord = "";
+
+    string directory;
+    string file = "test.txt";
 
     public StateMachine(RichTextBox textBoxRef)
     {
@@ -24,7 +26,11 @@ public class StateMachine
 
         //set initial state
         state = typingState;
-	}
+
+        directory = AppDomain.CurrentDomain.BaseDirectory;
+        directory = directory.Replace("bin\\Debug\\", "Text_documents\\");
+        setDocument(( Function.readFullFile(directory, file) )[0]);
+    }
 
 	//Initialize States
 	public void dot()
@@ -130,4 +136,8 @@ public class StateMachine
         }
     }
 
+    public void saveDocumentFile()
+    {
+        Function.addToFile(directory, file, getDocument());
+    }
 }
