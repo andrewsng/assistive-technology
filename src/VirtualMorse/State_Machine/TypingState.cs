@@ -6,7 +6,8 @@ public class TypingState : State
 	protected StateMachine stateMachine;
 
 	protected string current_letter = "";
-	string current_word = "";
+    string last_letter = "";
+    string current_word = "";
 	string current_text_file = "";
 	bool is_Capitalized = false;
 	string directory;
@@ -68,21 +69,29 @@ public class TypingState : State
 
     public override void enter()
     {
-		string c = Function.morseToText(current_letter);
-		if (c != "")
+		if (current_letter == "" && last_letter != "")
+		{
+            addLetterToWord(last_letter);
+            Console.WriteLine("added letter: " + last_letter);
+        }
+		else
         {
-			if (is_Capitalized)
-			{
-				c = c.ToUpper();
-				is_Capitalized = false;
-			}
-			addLetterToWord(c);
-			Console.WriteLine("added letter: " + c);
-		}
-        else
-        {
-			clearLetter();
-			Console.WriteLine("not a valid letter, try again");
+            string c = Function.morseToText(current_letter);
+            if (c != "")
+            {
+                if (is_Capitalized)
+                {
+                    c = c.ToUpper();
+                    is_Capitalized = false;
+                }
+                addLetterToWord(c);
+                Console.WriteLine("added letter: " + c);
+            }
+            else
+            {
+                clearLetter();
+                Console.WriteLine("not a valid letter, try again");
+            }
         }
 	}
 
@@ -151,7 +160,8 @@ public class TypingState : State
 	public void addLetterToWord(string c)
 	{
 		current_word += c;
-		current_letter = "";
+		last_letter = c;
+		clearLetter();
 	}
 	public void clearWord()
 	{
