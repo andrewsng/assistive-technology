@@ -45,20 +45,4 @@ public class State
     {
 
     }
-
-    public virtual string getCurrentWord()
-    {
-        return "ERROR: GETCURRENTWORD NOT IMPLEMENTED IN CURRENT STATE";
-    }
-
-    public virtual string getCurrentLetter()
-    {
-        return "ERROR: GETCURRENTLETTERNOT IMPLEMENTED IN CURRENT STATE";
-    }
-
-    public virtual string getFile()
-    {
-        return "ERROR: GETFILE NOT IMPLEMENT IN CURRENT STATE";
-    }
-
 }

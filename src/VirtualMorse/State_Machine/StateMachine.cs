@@ -90,12 +90,12 @@ public class StateMachine
 
 	public  string getCurrentWord()
 	{
-		return state.getCurrentWord();
+		return currentWord;
 	}
 
 	public  string getCurrentLetter()
 	{
-		return state.getCurrentLetter();
+		return currentLetter;
 	}
 
 	public  string getDocument()

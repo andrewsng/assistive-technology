@@ -116,21 +116,6 @@ public class TypingState : State
 		stateMachine.setState(stateMachine.getCommandState());
     }
 
-	public override string getCurrentWord()
-	{
-		return stateMachine.currentWord;
-	}
-
-	public override string getCurrentLetter()
-	{
-		return stateMachine.currentLetter;
-	}
-
-	public override string getFile()
-	{
-		return stateMachine.getDocument();
-	}
-
 	//helper functions
 	public void addDot()
 	{
