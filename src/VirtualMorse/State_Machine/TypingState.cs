@@ -107,7 +107,7 @@ public class TypingState : State
     {
 		Console.WriteLine("save text doc as is");
 		Console.WriteLine("says 'now saving'");
-        Function.addToFile(directory, file, stateMachine.currentDocument);
+        Function.addToFile(directory, file, stateMachine.getDocument());
     }
 
     public override void command()
@@ -128,7 +128,7 @@ public class TypingState : State
 
 	public override string getFile()
 	{
-		return stateMachine.currentDocument;
+		return stateMachine.getDocument();
 	}
 
 	//helper functions

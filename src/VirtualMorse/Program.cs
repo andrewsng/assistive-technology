@@ -96,7 +96,7 @@ namespace VirtualMorse
             }
             Console.WriteLine("current letter: '" + stateMachine.getCurrentLetter() + "'");
             Console.WriteLine("current word: '" + stateMachine.getCurrentWord() + "'");
-            Console.WriteLine("current document: '" + stateMachine.getFile() + "'");
+            Console.WriteLine("current document: '" + stateMachine.getDocument() + "'");
             Console.WriteLine();
         }
 

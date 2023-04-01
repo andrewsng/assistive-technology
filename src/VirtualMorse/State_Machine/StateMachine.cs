@@ -14,7 +14,6 @@ public class StateMachine
 
     public string currentLetter = "";
     public string currentWord = "";
-    public string currentDocument = "";
 
     public StateMachine(RichTextBox textBoxRef)
     {
@@ -99,9 +98,9 @@ public class StateMachine
 		return state.getCurrentLetter();
 	}
 
-	public  string getFile()
+	public  string getDocument()
 	{
-		return state.getFile();
+		return textBox.Text;
 	}
 
 	public void setDocument(string text)
