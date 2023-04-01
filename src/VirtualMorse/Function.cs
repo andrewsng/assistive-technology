@@ -2,98 +2,101 @@
 using System.Collections.Generic;
 using System.IO;
 
-public static class Function
+namespace VirtualMorse
 {
-    static Dictionary<string, string> morse_map = new Dictionary<string, string>() {
-    {".-", "a"},
-    {"-...", "b"},
-    {"-.-.", "c"},
-    {"-..", "d"},
-    {".", "e"},
-    {"..-.", "f"},
-    {"--.", "g"},
-    {"....", "h"},
-    {"..", "i"},
-    {".---", "j"},
-    {"-.-", "k"},
-    {".-..", "l"},
-    {"--", "m"},
-    {"-.", "n"},
-    {"---", "o"},
-    {".--.", "p"},
-    {"--.-", "q"},
-    {".-.", "r"},
-    {"...", "s"},
-    {"-", "t"},
-    {"..-", "u"},
-    {"...-", "v"},
-    {".--", "w"},
-    {"-..-", "x"},
-    {"-.--", "y"},
-    {"--..", "z"}
-    };
-
-    public static string morseToText(string morse)
+    public static class Function
     {
-        if (morse_map.ContainsKey(morse))
-            return morse_map[morse];
-        else
-            return "";
-    }
+        static Dictionary<string, string> morse_map = new Dictionary<string, string>() {
+        {".-", "a"},
+        {"-...", "b"},
+        {"-.-.", "c"},
+        {"-..", "d"},
+        {".", "e"},
+        {"..-.", "f"},
+        {"--.", "g"},
+        {"....", "h"},
+        {"..", "i"},
+        {".---", "j"},
+        {"-.-", "k"},
+        {".-..", "l"},
+        {"--", "m"},
+        {"-.", "n"},
+        {"---", "o"},
+        {".--.", "p"},
+        {"--.-", "q"},
+        {".-.", "r"},
+        {"...", "s"},
+        {"-", "t"},
+        {"..-", "u"},
+        {"...-", "v"},
+        {".--", "w"},
+        {"-..-", "x"},
+        {"-.--", "y"},
+        {"--..", "z"}
+        };
 
-    public static void parseCommand(string command)
-    {
-        switch (command)
+        public static string morseToText(string morse)
         {
-            case "l":
-                Console.WriteLine("read last sentence");
-                break;
-            case "g":
-                Console.WriteLine("checks email");
-                break;
-            case "d":
-                Console.WriteLine("deletes email");
-                break;
-            case "h":
-                Console.WriteLine("read email headers");
-                break;
-            case "r":
-                Console.WriteLine("reads email");
-                break;
-            case "y":
-                Console.WriteLine("reply to email");
-                break;
-            case "n":
-                Console.WriteLine("adds email address nickname");
-                break;
-            case "a":
-                Console.WriteLine("ties email address to nickname");
-                break;
-            default:
-                Console.WriteLine("invalid command");
-                break;
+            if (morse_map.ContainsKey(morse))
+                return morse_map[morse];
+            else
+                return "";
         }
-    }
 
-    public static void addToFile(string directory, string file, string text)
-    {
-
-        using (StreamWriter writer = new StreamWriter(directory + file))
+        public static void parseCommand(string command)
         {
-            writer.WriteLine(text);
-        }
-    }
-    public static List<string> readFullFile(string directory, string file)
-    {
-        List<string> return_string = new List<string>();
-        using (StreamReader reader = new StreamReader(directory + file))
-        {
-            string line;
-            while((line = reader.ReadLine()) != null)
+            switch (command)
             {
-                return_string.Add(line);
+                case "l":
+                    Console.WriteLine("read last sentence");
+                    break;
+                case "g":
+                    Console.WriteLine("checks email");
+                    break;
+                case "d":
+                    Console.WriteLine("deletes email");
+                    break;
+                case "h":
+                    Console.WriteLine("read email headers");
+                    break;
+                case "r":
+                    Console.WriteLine("reads email");
+                    break;
+                case "y":
+                    Console.WriteLine("reply to email");
+                    break;
+                case "n":
+                    Console.WriteLine("adds email address nickname");
+                    break;
+                case "a":
+                    Console.WriteLine("ties email address to nickname");
+                    break;
+                default:
+                    Console.WriteLine("invalid command");
+                    break;
             }
         }
-        return return_string;
+
+        public static void addToFile(string directory, string file, string text)
+        {
+
+            using (StreamWriter writer = new StreamWriter(directory + file))
+            {
+                writer.WriteLine(text);
+            }
+        }
+        public static List<string> readFullFile(string directory, string file)
+        {
+            List<string> return_string = new List<string>();
+            using (StreamReader reader = new StreamReader(directory + file))
+            {
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    return_string.Add(line);
+                }
+            }
+            return return_string;
+        }
     }
 }

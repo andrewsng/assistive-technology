@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace VirtualMorse
+namespace VirtualMorse.Input
 {
     public enum Switch
     {

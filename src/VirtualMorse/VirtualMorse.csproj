@@ -49,7 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Function.cs" />
-    <Compile Include="Inputs\FunctionKeyInput.cs" />
+    <Compile Include="Input\FunctionKeyInput.cs" />
     <Compile Include="Program.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -58,8 +58,8 @@
     <Compile Include="States\State.cs" />
     <Compile Include="WritingContext.cs" />
     <Compile Include="States\TypingState.cs" />
-    <Compile Include="Inputs\Switch.cs" />
-    <Compile Include="Inputs\SwitchInputEventArgs.cs" />
+    <Compile Include="Input\Switch.cs" />
+    <Compile Include="Input\SwitchInputEventArgs.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include=".vs\VirtualMorse\v17\" />

@@ -2,168 +2,171 @@
 using System.Drawing;
 using System.Speech.Synthesis;
 using System.Windows.Forms;
-using VirtualMorse;
-using VirtualMorse.State_Machine;
+using VirtualMorse.States;
+using VirtualMorse.Input;
 
-public class WritingContext
+namespace VirtualMorse
 {
-    RichTextBox textBox;
-
-    FunctionKeyInput functionKeys;
-    // ArduinoInput arduino;
-
-    public SpeechSynthesizer speaker;
-
-    State typingState;
-	State commandState;
-	State currentState;
-
-    public string currentLetter = "";
-    public string currentWord = "";
-
-    string directory;
-    string file = "test.txt";
-
-    public WritingContext()
+    public class WritingContext
     {
-        textBox = new RichTextBox();
-        textBox.Dock = DockStyle.Fill;
-        textBox.SelectionFont = new Font("Arial", 16, FontStyle.Regular);
-        textBox.SelectionColor = Color.Black;
-        textBox.AutoWordSelection = false;
-        textBox.SelectionChanged += TextBox_SelectionChanged;
+        RichTextBox textBox;
 
-        functionKeys = new FunctionKeyInput();
-        functionKeys.KeyPressed += Handler_InputReceived;
-        textBox.KeyDown += functionKeys.TextBox_KeyDown;
+        FunctionKeyInput functionKeys;
+        // ArduinoInput arduino;
 
-        speaker = new SpeechSynthesizer();
-        speaker.SetOutputToDefaultAudioDevice();
-        speaker.SpeakAsync(Program.programName + " " + Program.programVersion);
+        public SpeechSynthesizer speaker;
 
-        typingState = new TypingState(this);
-        commandState = new CommandState(this);
-        currentState = typingState;  //set initial state
+        State typingState;
+        State commandState;
+        State currentState;
 
-        directory = AppDomain.CurrentDomain.BaseDirectory;
-        directory = directory.Replace("bin\\Debug\\", "Text_documents\\");
-        setDocument(( Function.readFullFile(directory, file) )[0]);
-    }
+        public string currentLetter = "";
+        public string currentWord = "";
 
-    private void Handler_InputReceived(object sender, SwitchInputEventArgs e)
-    {
-        Switch input = e.switchInput;
-        switch (input)
+        string directory;
+        string file = "test.txt";
+
+        public WritingContext()
         {
-            case Switch.Switch1:  // Fall through
-            case Switch.Switch9:
-                currentState.command();
-                break;
-            case Switch.Switch2:
-                currentState.shift();
-                break;
-            case Switch.Switch3:
-                currentState.save();
-                break;
-            case Switch.Switch4:
-                currentState.space();
-                break;
-            case Switch.Switch5:
-                currentState.dot();
-                break;
-            case Switch.Switch6:
-                currentState.dash();
-                break;
-            case Switch.Switch7:
-                currentState.enter();
-                break;
-            case Switch.Switch8:
-                currentState.backspace();
-                break;
+            textBox = new RichTextBox();
+            textBox.Dock = DockStyle.Fill;
+            textBox.SelectionFont = new Font("Arial", 16, FontStyle.Regular);
+            textBox.SelectionColor = Color.Black;
+            textBox.AutoWordSelection = false;
+            textBox.SelectionChanged += TextBox_SelectionChanged;
+
+            functionKeys = new FunctionKeyInput();
+            functionKeys.KeyPressed += Handler_InputReceived;
+            textBox.KeyDown += functionKeys.TextBox_KeyDown;
+
+            speaker = new SpeechSynthesizer();
+            speaker.SetOutputToDefaultAudioDevice();
+            speaker.SpeakAsync(Program.programName + " " + Program.programVersion);
+
+            typingState = new TypingState(this);
+            commandState = new CommandState(this);
+            currentState = typingState;  //set initial state
+
+            directory = AppDomain.CurrentDomain.BaseDirectory;
+            directory = directory.Replace("bin\\Debug\\", "Text_documents\\");
+            setDocument((Function.readFullFile(directory, file))[0]);
         }
-        Console.WriteLine("current letter: '" + getCurrentLetter() + "'");
-        Console.WriteLine("current word: '" + getCurrentWord() + "'");
-        Console.WriteLine("current document: '" + getDocument() + "'");
-        Console.WriteLine();
-    }
 
-    private void TextBox_SelectionChanged(Object sender, EventArgs e)
-    {
-        textBox.SelectionFont = new Font("Arial", 16, FontStyle.Regular);
-        textBox.SelectionColor = Color.Black;
-    }
+        private void Handler_InputReceived(object sender, SwitchInputEventArgs e)
+        {
+            Switch input = e.switchInput;
+            switch (input)
+            {
+                case Switch.Switch1:  // Fall through
+                case Switch.Switch9:
+                    currentState.command();
+                    break;
+                case Switch.Switch2:
+                    currentState.shift();
+                    break;
+                case Switch.Switch3:
+                    currentState.save();
+                    break;
+                case Switch.Switch4:
+                    currentState.space();
+                    break;
+                case Switch.Switch5:
+                    currentState.dot();
+                    break;
+                case Switch.Switch6:
+                    currentState.dash();
+                    break;
+                case Switch.Switch7:
+                    currentState.enter();
+                    break;
+                case Switch.Switch8:
+                    currentState.backspace();
+                    break;
+            }
+            Console.WriteLine("current letter: '" + getCurrentLetter() + "'");
+            Console.WriteLine("current word: '" + getCurrentWord() + "'");
+            Console.WriteLine("current document: '" + getDocument() + "'");
+            Console.WriteLine();
+        }
 
-    //fetching / setting functions
+        private void TextBox_SelectionChanged(Object sender, EventArgs e)
+        {
+            textBox.SelectionFont = new Font("Arial", 16, FontStyle.Regular);
+            textBox.SelectionColor = Color.Black;
+        }
 
-    public RichTextBox getTextBox()
-    {
-        return textBox;
-    }
+        //fetching / setting functions
 
-    public void setState(State state)
-    {
-		this.currentState = state;
-    }
+        public RichTextBox getTextBox()
+        {
+            return textBox;
+        }
 
-	public State getState()
-    {
-		return currentState;
-    }
+        public void setState(State state)
+        {
+            this.currentState = state;
+        }
 
-	public State getTypingState()
-    {
-		return typingState;
-    }
+        public State getState()
+        {
+            return currentState;
+        }
 
-	public State getCommandState()
-    {
-		return commandState;
-    }
+        public State getTypingState()
+        {
+            return typingState;
+        }
 
-	public  string getCurrentWord()
-	{
-		return currentWord;
-	}
+        public State getCommandState()
+        {
+            return commandState;
+        }
 
-	public  string getCurrentLetter()
-	{
-		return currentLetter;
-	}
+        public string getCurrentWord()
+        {
+            return currentWord;
+        }
 
-	public  string getDocument()
-	{
-		return textBox.Text;
-	}
+        public string getCurrentLetter()
+        {
+            return currentLetter;
+        }
 
-	public void setDocument(string text)
-	{
-        textBox.Focus();
-        textBox.SelectionStart = 0;
-        textBox.SelectionLength = textBox.TextLength;
-        textBox.SelectedText = text;
-    }
+        public string getDocument()
+        {
+            return textBox.Text;
+        }
 
-	public void appendToDocument(string text)
-	{
-		textBox.Focus();
-		textBox.SelectionStart = textBox.TextLength;
-		textBox.SelectionLength = 0;
-        textBox.SelectedText = text;
-	}
-
-    public void backspaceDocument()
-    {
-        if (textBox.TextLength > 0)
+        public void setDocument(string text)
         {
             textBox.Focus();
-            textBox.SelectionStart = textBox.TextLength - 1;
-            textBox.SelectionLength = 1;
-            textBox.SelectedText = "";
+            textBox.SelectionStart = 0;
+            textBox.SelectionLength = textBox.TextLength;
+            textBox.SelectedText = text;
         }
-    }
 
-    public void saveDocumentFile()
-    {
-        Function.addToFile(directory, file, getDocument());
+        public void appendToDocument(string text)
+        {
+            textBox.Focus();
+            textBox.SelectionStart = textBox.TextLength;
+            textBox.SelectionLength = 0;
+            textBox.SelectedText = text;
+        }
+
+        public void backspaceDocument()
+        {
+            if (textBox.TextLength > 0)
+            {
+                textBox.Focus();
+                textBox.SelectionStart = textBox.TextLength - 1;
+                textBox.SelectionLength = 1;
+                textBox.SelectedText = "";
+            }
+        }
+
+        public void saveDocumentFile()
+        {
+            Function.addToFile(directory, file, getDocument());
+        }
     }
 }

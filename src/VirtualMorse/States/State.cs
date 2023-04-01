@@ -1,48 +1,51 @@
 ﻿using System;
 
-public class State
+namespace VirtualMorse.States
 {
-	public State()
-	{
-	}
-
-	public virtual void shift()
+    public class State
     {
+        public State()
+        {
+        }
 
-    }
+        public virtual void shift()
+        {
 
-	public virtual void command()
-    {
+        }
 
-    }
+        public virtual void command()
+        {
 
-	public virtual void save()
-    {
+        }
 
-    }
+        public virtual void save()
+        {
 
-    public virtual void space() 
-    {  
-    
-    }
+        }
 
-    public virtual void dot()
-    {
+        public virtual void space()
+        {
 
-    }
+        }
 
-    public virtual void dash()
-    {
+        public virtual void dot()
+        {
 
-    }
+        }
 
-    public virtual void enter()
-    {
+        public virtual void dash()
+        {
 
-    }
+        }
 
-    public virtual void backspace()
-    {
+        public virtual void enter()
+        {
 
+        }
+
+        public virtual void backspace()
+        {
+
+        }
     }
 }
