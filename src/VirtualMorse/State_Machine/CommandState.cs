@@ -14,11 +14,13 @@ namespace VirtualMorse.State_Machine
         public override void shift()
         {
             Console.WriteLine("Print page");
+            command();
         }
 
         public override void save()
         {
             Console.WriteLine("Clear document");
+            command();
         }
 
         public override void space()
