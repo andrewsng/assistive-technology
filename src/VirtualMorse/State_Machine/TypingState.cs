@@ -100,19 +100,16 @@ public class TypingState : State
 		if (current_letter.Length > 0)
 		{
 			clearLetter();
-            Console.WriteLine("Clearing morse string");
+            Console.WriteLine("Clearing morse symbols");
         }
 		else if (current_word.Length > 0)
 		{
 			current_word = current_word.Remove(current_word.Length - 1, 1);
-			Console.WriteLine("Deleting last letter of current word");
+			Console.WriteLine("Delete");
 		}
 		else if (current_text_file.Length > 0)
 		{
 			current_text_file = current_text_file.Remove(current_text_file.Length - 1, 1);
-			string[] words = current_text_file.Split(' ');
-			current_word = words[words.Length - 1];
-			current_text_file = current_text_file.Remove(current_text_file.Length - current_word.Length, current_word.Length);
 			Console.WriteLine("Backspace");
 		}
 	}
