@@ -50,30 +50,38 @@ namespace VirtualMorse.States
 
 		public override void enter()
 		{
+			string spokenMessage;
 			if (context.currentLetter == "" && lastLetter != "")
 			{
 				addLetterToWord(lastLetter);
 				Console.WriteLine("added letter: " + lastLetter);
+				spokenMessage = lastLetter;
 			}
 			else
 			{
 				string c = Function.morseToText(context.currentLetter);
 				if (c != "")
 				{
+					string message = c;
 					if (isCapitalized)
 					{
 						c = c.ToUpper();
 						isCapitalized = false;
-					}
+						message = "Capital " + message;
+                    }
 					addLetterToWord(c);
 					Console.WriteLine("added letter: " + c);
-				}
+					spokenMessage = c;
+                }
 				else
 				{
 					clearLetter();
 					Console.WriteLine("not a valid letter, try again");
+					context.speaker.SpeakAsync("Try again.");
+					spokenMessage = "Try again";
 				}
 			}
+			speak(spokenMessage);
 		}
 
 		public override void backspace()
@@ -129,7 +137,7 @@ namespace VirtualMorse.States
 			context.currentWord += c;
 			lastLetter = c;
 			clearLetter();
-		}
+        }
 		public void clearWord()
 		{
 			context.currentWord = "";
@@ -139,5 +147,20 @@ namespace VirtualMorse.States
 		{
 			isCapitalized = !isCapitalized;
 		}
+
+		public void speak(string message)
+		{
+			context.speaker.SpeakAsync(message);
+		}
+
+		public void speakLetter(string letter)
+		{
+            string message = letter;
+            if (Char.IsUpper(letter, 0))
+            {
+                message = "Capital " + letter;
+            }
+            context.speaker.SpeakAsync(message);
+        }
 	}
 }
