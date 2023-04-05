@@ -18,6 +18,7 @@ namespace VirtualMorse
             context = new WritingContext();
 
             this.Text = programName + " " + programVersion;
+            this.Size = new System.Drawing.Size(1024, 512);
             this.StartPosition = FormStartPosition.CenterScreen;
             this.KeyPreview = true;
             this.Controls.Add(context.getTextBox());
