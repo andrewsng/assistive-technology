@@ -16,8 +16,6 @@ Senior Capstone project from the Spring 2023 semester at UAF.
 
 ## Architecture Diagram
 
-- TODO
+![virtual-morse-2023-architecture drawio](https://user-images.githubusercontent.com/7608183/229966361-763fa2c2-2b47-4412-b91c-25b4cc0ce920.svg)
 
 ## Testing Plan
-
-- TODO
