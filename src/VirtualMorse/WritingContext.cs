@@ -31,10 +31,9 @@ namespace VirtualMorse
         {
             textBox = new RichTextBox();
             textBox.Dock = DockStyle.Fill;
-            textBox.SelectionFont = new Font("Arial", 16, FontStyle.Regular);
-            textBox.SelectionColor = Color.Black;
             textBox.AutoWordSelection = false;
-            textBox.SelectionChanged += TextBox_SelectionChanged;
+            textBox.Font = new Font("Arial", 16, FontStyle.Regular);
+            textBox.ForeColor = Color.Black;
 
             functionKeys = new FunctionKeyInput();
             functionKeys.KeyPressed += Handler_InputReceived;
@@ -53,8 +52,8 @@ namespace VirtualMorse
             List<string> fileContents = Function.readFullFile(directory, file);
             if (fileContents.Count > 0)
             {
-            setDocument((Function.readFullFile(directory, file))[0]);
-        }
+                setDocument((Function.readFullFile(directory, file))[0]);
+            }
         }
 
         private void Handler_InputReceived(object sender, SwitchInputEventArgs e)
@@ -92,12 +91,6 @@ namespace VirtualMorse
             Console.WriteLine("current word: '" + getCurrentWord() + "'");
             Console.WriteLine("current document: '" + getDocument() + "'");
             Console.WriteLine();
-        }
-
-        private void TextBox_SelectionChanged(Object sender, EventArgs e)
-        {
-            textBox.SelectionFont = new Font("Arial", 16, FontStyle.Regular);
-            textBox.SelectionColor = Color.Black;
         }
 
         //fetching / setting functions
