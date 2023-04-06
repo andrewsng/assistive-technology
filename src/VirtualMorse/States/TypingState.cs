@@ -23,7 +23,7 @@ namespace VirtualMorse.States
 
 		public override void dash()
 		{
-			Console.WriteLine("storing dash, if TTT is entered: read entire page and clear TTT");
+			Console.WriteLine("storing dash");
 			addDash();
 		}
 
@@ -73,11 +73,24 @@ namespace VirtualMorse.States
 			{
 				addLetterToWord(letter);
 				Console.WriteLine("added letter: " + letter);
-				spokenMessage = letter;
-				if (Char.IsUpper(letter, 0))
+				if (context.currentWord == "ttt")
 				{
-					spokenMessage = "Capital " + spokenMessage;
-				}
+					clearWord();
+					spokenMessage = context.getDocument();
+					if (spokenMessage == "")
+					{
+						spokenMessage = "This page is blank.";
+					}
+                    Console.WriteLine("\"ttt\" entered - reading entire page");
+                }
+				else
+                {
+                    spokenMessage = letter;
+                    if (Char.IsUpper(letter, 0))
+                    {
+                        spokenMessage = "Capital " + spokenMessage;
+                    }
+                }
 			}
 			else
 			{
