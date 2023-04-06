@@ -16,8 +16,10 @@ namespace VirtualMorse.States
 
         public override void save()
         {
-            Console.WriteLine("Clear document");
+            context.setDocument("");
             moveToTypingState();
+            Console.WriteLine("Clear document");
+            speak("Document cleared.");
         }
 
         public override void space()
@@ -34,16 +36,37 @@ namespace VirtualMorse.States
 
         public override void enter()
         {
-            string c = Function.morseToText(context.currentLetter);
-            if (c != "")
+            string commandLetter = Function.morseToText(context.currentLetter);
+            switch (commandLetter)
             {
-                Console.WriteLine("Valid letter");
-                Function.parseCommand(c);
-            }
-            else
-            {
-                Console.WriteLine("Invalid letter");
-                sayUnprogrammedError();
+                case "l":
+                    Console.WriteLine("read last sentence");
+                    break;
+                case "g":
+                    Console.WriteLine("checks email");
+                    break;
+                case "d":
+                    Console.WriteLine("deletes email");
+                    break;
+                case "h":
+                    Console.WriteLine("read email headers");
+                    break;
+                case "r":
+                    Console.WriteLine("reads email");
+                    break;
+                case "y":
+                    Console.WriteLine("reply to email");
+                    break;
+                case "n":
+                    Console.WriteLine("adds email address nickname");
+                    break;
+                case "a":
+                    Console.WriteLine("ties email address to nickname");
+                    break;
+                default:
+                    Console.WriteLine("invalid command");
+                    sayUnprogrammedError();
+                    break;
             }
             moveToTypingState();
         }
