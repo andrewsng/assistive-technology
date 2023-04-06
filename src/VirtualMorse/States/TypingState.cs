@@ -90,12 +90,7 @@ namespace VirtualMorse.States
 
 		public override void backspace()
 		{
-			if (context.currentLetter.Length > 0)
-			{
-				clearLetter();
-				Console.WriteLine("Clearing morse symbols");
-			}
-			else if (context.currentWord.Length > 0)
+			if (context.currentWord.Length > 0)
 			{
 				context.currentWord = context.currentWord.Remove(context.currentWord.Length - 1, 1);
 				Console.WriteLine("Delete");
