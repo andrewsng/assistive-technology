@@ -11,21 +11,25 @@ namespace VirtualMorse.States
         public override void shift()
         {
             Console.WriteLine("Print page");
-            command();
+            moveToTypingState();
         }
 
         public override void save()
         {
             Console.WriteLine("Clear document");
-            command();
+            moveToTypingState();
         }
 
         public override void space()
         {
+            moveToTypingState();
+            sayUnprogrammedError();
         }
 
         public override void backspace()
         {
+            moveToTypingState();
+            sayUnprogrammedError();
         }
 
         public override void enter()
@@ -39,15 +43,29 @@ namespace VirtualMorse.States
             else
             {
                 Console.WriteLine("Invalid letter");
+                sayUnprogrammedError();
             }
-            command(); // clears letter, returns to typing state
+            moveToTypingState();
         }
 
         public override void command()
         {
-            Console.WriteLine("move to typing state");
+            moveToTypingState();
+            speak("Command Off.");
+        }
+
+        // Helper functions
+
+        void moveToTypingState()
+        {
             clearLetter();
             context.setState(context.getTypingState());
+            Console.WriteLine("move to typing state");
+        }
+
+        void sayUnprogrammedError()
+        {
+            speak("That command is not programmed.");
         }
     }
 }

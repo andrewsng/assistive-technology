@@ -32,13 +32,15 @@ namespace VirtualMorse.States
 			if (context.currentWord != "")
 			{
 				context.appendToDocument(context.currentWord);
-				clearWord();
 				Console.WriteLine("added word to file: " + context.currentWord);
-			}
+				speak(context.currentWord);
+                clearWord();
+            }
 			else
 			{
 				context.appendToDocument(" ");
 				Console.WriteLine("SPACE added to file");
+				speak("Space.");
 			}
 		}
 
@@ -46,6 +48,7 @@ namespace VirtualMorse.States
 		{
 			toggleCapitalized();
 			Console.WriteLine("capitalization set to: " + isCapitalized);
+			speak("shift");
 		}
 
 		public override void enter()
@@ -56,28 +59,30 @@ namespace VirtualMorse.States
 				addLetterToWord(lastLetter);
 				Console.WriteLine("added letter: " + lastLetter);
 				spokenMessage = lastLetter;
+				if (Char.IsUpper(lastLetter, 0))
+				{
+                    spokenMessage = "Capital " + spokenMessage;
+                }
 			}
 			else
 			{
 				string c = Function.morseToText(context.currentLetter);
 				if (c != "")
-				{
-					string message = c;
-					if (isCapitalized)
+                {
+                    spokenMessage = c;
+                    if (isCapitalized)
 					{
 						c = c.ToUpper();
 						isCapitalized = false;
-						message = "Capital " + message;
+                        spokenMessage = "Capital " + spokenMessage;
                     }
 					addLetterToWord(c);
 					Console.WriteLine("added letter: " + c);
-					spokenMessage = c;
                 }
 				else
 				{
 					clearLetter();
 					Console.WriteLine("not a valid letter, try again");
-					context.speaker.SpeakAsync("Try again.");
 					spokenMessage = "Try again";
 				}
 			}
@@ -95,26 +100,29 @@ namespace VirtualMorse.States
 			{
 				context.currentWord = context.currentWord.Remove(context.currentWord.Length - 1, 1);
 				Console.WriteLine("Delete");
+				speak("Delete.");
 			}
 			else
 			{
 				context.backspaceDocument();
 				Console.WriteLine("Backspace");
+				speak("Backspace.");
 			}
 		}
 
 		public override void save()
 		{
 			Console.WriteLine("save text doc as is");
-			Console.WriteLine("says 'now saving'");
 			context.saveDocumentFile();
+			speak("Now saving.");
 		}
 
 		public override void command()
 		{
-			Console.WriteLine("move to command state");
 			context.setState(context.getCommandState());
-		}
+            Console.WriteLine("move to command state");
+			speak("Command On.");
+        }
 
 		//helper functions
 		public void addDot()
@@ -150,6 +158,7 @@ namespace VirtualMorse.States
 
 		public void speak(string message)
 		{
+			context.speaker.SpeakAsyncCancelAll();
 			context.speaker.SpeakAsync(message);
 		}
 
@@ -160,7 +169,7 @@ namespace VirtualMorse.States
             {
                 message = "Capital " + letter;
             }
-            context.speaker.SpeakAsync(message);
+            speak(message);
         }
 	}
 }
