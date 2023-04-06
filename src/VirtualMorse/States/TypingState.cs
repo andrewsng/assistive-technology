@@ -54,37 +54,36 @@ namespace VirtualMorse.States
 		public override void enter()
 		{
 			string spokenMessage;
+			string letter;
 			if (context.currentLetter == "" && lastLetter != "")
 			{
-				addLetterToWord(lastLetter);
-				Console.WriteLine("added letter: " + lastLetter);
-				spokenMessage = lastLetter;
-				if (Char.IsUpper(lastLetter, 0))
-				{
-                    spokenMessage = "Capital " + spokenMessage;
-                }
+				letter = lastLetter;
 			}
 			else
 			{
-				string c = Function.morseToText(context.currentLetter);
-				if (c != "")
-                {
-                    spokenMessage = c;
-                    if (isCapitalized)
-					{
-						c = c.ToUpper();
-						isCapitalized = false;
-                        spokenMessage = "Capital " + spokenMessage;
-                    }
-					addLetterToWord(c);
-					Console.WriteLine("added letter: " + c);
-                }
-				else
+				letter = Function.morseToText(context.currentLetter);
+				if (isCapitalized)
 				{
-					clearLetter();
-					Console.WriteLine("not a valid letter, try again");
-					spokenMessage = "Try again";
+					letter = letter.ToUpper();
+					isCapitalized = false;
 				}
+			}
+
+			if (letter != "")
+			{
+				addLetterToWord(letter);
+				Console.WriteLine("added letter: " + letter);
+				spokenMessage = letter;
+				if (Char.IsUpper(letter, 0))
+				{
+					spokenMessage = "Capital " + spokenMessage;
+				}
+			}
+			else
+			{
+				clearLetter();
+				Console.WriteLine("not a valid letter, try again");
+				spokenMessage = "Try again";
 			}
 			speak(spokenMessage);
 		}
