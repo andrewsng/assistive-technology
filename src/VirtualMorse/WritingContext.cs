@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Speech.Synthesis;
 using System.Windows.Forms;
@@ -49,7 +50,11 @@ namespace VirtualMorse
 
             directory = AppDomain.CurrentDomain.BaseDirectory;
             directory = directory.Replace("bin\\Debug\\", "Text_documents\\");
+            List<string> fileContents = Function.readFullFile(directory, file);
+            if (fileContents.Count > 0)
+            {
             setDocument((Function.readFullFile(directory, file))[0]);
+        }
         }
 
         private void Handler_InputReceived(object sender, SwitchInputEventArgs e)
