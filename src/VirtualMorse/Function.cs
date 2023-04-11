@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace VirtualMorse
 {
@@ -105,6 +106,27 @@ namespace VirtualMorse
                     Console.WriteLine("invalid command");
                     break;
             }
+        }
+
+        public static string getLastSentence(string document)
+        {
+            char[] chars = { '.', '!', '?' };
+            List<string> sentences = document.Split(chars, StringSplitOptions.RemoveEmptyEntries).ToList();
+            if (sentences.Count == 0)
+            {
+                return "";
+            }
+            sentences[sentences.Count - 1] = sentences.Last().Trim();
+            while (sentences.Last() == "")
+            {
+                sentences.RemoveAt(sentences.Count - 1);
+                if (sentences.Count == 0)
+                {
+                    return "";
+                }
+                sentences[sentences.Count - 1] = sentences.Last().Trim();
+            }
+            return sentences.Last();
         }
 
         public static void addToFile(string directory, string file, string text)

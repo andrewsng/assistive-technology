@@ -41,6 +41,9 @@ namespace VirtualMorse.States
             {
                 case "l":
                     Console.WriteLine("read last sentence");
+                    string sentence = Function.getLastSentence(context.getDocument());
+                    Console.WriteLine(sentence);
+                    speak(sentence);
                     break;
                 case "g":
                     Console.WriteLine("checks email");
