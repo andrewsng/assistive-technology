@@ -8,6 +8,8 @@ namespace VirtualMorse.States
         {
         }
 
+        static string nickname = "";
+
         public override void shift()
         {
             Console.WriteLine("Print page");
@@ -37,6 +39,9 @@ namespace VirtualMorse.States
         public override void enter()
         {
             string commandLetter = Function.morseToText(context.currentLetter);
+            string address = "";
+            string contents = "";
+            string index = "";
             switch (commandLetter)
             {
                 case "l":
@@ -50,21 +55,33 @@ namespace VirtualMorse.States
                     break;
                 case "d":
                     Console.WriteLine("deletes email");
+                    index = context.getCurrentWord();
                     break;
                 case "h":
                     Console.WriteLine("read email headers");
+                    index = context.getCurrentWord();
                     break;
                 case "r":
                     Console.WriteLine("reads email");
+                    index = context.getCurrentWord();
+                    break;
+                case "e":
+                    Console.WriteLine("create/send email");
+                    address = context.getCurrentWord();
+                    contents = context.getDocument();
                     break;
                 case "y":
                     Console.WriteLine("reply to email");
+                    index = context.getCurrentWord();
+                    contents = context.getDocument();
                     break;
                 case "n":
                     Console.WriteLine("adds email address nickname");
+                    nickname = context.getCurrentWord();
                     break;
                 case "a":
                     Console.WriteLine("ties email address to nickname");
+                    address = context.getCurrentWord();
                     break;
                 default:
                     Console.WriteLine("invalid command");
