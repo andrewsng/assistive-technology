@@ -15,9 +15,4 @@ Senior Capstone project from the Spring 2023 semester at UAF.
 - `dev` → testing changes to be merged into `main`.
 
 ## Architecture Diagram
-
-- TODO
-
-## Testing Plan
-
-- TODO
+![Virtual Morse 2023 - Architecture Diagram](docs/virtual-morse-2023-architecture.svg)
