@@ -30,16 +30,12 @@ namespace VirtualMorse.Input
 
         }
 
+        //Event to Detect when a button is pressed 
         public event EventHandler<SwitchInputEventArgs> ButtonPressed;
 
 
 
-        //Set up New Serial Port w/
-        //constructors (string portName, int baudRate, System.IO.PortsPairty, int bits, System.IO.PORTS.STopBits stopBits);
-
-
-
-
+        //Dictionary holding all button presses, and associated switches
         public Dictionary<string, Switch> targetKeys = new Dictionary<string, Switch>()
         {
             {  "2", Switch.Switch1 },
@@ -60,6 +56,8 @@ namespace VirtualMorse.Input
             try //Erorr may occur when opening a Serial Port 
             {
 
+
+                //Set up Loccal serial port and cast the sender object to it 
                 SerialPort sp = (SerialPort)sender;
                 string str = sp.ReadLine();
            
