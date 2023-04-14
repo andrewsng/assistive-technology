@@ -15,7 +15,7 @@ namespace VirtualMorse.Input
         public ArduinoComms(RichTextBox textBox)
         {
             this.textBox = textBox;
-            _serialPort = new SerialPort("COM3", 9600, Parity.None, 8, StopBits.One);
+            _serialPort = new SerialPort("COM4", 9600, Parity.None, 8, StopBits.One);
             _serialPort.Open();
             _serialPort.DataReceived += DataHandler;
         }
@@ -48,7 +48,7 @@ namespace VirtualMorse.Input
 
         private void DataHandler(object sender, SerialDataReceivedEventArgs button)
         {
-            try //Erorr may occur when opening a Serial Port 
+            try //Error may occur when opening a Serial Port 
             {
                 //Set up Local serial port and cast the sender object to it 
                 SerialPort sp = (SerialPort)sender;
@@ -64,7 +64,7 @@ namespace VirtualMorse.Input
             }
             catch (Exception e)
             {
-               
+                Console.WriteLine("{0} Exception caught.", e);
             }
         }
     }
