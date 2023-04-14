@@ -13,7 +13,7 @@ namespace VirtualMorse
         RichTextBox textBox;
 
         FunctionKeyInput functionKeys;
-        // ArduinoInput arduino;
+        ArduinoComms Board;
 
         public SpeechSynthesizer speaker;
 
@@ -38,6 +38,9 @@ namespace VirtualMorse
             functionKeys = new FunctionKeyInput();
             functionKeys.KeyPressed += Handler_InputReceived;
             textBox.KeyDown += functionKeys.TextBox_KeyDown;
+
+            Board = new ArduinoComms();
+            Board.ButtonPressed += Handler_InputReceived;
 
             speaker = new SpeechSynthesizer();
             speaker.SetOutputToDefaultAudioDevice();
