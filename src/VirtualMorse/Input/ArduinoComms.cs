@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using System.IO.Ports; //access to SerialPort Class 
 
@@ -10,30 +8,28 @@ namespace VirtualMorse.Input
 {
     public class ArduinoComms
     {
-        public string coms;
-        public int buad;
+        RichTextBox textBox;
         SerialPort _serialPort;
 
         //Constructors
-        public ArduinoComms()
+        public ArduinoComms(RichTextBox textBox)
         {
-            _serialPort = new SerialPort("COM4", 9600, Parity.None, 8, StopBits.One);
+            this.textBox = textBox;
+            _serialPort = new SerialPort("COM3", 9600, Parity.None, 8, StopBits.One);
             _serialPort.Open();
             _serialPort.DataReceived += DataHandler;
         }
-        public ArduinoComms(string COMS, int baud_rate)
-        {
-            coms = COMS;
-            buad = baud_rate;
-            _serialPort = new SerialPort(COMS, baud_rate, Parity.None, 8, StopBits.One);
-            _serialPort.Open();
 
+        public ArduinoComms(RichTextBox textBox, string portName, int baudRate)
+        {
+            this.textBox = textBox;
+            _serialPort = new SerialPort(portName, baudRate, Parity.None, 8, StopBits.One);
+            _serialPort.Open();
+            _serialPort.DataReceived += DataHandler;
         }
 
         //Event to Detect when a button is pressed 
-        public event EventHandler<SwitchInputEventArgs> ButtonPressed;
-
-
+        public event EventHandler<SwitchInputEventArgs> buttonPressed;
 
         //Dictionary holding all button presses, and associated switches
         public Dictionary<string, Switch> targetKeys = new Dictionary<string, Switch>()
@@ -50,31 +46,26 @@ namespace VirtualMorse.Input
             { "11", Switch.Switch10 },
         };
 
-
         private void DataHandler(object sender, SerialDataReceivedEventArgs button)
         {
             try //Erorr may occur when opening a Serial Port 
             {
-
-
-                //Set up Loccal serial port and cast the sender object to it 
+                //Set up Local serial port and cast the sender object to it 
                 SerialPort sp = (SerialPort)sender;
                 string str = sp.ReadLine();
-           
-
-                if (targetKeys.ContainsKey(str.Trim()))
+                str = str.Trim();
+                if (targetKeys.ContainsKey(str))
                 {
-                    Console.Write(str);
-                    ButtonPressed?.Invoke(sp, new SwitchInputEventArgs(targetKeys[str.Trim()]));
+                    Action action = delegate () {
+                        buttonPressed?.Invoke(this, new SwitchInputEventArgs(targetKeys[str]));
+                    };
+                    textBox.Invoke(action);  // Event must be handled on the text box's thread.
                 }
-                else { Console.Write("nope"); }
-
             }
             catch (Exception e)
             {
                
             }
         }
-
     }
 }
