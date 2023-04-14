@@ -8,7 +8,7 @@
 #define buttonPin6 6
 #define buttonPin7 7
 #define buttonPin8 8
-#define buttonPin9 9 
+#define buttonPin9 9
 #define buttonPin10 10
 #define buttonPin11 11
 
@@ -44,7 +44,8 @@ void checkButton(int pinNum)
   
   if(pushed == LOW)
   {
-    Serial.println(pinNum);
+    Serial.print(pinNum);
+    Serial.println();
     
   }
  
