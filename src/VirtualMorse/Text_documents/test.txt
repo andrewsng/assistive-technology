@@ -1,1 +1,1 @@
-This is text read from a file.
+This is text read from a file.-rmkir  /mait

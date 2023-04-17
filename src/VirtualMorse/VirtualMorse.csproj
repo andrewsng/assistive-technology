@@ -55,6 +55,8 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="States\CommandState.cs" />
+    <Compile Include="States\ConfirmationState.cs" />
+    <Compile Include="States\PunctuationState.cs" />
     <Compile Include="States\State.cs" />
     <Compile Include="WritingContext.cs" />
     <Compile Include="States\TypingState.cs" />
