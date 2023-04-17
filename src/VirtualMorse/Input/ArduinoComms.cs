@@ -34,16 +34,16 @@ namespace VirtualMorse.Input
         //Dictionary holding all button presses, and associated switches
         public Dictionary<string, Switch> targetKeys = new Dictionary<string, Switch>()
         {
-            {  "2", Switch.Switch1 },
-            {  "3", Switch.Switch2 },
-            {  "4", Switch.Switch3 },
-            {  "5", Switch.Switch4 },
-            {  "6", Switch.Switch5 },
-            {  "7", Switch.Switch6 },
-            {  "8", Switch.Switch7 },
-            {  "9", Switch.Switch8 },
-            { "10", Switch.Switch9 },
-            { "11", Switch.Switch10 },
+            {  "0", Switch.Switch1 },
+            {  "1", Switch.Switch2 },
+            {  "2", Switch.Switch3 },
+            {  "3", Switch.Switch4 },
+            {  "4", Switch.Switch5 },
+            {  "5", Switch.Switch6 },
+            {  "6", Switch.Switch7 },
+            {  "7", Switch.Switch8 },
+            {  "8", Switch.Switch9 },
+            {  "9", Switch.Switch10 },
         };
 
         private void DataHandler(object sender, SerialDataReceivedEventArgs button)
