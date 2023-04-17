@@ -1,1 +1,0 @@
-This is text read from a file.-rmkir  /mait
