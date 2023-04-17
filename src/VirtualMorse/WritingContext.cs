@@ -19,9 +19,10 @@ namespace VirtualMorse
 
         State typingState;
         State commandState;
-        State currentState;
         State punctuationState;
         State ConfirmationState;
+
+        State currentState;
 
         public string currentLetter = "";
         public string currentWord = "";
@@ -58,7 +59,7 @@ namespace VirtualMorse
             }
 
             punctuationState = new PunctuationState(this);
-            ConfirmationState = new ConfirmationState(this);
+            ConfirmationState = new ConfirmationState(this, this.currentState);
         }
 
         private void Handler_InputReceived(object sender, SwitchInputEventArgs e)
@@ -109,6 +110,7 @@ namespace VirtualMorse
         {
             this.currentState = state;
         }
+
 
         public State getState()
         {
