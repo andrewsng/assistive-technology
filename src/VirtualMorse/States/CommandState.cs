@@ -93,8 +93,8 @@ namespace VirtualMorse.States
 
         public override void command()
         {
-            moveToTypingState();
-            speak("Command Off.");
+            context.setState(context.getPunctuationState());
+            speak("move to punctuation state.");
         }
 
         // Helper functions
