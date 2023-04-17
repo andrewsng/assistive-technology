@@ -21,6 +21,7 @@ namespace VirtualMorse
         State commandState;
         State currentState;
         State punctuationState;
+        State ConfirmationState;
 
         public string currentLetter = "";
         public string currentWord = "";
@@ -56,7 +57,8 @@ namespace VirtualMorse
                 setDocument((Function.readFullFile(directory, file))[0]);
             }
 
-            punctuationState = new Punctuation(this);
+            punctuationState = new PunctuationState(this);
+            ConfirmationState = new ConfirmationState(this);
         }
 
         private void Handler_InputReceived(object sender, SwitchInputEventArgs e)
