@@ -11,14 +11,14 @@ namespace VirtualMorse.States
         public PunctuationState(WritingContext context) : base(context)
         {
             switchResponses = new Dictionary<Switch, Action>(){
-                { Switch.Switch1,  enter },
-                { Switch.Switch2,  shift },
-                { Switch.Switch3,  save },
-                { Switch.Switch4,  space },
-                { Switch.Switch5,  dot },
-                { Switch.Switch6,  dash },
-                { Switch.Switch7,  enter },
-                { Switch.Switch8,  backspace },
+                { Switch.Switch1,  command },
+                { Switch.Switch2,  enterPunctuation("'",  "apostrophe") },
+                { Switch.Switch3,  enterPunctuation("\"", "quotation mark") },
+                { Switch.Switch4,  enterPunctuation("!",  "exclamation mark") },
+                { Switch.Switch5,  enterPunctuation(".",  "period") },
+                { Switch.Switch6,  enterPunctuation(",",  "comma") },
+                { Switch.Switch7,  enterPunctuation("?",  "question mark") },
+                { Switch.Switch8,  enterPunctuation("-",  "hyphen") },
                 { Switch.Switch9,  command },
                 { Switch.Switch10, command },
             };
@@ -29,11 +29,14 @@ namespace VirtualMorse.States
             switchResponses[input]();
         }
 
-        public override void shift()
+        Action enterPunctuation(string punctuation, string spokenMessage)
         {
-            context.appendToDocument("'");
-            speak("apostrophe");
-            context.setState(context.getTypingState());
+            return () =>
+            {
+                context.appendToDocument(punctuation);
+                speak(spokenMessage);
+                context.setState(context.getTypingState());
+            };
         }
 
         public override void command()
@@ -42,48 +45,6 @@ namespace VirtualMorse.States
             context.setState(context.getTypingState());
         }
 
-        public override void save()
-        {
-            context.appendToDocument("\"");
-            speak("quotation mark");
-            context.setState(context.getTypingState());
-        }
-
-        public override void space()
-        {
-            context.appendToDocument("!");
-            speak("exclamation mark");
-            context.setState(context.getTypingState());
-        }
-
-        public override void dot()
-        {
-            context.appendToDocument(".");
-            speak("period");
-            context.setState(context.getTypingState());
-        }
-
-        public override void dash()
-        {
-            context.appendToDocument(",");
-            speak("comma");
-            context.setState(context.getTypingState());
-        }
-
-        public override void enter()
-        {
-            context.appendToDocument("?");
-            speak("question mark");
-            context.setState(context.getTypingState());
-
-        }
-
-        public override void backspace()
-        {
-            context.appendToDocument("-");
-            speak("hyphen");
-            context.setState(context.getTypingState());
-        }
         public void speak(string message)
         {
             context.speaker.SpeakAsyncCancelAll();
