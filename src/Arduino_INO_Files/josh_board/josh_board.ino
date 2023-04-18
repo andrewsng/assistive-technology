@@ -1,52 +1,24 @@
-// C++ code
+const int buttonPins[] = {2, 3, 4, 5, 6, 7, 8, 9, 10}; 
 
+const int numButtons = sizeof(buttonPins)/sizeof(buttonPins[0]); // calculate the number of buttons
 
-#define buttonPin2 2
-#define buttonPin3 3
-#define buttonPin4 4
-#define buttonPin5 5
-#define buttonPin6 6
-#define buttonPin7 7
-#define buttonPin8 8
-#define buttonPin9 9
-#define buttonPin10 10
-#define buttonPin11 11
+int buttonStates[numButtons];
 
-
-
-
-void setup()
-{
-  Serial.begin(9600);
-  pinMode(buttonPin2, INPUT_PULLUP);
-  pinMode(buttonPin3, INPUT_PULLUP);
-  pinMode(buttonPin4, INPUT_PULLUP);
-  pinMode(buttonPin5, INPUT_PULLUP);
-  pinMode(buttonPin6, INPUT_PULLUP);
-  pinMode(buttonPin7, INPUT_PULLUP);
-  pinMode(buttonPin8, INPUT_PULLUP);
-  pinMode(buttonPin9, INPUT_PULLUP);
-  pinMode(buttonPin10,INPUT_PULLUP);
-  pinMode(buttonPin11,INPUT_PULLUP);
-  
-}
-
-void loop()
-{
-  for(int i = 2; i <= 11; i++)
-    checkButton(i);
-  delay(100);
-}
-
-void checkButton(int pinNum)
-{
-  int pushed = digitalRead(pinNum);
-  
-  if(pushed == LOW)
-  {
-    Serial.print(pinNum);
-    Serial.println();
-    
+void setup() {
+  Serial.begin(9600);  // initialize serial communication
+  for (int i = 0; i < numButtons; i++) {
+    pinMode(buttonPins[i], INPUT_PULLUP);
   }
- 
+}
+
+void loop() {
+  for (int i = 0; i < numButtons; i++) {
+    buttonStates[i] = digitalRead(buttonPins[i]);  // read the button state
+    if (buttonStates[i] == LOW) {
+      Serial.println(i);
+      while (digitalRead(buttonPins[i]) == LOW) {  // wait for the button to be released
+        delay(10);  // add a small delay to reduce the loop frequency
+      }
+    }
+  }
 }
