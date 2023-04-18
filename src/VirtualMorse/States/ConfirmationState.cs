@@ -10,44 +10,13 @@ namespace VirtualMorse.States
         {
         }
 
-        public override void shift()
-        {
-
-        }
-
-        public override void command()
-        {
-
-        }
-
-        public override void save()
-        {
-
-        }
-
-        public override void space()
+        void space()
         {
             confirmation = true;
             context.setState(previousState);
         }
 
-        public override void dot()
-        {
-
-        }
-
-        public override void dash()
-        {
-
-        }
-
-        public override void enter()
-        {
-
-
-        }
-
-        public override void backspace()
+        void backspace()
         {
             confirmation = false;
             context.setState(context.getCommandState());

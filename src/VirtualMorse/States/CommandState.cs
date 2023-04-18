@@ -33,22 +33,27 @@ namespace VirtualMorse.States
                 sayUnprogrammedError();
             }
         }
+        void command()
+        {
+            context.setState(context.getPunctuationState());
+            speak("move to punctuation state.");
+        }
 
-        public void printPage()
+        void printPage()
         {
             Console.WriteLine("Print page");
             moveToTypingState();
         }
 
-        public void clearDocument()
+        void clearDocument()
         {
             context.setDocument("");
             moveToTypingState();
-            Console.WriteLine("Clear document");
+            Console.WriteLine("clear document");
             speak("Document cleared.");
         }
 
-        public void enterCommand()
+        void enterCommand()
         {
             string commandLetter = Function.morseToText(context.currentLetter);
             List<string> header;
@@ -62,8 +67,8 @@ namespace VirtualMorse.States
                     string sentence = Function.getLastSentence(context.getDocument());
                     Console.WriteLine(sentence);
                     speak(sentence);
-                    clearLetter();
-                    clearWord();
+                    context.clearLetter();
+                    context.clearWord();
                     break;
 
                 case "g":
@@ -80,8 +85,8 @@ namespace VirtualMorse.States
                     {
                         speak("failed to retrieve email header");
                     }
-                    clearLetter();
-                    clearWord();
+                    context.clearLetter();
+                    context.clearWord();
                     break;
 
                 case "d":
@@ -96,8 +101,8 @@ namespace VirtualMorse.States
                     {
                         speak("failed to delete email");
                     }
-                    clearLetter();
-                    clearWord();
+                    context.clearLetter();
+                    context.clearWord();
                     break;
 
                 case "h":
@@ -116,8 +121,8 @@ namespace VirtualMorse.States
                     {
                         speak("failed to read email header");
                     }
-                    clearLetter();
-                    clearWord();
+                    context.clearLetter();
+                    context.clearWord();
                     break;
 
                 case "r":
@@ -138,8 +143,8 @@ namespace VirtualMorse.States
                     {
                         speak("failed to read email");
                     }
-                    clearLetter();
-                    clearWord();
+                    context.clearLetter();
+                    context.clearWord();
                     break;
 
                 case "e":
@@ -156,8 +161,8 @@ namespace VirtualMorse.States
                     {
                         speak("Email failed to send");
                     }
-                    clearLetter();
-                    clearWord();
+                    context.clearLetter();
+                    context.clearWord();
                     break;
 
                 case "y":
@@ -174,8 +179,8 @@ namespace VirtualMorse.States
                     {
                         speak("failed to reply to email");
                     }
-                    clearLetter();
-                    clearWord();
+                    context.clearLetter();
+                    context.clearWord();
                     break;
 
                 case "n":
@@ -183,8 +188,8 @@ namespace VirtualMorse.States
                     nickname = context.getCurrentWord();
                     Function.createNickname(nickname);
                     speak("added nickname " + nickname);
-                    clearLetter();
-                    clearWord();
+                    context.clearLetter();
+                    context.clearWord();
                     break;
 
                 case "a":
@@ -192,8 +197,8 @@ namespace VirtualMorse.States
                     address = context.getCurrentWord();
                     Function.addEmailToBook(address);
                     speak("added email address " + address);
-                    clearLetter();
-                    clearWord();
+                    context.clearLetter();
+                    context.clearWord();
                     break;
 
                 default:
@@ -204,17 +209,11 @@ namespace VirtualMorse.States
             moveToTypingState();
         }
 
-        public override void command()
-        {
-            context.setState(context.getPunctuationState());
-            speak("move to punctuation state.");
-        }
-
         // Helper functions
 
         void moveToTypingState()
         {
-            clearLetter();
+            context.clearLetter();
             context.setState(context.getTypingState());
             Console.WriteLine("move to typing state");
         }

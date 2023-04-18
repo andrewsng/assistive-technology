@@ -122,6 +122,16 @@ namespace VirtualMorse
             return textBox.Text;
         }
 
+        public void clearLetter()
+        {
+            currentLetter = "";
+        }
+
+        public void clearWord()
+        {
+            currentWord = "";
+        }
+
         public void setDocument(string text)
         {
             textBox.Focus();

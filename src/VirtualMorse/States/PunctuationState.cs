@@ -42,7 +42,7 @@ namespace VirtualMorse.States
             };
         }
 
-        public override void command()
+        void command()
         {
             speak("Move to typing state");
             context.setState(context.getTypingState());
