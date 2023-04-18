@@ -31,7 +31,10 @@ namespace VirtualMorse.States
 
         public override void respond(Switch input)
         {
-			switchResponses[input]();
+            if (switchResponses.ContainsKey(input))
+            {
+                switchResponses[input]();
+            }
         }
 
         public override void dot()

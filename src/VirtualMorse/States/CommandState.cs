@@ -14,29 +14,33 @@ namespace VirtualMorse.States
         {
             switchResponses = new Dictionary<Switch, Action>(){
                 { Switch.Switch1,  command },
-                { Switch.Switch2,  shift },
-                { Switch.Switch3,  save },
-                { Switch.Switch4,  space },
-                { Switch.Switch5,  dot },
-                { Switch.Switch6,  dash },
-                { Switch.Switch7,  enter },
-                { Switch.Switch8,  backspace },
+                { Switch.Switch2,  printPage },
+                { Switch.Switch3,  clearDocument },
+                { Switch.Switch7,  enterCommand },
                 { Switch.Switch9,  command },
                 { Switch.Switch10, command },
             };
         }
         public override void respond(Switch input)
         {
-            switchResponses[input]();
+            if (switchResponses.ContainsKey(input))
+            {
+                switchResponses[input]();
+            }
+            else
+            {
+                moveToTypingState();
+                sayUnprogrammedError();
+            }
         }
 
-        public override void shift()
+        public void printPage()
         {
             Console.WriteLine("Print page");
             moveToTypingState();
         }
 
-        public override void save()
+        public void clearDocument()
         {
             context.setDocument("");
             moveToTypingState();
@@ -44,19 +48,7 @@ namespace VirtualMorse.States
             speak("Document cleared.");
         }
 
-        public override void space()
-        {
-            moveToTypingState();
-            sayUnprogrammedError();
-        }
-
-        public override void backspace()
-        {
-            moveToTypingState();
-            sayUnprogrammedError();
-        }
-
-        public override void enter()
+        public void enterCommand()
         {
             string commandLetter = Function.morseToText(context.currentLetter);
             List<string> header;

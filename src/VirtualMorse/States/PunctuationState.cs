@@ -26,7 +26,10 @@ namespace VirtualMorse.States
 
         public override void respond(Switch input)
         {
-            switchResponses[input]();
+            if (switchResponses.ContainsKey(input))
+            {
+                switchResponses[input]();
+            }
         }
 
         Action enterPunctuation(string punctuation, string spokenMessage)
