@@ -1,15 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
+using VirtualMorse.Input;
 
 namespace VirtualMorse.States
 {
-    public class CommandState : TypingState
+    public class CommandState : State
     {
+        static string nickname = "";
+
+        Dictionary<Switch, Action> switchResponses;
+
         public CommandState(WritingContext context) : base(context)
         {
+            switchResponses = new Dictionary<Switch, Action>(){
+                { Switch.Switch1,  command },
+                { Switch.Switch2,  shift },
+                { Switch.Switch3,  save },
+                { Switch.Switch4,  space },
+                { Switch.Switch5,  dot },
+                { Switch.Switch6,  dash },
+                { Switch.Switch7,  enter },
+                { Switch.Switch8,  backspace },
+                { Switch.Switch9,  command },
+                { Switch.Switch10, command },
+            };
         }
-
-        static string nickname = "";
+        public override void respond(Switch input)
+        {
+            switchResponses[input]();
+        }
 
         public override void shift()
         {
