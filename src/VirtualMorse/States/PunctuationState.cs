@@ -1,13 +1,32 @@
 ﻿using System;
+using System.Collections.Generic;
+using VirtualMorse.Input;
 
 namespace VirtualMorse.States
 {
     public class PunctuationState : State
     {
-        protected WritingContext context;
-        public PunctuationState(WritingContext context)
+        Dictionary<Switch, Action> switchResponses;
+
+        public PunctuationState(WritingContext context) : base(context)
         {
-            this.context = context;
+            switchResponses = new Dictionary<Switch, Action>(){
+                { Switch.Switch1,  enter },
+                { Switch.Switch2,  shift },
+                { Switch.Switch3,  save },
+                { Switch.Switch4,  space },
+                { Switch.Switch5,  dot },
+                { Switch.Switch6,  dash },
+                { Switch.Switch7,  enter },
+                { Switch.Switch8,  backspace },
+                { Switch.Switch9,  command },
+                { Switch.Switch10, command },
+            };
+        }
+
+        public override void respond(Switch input)
+        {
+            switchResponses[input]();
         }
 
         public override void shift()

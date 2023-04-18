@@ -1,21 +1,40 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Windows.Forms;
+using VirtualMorse.Input;
 
 namespace VirtualMorse.States
 {
 	public class TypingState : State
 	{
-		protected WritingContext context;
-
 		string lastLetter = "";
 		bool isCapitalized = false;
 
-		//state functions
-		public TypingState(WritingContext context)
-		{
-			this.context = context;
-		}
+		Dictionary<Switch, Action> switchResponses;
 
-		public override void dot()
+		//state functions
+		public TypingState(WritingContext context) : base(context)
+		{
+			switchResponses = new Dictionary<Switch, Action>(){
+				{ Switch.Switch1,  command },
+				{ Switch.Switch2,  shift },
+				{ Switch.Switch3,  save },
+				{ Switch.Switch4,  space },
+				{ Switch.Switch5,  dot },
+				{ Switch.Switch6,  dash },
+				{ Switch.Switch7,  enter },
+				{ Switch.Switch8,  backspace },
+				{ Switch.Switch9,  command },
+				{ Switch.Switch10, command },
+			};
+        }
+
+        public override void respond(Switch input)
+        {
+			switchResponses[input]();
+        }
+
+        public override void dot()
 		{
 			Console.WriteLine("storing dot");
 			addDot();
@@ -142,41 +161,16 @@ namespace VirtualMorse.States
 			context.currentLetter += '-';
 		}
 
-		public void clearLetter()
-		{
-			context.currentLetter = "";
-		}
-
 		public void addLetterToWord(string c)
 		{
 			context.currentWord += c;
 			lastLetter = c;
 			clearLetter();
         }
-		public void clearWord()
-		{
-			context.currentWord = "";
-		}
 
 		public void toggleCapitalized()
 		{
 			isCapitalized = !isCapitalized;
 		}
-
-		public void speak(string message)
-		{
-			//context.speaker.SpeakAsyncCancelAll();
-			context.speaker.SpeakAsync(message);
-		}
-
-		public void speakLetter(string letter)
-		{
-            string message = letter;
-            if (Char.IsUpper(letter, 0))
-            {
-                message = "Capital " + letter;
-            }
-            speak(message);
-        }
 	}
 }

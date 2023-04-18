@@ -4,14 +4,10 @@ namespace VirtualMorse.States
 {
     public class ConfirmationState : State
     {
-        protected WritingContext context;
-
         protected bool confirmation;
         State previousState;
-        public ConfirmationState(WritingContext context, State previousState)
+        public ConfirmationState(WritingContext context) : base(context)
         {
-            this.context = context;
-            this.previousState = previousState;
         }
 
         public override void shift()

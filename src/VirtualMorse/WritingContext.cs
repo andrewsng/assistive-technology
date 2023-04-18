@@ -62,40 +62,12 @@ namespace VirtualMorse
             }
 
             punctuationState = new PunctuationState(this);
-            ConfirmationState = new ConfirmationState(this, this.currentState);
+            //ConfirmationState = new ConfirmationState(this, this.currentState);
         }
 
         private void Handler_InputReceived(object sender, SwitchInputEventArgs e)
         {
-            Switch input = e.switchInput;
-            switch (input)
-            {
-                case Switch.Switch1:  // Fall through
-                case Switch.Switch9:
-                    currentState.command();
-                    break;
-                case Switch.Switch2:
-                    currentState.shift();
-                    break;
-                case Switch.Switch3:
-                    currentState.save();
-                    break;
-                case Switch.Switch4:
-                    currentState.space();
-                    break;
-                case Switch.Switch5:
-                    currentState.dot();
-                    break;
-                case Switch.Switch6:
-                    currentState.dash();
-                    break;
-                case Switch.Switch7:
-                    currentState.enter();
-                    break;
-                case Switch.Switch8:
-                    currentState.backspace();
-                    break;
-            }
+            currentState.respond(e.switchInput);
             Console.WriteLine("current letter: '" + getCurrentLetter() + "'");
             Console.WriteLine("current word: '" + getCurrentWord() + "'");
             Console.WriteLine("current document: '" + getDocument() + "'");
