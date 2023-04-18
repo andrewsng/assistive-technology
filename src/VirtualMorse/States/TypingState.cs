@@ -165,7 +165,7 @@ namespace VirtualMorse.States
 
 		public void speak(string message)
 		{
-			context.speaker.SpeakAsyncCancelAll();
+			//context.speaker.SpeakAsyncCancelAll();
 			context.speaker.SpeakAsync(message);
 		}
 

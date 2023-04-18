@@ -18,11 +18,6 @@ namespace VirtualMorse
 {
     public class AddressBook
     {
-        public AddressBook(string nickname, string email)
-        {
-            this.Nickname = nickname;
-            this.Email = email;
-        }
         public string Nickname { get; set; }
         public string Email { get; set; }
     }
@@ -36,6 +31,7 @@ namespace VirtualMorse
         static string addressBook;
         static string virtualMorseVersion = "2023";
         static string nickname = "";
+        static public bool has_executed = true;
         static Function()
         {
             directory = AppDomain.CurrentDomain.BaseDirectory;
@@ -157,9 +153,6 @@ namespace VirtualMorse
 
         public static void sendEmail(string address, string contents)
         {
-            
-            //parse address (check to see if its an address or if its in addressbook
-            //TODO
             address = checkNickname(address);
 
             var message = new MimeMessage();
@@ -177,7 +170,9 @@ namespace VirtualMorse
 
             using (var client = new SmtpClient())
             {
-                client.Connect("smtp.gmail.com", 587);
+                try
+                {
+                    client.Connect("smtp.gmail.com", 587);
 
                 client.AuthenticationMechanisms.Remove("XOAUTH2");
 
@@ -186,9 +181,21 @@ namespace VirtualMorse
 
                 // Speaks name & email destination (spells out email address).
                 Console.WriteLine(">> Sending email to [LOCATION].");
+                
+                    client.Send(message);
+                    has_executed = true;
+                }
+                catch(Exception e)
+                {
+                    Console.WriteLine("Email failed to send");
+                    has_executed = false;
 
-                client.Send(message);
-                client.Disconnect(true);
+                }
+                finally
+                {
+                    client.Disconnect(true);
+                }
+                
             }
         }
 
@@ -200,27 +207,41 @@ namespace VirtualMorse
 
             using (var client = new ImapClient())
             {
-                client.Connect("imap.gmail.com", 993, true);
+                try
+                {
+                    client.Connect("imap.gmail.com", 993, true);
 
-                client.Authenticate(DotNetEnv.Env.GetString("EMAIL__ACCOUNT"), DotNetEnv.Env.GetString("APP__PASSWORD"));
+                    client.Authenticate(DotNetEnv.Env.GetString("EMAIL__ACCOUNT"), DotNetEnv.Env.GetString("APP__PASSWORD"));
 
-                var inbox = client.Inbox;
-                inbox.Open(FolderAccess.ReadOnly);
+                    var inbox = client.Inbox;
+                    inbox.Open(FolderAccess.ReadOnly);
 
-                // Email header number 
-                // Oldest email = 1 vs. newest email = nth inbox location.
+                    // Email header number 
+                    // Oldest email = 1 vs. newest email = nth inbox location.
 
-                // Decrement emailNumber by 1 to get the correct email header number.
-                if(index >= 0 && index <inbox.Count) {
-                    var message = inbox.GetMessage(index);
-                    body = message.TextBody;
+                    // Decrement emailNumber by 1 to get the correct email header number.
+                    if (index >= 0 && index < inbox.Count)
+                    {
+                        var message = inbox.GetMessage(index);
+                        body = message.TextBody;
+                    }
+
+                    // TODO: Detect hyperlinks in email body and avoid reading them out loud.
+
+                    Console.WriteLine("Body: {0}", body);
+
+                    client.Disconnect(true);
+                    has_executed = true;
                 }
-
-                // TODO: Detect hyperlinks in email body and avoid reading them out loud.
-
-                Console.WriteLine("Body: {0}", body);
-
-                client.Disconnect(true);
+                catch
+                {
+                    Console.WriteLine("failed to read email");
+                    has_executed = false;
+                }
+                finally
+                {
+                    client.Disconnect(true);
+                }
             }
             return body;
         }
@@ -231,39 +252,53 @@ namespace VirtualMorse
             index--;
             List<string> return_string = new List<string>();
 
+
             using (var client = new ImapClient())
             {
-                client.Connect("imap.gmail.com", 993, true);
+                try
+                {
+                    client.Connect("imap.gmail.com", 993, true);
 
                 client.Authenticate(DotNetEnv.Env.GetString("EMAIL__ACCOUNT"), DotNetEnv.Env.GetString("APP__PASSWORD"));
+                
+                    var inbox = client.Inbox;
+                    inbox.Open(FolderAccess.ReadOnly);
 
-                var inbox = client.Inbox;
-                inbox.Open(FolderAccess.ReadOnly);
+                    // Email header number 
+                    // Oldest email = 1 vs. newest email = nth inbox location.
+                    if (index >= 0 && index < inbox.Count)
+                    {
+                        var message = inbox.GetMessage(index);
+                        var dateSent = message.Date;
+                        var senderName = message.From;
+                        var senderAddress = message.From.Mailboxes.FirstOrDefault().Address;
+                        var subjectLine = message.Subject;
 
-                // Email header number 
-                // Oldest email = 1 vs. newest email = nth inbox location.
-                if (index >= 0 && index < inbox.Count)
-                {
-                    var message = inbox.GetMessage(index);
-                    var dateSent = message.Date;
-                    var senderName = message.From;
-                    var senderAddress = message.From.Mailboxes.FirstOrDefault().Address;
-                    var subjectLine = message.Subject;
+                        Console.WriteLine("Date Sent: {0}", dateSent);
+                        Console.WriteLine("Sender Name: {0}", senderName);
+                        Console.WriteLine("Sender Address: {0}", senderAddress);
+                        Console.WriteLine("Subject Line: {0}", subjectLine);
 
-                    Console.WriteLine("Date Sent: {0}", dateSent);
-                    Console.WriteLine("Sender Name: {0}", senderName);
-                    Console.WriteLine("Sender Address: {0}", senderAddress);
-                    Console.WriteLine("Subject Line: {0}", subjectLine);
+                        return_string.Add((index + 1).ToString());
+                        return_string.Add(dateSent.ToString());
+                        return_string.Add(senderName.ToString());
+                        return_string.Add(senderAddress.ToString());
+                        return_string.Add(subjectLine.ToString());
 
-                    return_string.Add((index + 1).ToString());
-                    return_string.Add(dateSent.ToString());
-                    return_string.Add(senderName.ToString());
-                    return_string.Add(senderAddress.ToString());
-                    return_string.Add(subjectLine.ToString());
+                    }
 
+                    client.Disconnect(true);
+                    has_executed = true;
                 }
-
-                client.Disconnect(true);
+                catch
+                {
+                    Console.WriteLine("failed to retrieve header");
+                    has_executed = false;
+                }
+                finally
+                {
+                    client.Disconnect(true);
+                }
             }
 
             return return_string;
@@ -276,37 +311,50 @@ namespace VirtualMorse
 
             using (var client = new ImapClient())
             {
-                client.Connect("imap.gmail.com", 993, true);
-
-                client.Authenticate(DotNetEnv.Env.GetString("EMAIL__ACCOUNT"), DotNetEnv.Env.GetString("APP__PASSWORD"));
-
-                var inbox = client.Inbox;
-                inbox.Open(FolderAccess.ReadOnly);
-
-                Console.WriteLine(">> Checking mail server...");
-
-                var unreadEmails = inbox.Search(SearchQuery.NotSeen);
-
-                if (unreadEmails.Count == 1)
+                try
                 {
-                    Console.WriteLine(">> You have {0} unread email.", unreadEmails.Count);
+                    client.Connect("imap.gmail.com", 993, true);
+
+                    client.Authenticate(DotNetEnv.Env.GetString("EMAIL__ACCOUNT"), DotNetEnv.Env.GetString("APP__PASSWORD"));
+
+                    var inbox = client.Inbox;
+                    inbox.Open(FolderAccess.ReadOnly);
+
+                    Console.WriteLine(">> Checking mail server...");
+
+                    var unreadEmails = inbox.Search(SearchQuery.NotSeen);
+
+                    if (unreadEmails.Count == 1)
+                    {
+                        Console.WriteLine(">> You have {0} unread email.", unreadEmails.Count);
+                    }
+                    else
+                    {
+                        Console.WriteLine(">> You have {0} unread emails.", unreadEmails.Count);
+                    }
+
+                    var totalMessages = inbox.Count;
+
+                    // FIXME: How to deal with threaded conversations within the inbox.
+
+                    Console.WriteLine(">> Total messages: {0}", totalMessages);
+
+                    return_list.Add(unreadEmails.Count);
+                    return_list.Add(inbox.Count);
+
+
+                    client.Disconnect(true);
+                    has_executed = true;
                 }
-                else
+                catch
                 {
-                    Console.WriteLine(">> You have {0} unread emails.", unreadEmails.Count);
+                    Console.WriteLine("failed to check email");
+                    has_executed = false;
                 }
-
-                var totalMessages = inbox.Count;
-
-                // FIXME: How to deal with threaded conversations within the inbox.
-
-                Console.WriteLine(">> Total messages: {0}", totalMessages);
-
-                return_list.Add(unreadEmails.Count);
-                return_list.Add(inbox.Count);
-
-
-                client.Disconnect(true);
+                finally
+                {
+                    client.Disconnect(true);
+                }
 
 
             }
@@ -321,23 +369,36 @@ namespace VirtualMorse
 
             using (var client = new ImapClient())
             {
-                client.Connect("imap.gmail.com", 993, true);
-
-                client.Authenticate(DotNetEnv.Env.GetString("EMAIL__ACCOUNT"), DotNetEnv.Env.GetString("APP__PASSWORD"));
-
-                var inbox = client.Inbox;
-                inbox.Open(FolderAccess.ReadWrite);
-
-                if (index >= 0 && index < inbox.Count)
+                try
                 {
-                    inbox.AddFlags(index, MessageFlags.Deleted, true);
+                    client.Connect("imap.gmail.com", 993, true);
 
-                    inbox.Expunge();
+                    client.Authenticate(DotNetEnv.Env.GetString("EMAIL__ACCOUNT"), DotNetEnv.Env.GetString("APP__PASSWORD"));
 
-                    Console.WriteLine(">> Deleted.");
+                    var inbox = client.Inbox;
+                    inbox.Open(FolderAccess.ReadWrite);
+
+                    if (index >= 0 && index < inbox.Count)
+                    {
+                        inbox.AddFlags(index, MessageFlags.Deleted, true);
+
+                        inbox.Expunge();
+
+                        Console.WriteLine(">> Deleted.");
+                    }
+
+                    client.Disconnect(true);
+                    has_executed = true;
                 }
-
-                client.Disconnect(true);
+                catch
+                {
+                    Console.WriteLine("failed to delete email");
+                    has_executed = false;
+                }
+                finally
+                {
+                    client.Disconnect(true);
+                }
             }
 
         }
@@ -361,10 +422,9 @@ namespace VirtualMorse
                 using (var csv = new CsvWriter(writer, config))
                 {
                     csv.NextRecord();
-
-                    AddressBook new_entry = new AddressBook(Function.nickname, email);
+                    AddressBook new_entry = new AddressBook { Nickname = Function.nickname, Email = email };
                     csv.WriteRecord(new_entry);
-                    
+
                 }
             }
         }
@@ -372,7 +432,6 @@ namespace VirtualMorse
 
         public static string checkNickname(string address)
         {
-            var pathToAddressBook = "AddressBook.csv";
             string email = address;
 
             using (var reader = new StreamReader(directory + addressBook))
@@ -385,7 +444,7 @@ namespace VirtualMorse
                     {
                         if (record.Nickname.Equals(address))
                         {
-                            email =  record.Email;
+                            email = record.Email;
                         }
 
                     });
@@ -393,6 +452,7 @@ namespace VirtualMorse
             }
             return email;
         }
-    }
 
+    }
 }
+

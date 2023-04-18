@@ -34,7 +34,6 @@ namespace VirtualMorse
             {
                 Console.WriteLine(str);
             }
-
             Application.EnableVisualStyles();
             Application.Run(new Program());
         }
