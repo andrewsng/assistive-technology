@@ -37,26 +37,26 @@ namespace VirtualMorse.States
             }
         }
 
-        public override void dot()
+        void dot()
 		{
 			Console.WriteLine("storing dot");
 			addDot();
 		}
 
-		public override void dash()
+		void dash()
 		{
 			Console.WriteLine("storing dash");
 			addDash();
 		}
 
-		public override void space()
+		void space()
 		{
 			if (context.currentWord != "")
 			{
 				context.appendToDocument(context.currentWord);
 				Console.WriteLine("added word to file: " + context.currentWord);
 				speak(context.currentWord);
-                clearWord();
+                context.clearWord();
             }
 			else
 			{
@@ -66,14 +66,14 @@ namespace VirtualMorse.States
 			}
 		}
 
-		public override void shift()
+		void shift()
 		{
 			toggleCapitalized();
 			Console.WriteLine("capitalization set to: " + isCapitalized);
 			speak("shift");
 		}
 
-		public override void enter()
+		void enter()
 		{
 			string spokenMessage;
 			string letter;
@@ -97,7 +97,7 @@ namespace VirtualMorse.States
 				Console.WriteLine("added letter: " + letter);
 				if (context.currentWord == "ttt")
 				{
-					clearWord();
+					context.clearWord();
 					spokenMessage = context.getDocument();
 					if (spokenMessage == "")
 					{
@@ -116,14 +116,14 @@ namespace VirtualMorse.States
 			}
 			else
 			{
-				clearLetter();
+				context.clearLetter();
 				Console.WriteLine("not a valid letter, try again");
 				spokenMessage = "Try again";
 			}
 			speak(spokenMessage);
 		}
 
-		public override void backspace()
+		void backspace()
 		{
 			if (context.currentWord.Length > 0)
 			{
@@ -139,14 +139,14 @@ namespace VirtualMorse.States
 			}
 		}
 
-		public override void save()
+		void save()
 		{
 			Console.WriteLine("save text doc as is");
 			context.saveDocumentFile();
 			speak("Now saving.");
 		}
 
-		public override void command()
+		void command()
 		{
 			context.setState(context.getCommandState());
             Console.WriteLine("move to command state");
@@ -154,24 +154,24 @@ namespace VirtualMorse.States
         }
 
 		//helper functions
-		public void addDot()
+		void addDot()
 		{
 			context.currentLetter += '.';
 		}
 
-		public void addDash()
+		void addDash()
 		{
 			context.currentLetter += '-';
 		}
 
-		public void addLetterToWord(string c)
+		void addLetterToWord(string c)
 		{
 			context.currentWord += c;
 			lastLetter = c;
-			clearLetter();
+			context.clearLetter();
         }
 
-		public void toggleCapitalized()
+		void toggleCapitalized()
 		{
 			isCapitalized = !isCapitalized;
 		}
