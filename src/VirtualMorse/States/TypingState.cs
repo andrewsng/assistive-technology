@@ -55,14 +55,14 @@ namespace VirtualMorse.States
 			{
 				context.appendToDocument(context.currentWord);
 				Console.WriteLine("added word to file: " + context.currentWord);
-				speak(context.currentWord);
+				Function.speak(context.currentWord);
                 context.clearWord();
             }
 			else
 			{
 				context.appendToDocument(" ");
 				Console.WriteLine("SPACE added to file");
-				speak("Space.");
+				Function.speak("Space.");
 			}
 		}
 
@@ -70,7 +70,7 @@ namespace VirtualMorse.States
 		{
 			toggleCapitalized();
 			Console.WriteLine("capitalization set to: " + isCapitalized);
-			speak("shift");
+			Function.speak("shift");
 		}
 
 		void enter()
@@ -120,7 +120,7 @@ namespace VirtualMorse.States
 				Console.WriteLine("not a valid letter, try again");
 				spokenMessage = "Try again";
 			}
-			speak(spokenMessage);
+			Function.speak(spokenMessage);
 		}
 
 		void backspace()
@@ -129,13 +129,13 @@ namespace VirtualMorse.States
 			{
 				context.currentWord = context.currentWord.Remove(context.currentWord.Length - 1, 1);
 				Console.WriteLine("Delete");
-				speak("Delete.");
+				Function.speak("Delete.");
 			}
 			else
 			{
 				context.backspaceDocument();
 				Console.WriteLine("Backspace");
-				speak("Backspace.");
+				Function.speak("Backspace.");
 			}
 		}
 
@@ -143,14 +143,14 @@ namespace VirtualMorse.States
 		{
 			Console.WriteLine("save text doc as is");
 			context.saveDocumentFile();
-			speak("Now saving.");
+			Function.speak("Now saving.");
 		}
 
 		void command()
 		{
 			context.setState(context.getCommandState());
             Console.WriteLine("move to command state");
-			speak("Command On.");
+			Function.speak("Command On.");
         }
 
 		//helper functions
