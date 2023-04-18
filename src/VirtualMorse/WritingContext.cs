@@ -15,8 +15,6 @@ namespace VirtualMorse
         FunctionKeyInput functionKeys;
         ArduinoComms Board;
 
-        public SpeechSynthesizer speaker;
-
         State typingState;
         State commandState;
         State punctuationState;
@@ -44,10 +42,6 @@ namespace VirtualMorse
 
             //Board = new ArduinoComms(textBox);
             //Board.buttonPressed += Handler_InputReceived;
-
-            speaker = new SpeechSynthesizer();
-            speaker.SetOutputToDefaultAudioDevice();
-            speaker.SpeakAsync(Program.programName + " " + Program.programVersion);
 
             typingState = new TypingState(this);
             commandState = new CommandState(this);

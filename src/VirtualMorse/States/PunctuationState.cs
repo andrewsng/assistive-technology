@@ -37,21 +37,15 @@ namespace VirtualMorse.States
             return () =>
             {
                 context.appendToDocument(punctuation);
-                speak(spokenMessage);
+                Function.speak(spokenMessage);
                 context.setState(context.getTypingState());
             };
         }
 
         void command()
         {
-            speak("Move to typing state");
+            Function.speak("Move to typing state");
             context.setState(context.getTypingState());
-        }
-
-        public void speak(string message)
-        {
-            context.speaker.SpeakAsyncCancelAll();
-            context.speaker.SpeakAsync(message);
         }
     }
 }

@@ -21,6 +21,7 @@ namespace VirtualMorse.States
                 { Switch.Switch10, command },
             };
         }
+
         public override void respond(Switch input)
         {
             if (switchResponses.ContainsKey(input))
@@ -36,7 +37,7 @@ namespace VirtualMorse.States
         void command()
         {
             context.setState(context.getPunctuationState());
-            speak("move to punctuation state.");
+            Function.speak("move to punctuation state.");
         }
 
         void printPage()
@@ -50,7 +51,7 @@ namespace VirtualMorse.States
             context.setDocument("");
             moveToTypingState();
             Console.WriteLine("clear document");
-            speak("Document cleared.");
+            Function.speak("Document cleared.");
         }
 
         void enterCommand()
@@ -66,7 +67,7 @@ namespace VirtualMorse.States
                     Console.WriteLine("read last sentence");
                     string sentence = Function.getLastSentence(context.getDocument());
                     Console.WriteLine(sentence);
-                    speak(sentence);
+                    Function.speak(sentence);
                     context.clearLetter();
                     context.clearWord();
                     break;
@@ -78,12 +79,12 @@ namespace VirtualMorse.States
                     {
                         int unread = email_count[0];
                         int total = email_count[1];
-                        speak("you have " + unread + " unread emails.");
-                        speak("you have " + total + " total emails.");
+                        Function.speak("you have " + unread + " unread emails.");
+                        Function.speak("you have " + total + " total emails.");
                     }
                     else
                     {
-                        speak("failed to retrieve email header");
+                        Function.speak("failed to retrieve email header");
                     }
                     context.clearLetter();
                     context.clearWord();
@@ -95,11 +96,11 @@ namespace VirtualMorse.States
                     Function.deleteEmail(Int32.Parse(index));
                     if (Function.has_executed == true)
                     {
-                        speak("email number " + index + " deleted");
+                        Function.speak("email number " + index + " deleted");
                     }
                     else
                     {
-                        speak("failed to delete email");
+                        Function.speak("failed to delete email");
                     }
                     context.clearLetter();
                     context.clearWord();
@@ -111,15 +112,15 @@ namespace VirtualMorse.States
                     header = Function.readEmailHeader(Int32.Parse(index));
                     if (Function.has_executed == true)
                     {
-                        speak("Email header number: " + header[0]);
-                        speak("Date and time sent: " + header[1]);
-                        speak("Sender's display name: " + header[2]);
-                        speak("Sender's address: " + header[3]);
-                        speak("Email subject line: " + header[4]);
+                        Function.speak("Email header number: " + header[0]);
+                        Function.speak("Date and time sent: " + header[1]);
+                        Function.speak("Sender's display name: " + header[2]);
+                        Function.speak("Sender's address: " + header[3]);
+                        Function.speak("Email subject line: " + header[4]);
                     }
                     else
                     {
-                        speak("failed to read email header");
+                        Function.speak("failed to read email header");
                     }
                     context.clearLetter();
                     context.clearWord();
@@ -131,17 +132,17 @@ namespace VirtualMorse.States
                     header = Function.readEmailHeader(Int32.Parse(index));
                     if (Function.has_executed == true)
                     {
-                        speak("Email header number: " + header[0]);
-                        speak("Date and time sent: " + header[1]);
-                        speak("Sender's display name: " + header[2]);
-                        speak("Sender's address: " + header[3]);
-                        speak("Email subject line: " + header[4]);
+                        Function.speak("Email header number: " + header[0]);
+                        Function.speak("Date and time sent: " + header[1]);
+                        Function.speak("Sender's display name: " + header[2]);
+                        Function.speak("Sender's address: " + header[3]);
+                        Function.speak("Email subject line: " + header[4]);
                         string email = Function.readEmail(Int32.Parse(index));
-                        speak("Email Contents: " + email);
+                        Function.speak("Email Contents: " + email);
                     }
                     else
                     {
-                        speak("failed to read email");
+                        Function.speak("failed to read email");
                     }
                     context.clearLetter();
                     context.clearWord();
@@ -155,11 +156,11 @@ namespace VirtualMorse.States
 
                     if(Function.has_executed == true)
                     {
-                        speak("sent");
+                        Function.speak("sent");
                     }
                     else
                     {
-                        speak("Email failed to send");
+                        Function.speak("Email failed to send");
                     }
                     context.clearLetter();
                     context.clearWord();
@@ -173,11 +174,11 @@ namespace VirtualMorse.States
                     Function.sendEmail(header[3], contents);
                     if (Function.has_executed == true)
                     {
-                        speak("replied to " + header[3]);
+                        Function.speak("replied to " + header[3]);
                     }
                     else
                     {
-                        speak("failed to reply to email");
+                        Function.speak("failed to reply to email");
                     }
                     context.clearLetter();
                     context.clearWord();
@@ -187,7 +188,7 @@ namespace VirtualMorse.States
                     Console.WriteLine("adds email address nickname");
                     nickname = context.getCurrentWord();
                     Function.createNickname(nickname);
-                    speak("added nickname " + nickname);
+                    Function.speak("added nickname " + nickname);
                     context.clearLetter();
                     context.clearWord();
                     break;
@@ -196,7 +197,7 @@ namespace VirtualMorse.States
                     Console.WriteLine("ties email address to nickname");
                     address = context.getCurrentWord();
                     Function.addEmailToBook(address);
-                    speak("added email address " + address);
+                    Function.speak("added email address " + address);
                     context.clearLetter();
                     context.clearWord();
                     break;
@@ -220,7 +221,7 @@ namespace VirtualMorse.States
 
         void sayUnprogrammedError()
         {
-            speak("That command is not programmed.");
+            Function.speak("That command is not programmed.");
         }
     }
 }

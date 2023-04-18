@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Speech.Synthesis;
 using MailKit.Net.Smtp;
 using MailKit;
 using MimeKit;
@@ -32,6 +33,7 @@ namespace VirtualMorse
         static string virtualMorseVersion = "2023";
         static string nickname = "";
         static public bool has_executed = true;
+        static SpeechSynthesizer speaker;
         static Function()
         {
             directory = AppDomain.CurrentDomain.BaseDirectory;
@@ -39,6 +41,8 @@ namespace VirtualMorse
             addressBook = "AddressBook.csv";
             DotNetEnv.Env.TraversePath().Load();
 
+            speaker = new SpeechSynthesizer();
+            speaker.SetOutputToDefaultAudioDevice();
         }
         static Dictionary<string, string> morse_map = new Dictionary<string, string>() {
             // Letters
@@ -150,6 +154,15 @@ namespace VirtualMorse
             return return_string;
         }
 
+        public static void speak(string message)
+        {
+            speaker.SpeakAsync(message);
+        }
+
+        public static void cancelSpeech()
+        {
+            speaker.SpeakAsyncCancelAll();
+        }
 
         public static void sendEmail(string address, string contents)
         {
