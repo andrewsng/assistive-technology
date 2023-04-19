@@ -40,8 +40,16 @@ namespace VirtualMorse
             functionKeys.KeyPressed += Handler_InputReceived;
             textBox.KeyDown += functionKeys.TextBox_KeyDown;
 
+            try
+            {
             Board = new ArduinoComms(textBox);
             Board.buttonPressed += Handler_InputReceived;
+            }
+            catch
+            {
+                Console.WriteLine("Error opening serial port");
+                // TODO: Throw here or not?
+            }
 
             typingState = new TypingState(this);
             commandState = new CommandState(this);
