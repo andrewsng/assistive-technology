@@ -13,13 +13,13 @@ namespace VirtualMorse.States
         void space()
         {
             confirmation = true;
-            context.setState(previousState);
+            context.transitionToState(previousState);
         }
 
         void backspace()
         {
             confirmation = false;
-            context.setState(context.getCommandState());
+            context.transitionToState(new CommandState(context));
         }
         public void speak(string message)
         {

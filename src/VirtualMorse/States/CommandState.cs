@@ -36,7 +36,7 @@ namespace VirtualMorse.States
         }
         void command()
         {
-            context.setState(context.getPunctuationState());
+            context.transitionToState(new PunctuationState(context));
             Function.speak("move to punctuation state.");
         }
 
@@ -215,7 +215,7 @@ namespace VirtualMorse.States
         void moveToTypingState()
         {
             context.clearLetter();
-            context.setState(context.getTypingState());
+            context.transitionToState(new TypingState(context));
             Console.WriteLine("move to typing state");
         }
 

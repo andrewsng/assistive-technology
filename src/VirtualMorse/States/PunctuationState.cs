@@ -38,14 +38,14 @@ namespace VirtualMorse.States
             {
                 context.appendToDocument(punctuation);
                 Function.speak(spokenMessage);
-                context.setState(context.getTypingState());
+                context.transitionToState(new TypingState(context));
             };
         }
 
         void command()
         {
             Function.speak("Move to typing state");
-            context.setState(context.getTypingState());
+            context.transitionToState(new TypingState(context));
         }
     }
 }

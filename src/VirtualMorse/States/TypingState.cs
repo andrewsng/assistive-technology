@@ -6,11 +6,10 @@ using VirtualMorse.Input;
 namespace VirtualMorse.States
 {
 	public class TypingState : State
-	{
-		string lastLetter = "";
-		bool isCapitalized = false;
+    {
+        bool isCapitalized = false;
 
-		Dictionary<Switch, Action> switchResponses;
+        Dictionary<Switch, Action> switchResponses;
 
 		//state functions
 		public TypingState(WritingContext context) : base(context)
@@ -77,9 +76,9 @@ namespace VirtualMorse.States
 		{
 			string spokenMessage;
 			string letter;
-			if (context.currentLetter == "" && lastLetter != "")
+			if (context.currentLetter == "" && context.lastLetter != "")
 			{
-				letter = lastLetter;
+				letter = context.lastLetter;
 			}
 			else
 			{
@@ -148,7 +147,7 @@ namespace VirtualMorse.States
 
 		void command()
 		{
-			context.setState(context.getCommandState());
+			context.transitionToState(new CommandState(context));
             Console.WriteLine("move to command state");
 			Function.speak("Command On.");
         }
@@ -167,7 +166,7 @@ namespace VirtualMorse.States
 		void addLetterToWord(string c)
 		{
 			context.currentWord += c;
-			lastLetter = c;
+			context.lastLetter = c;
 			context.clearLetter();
         }
 

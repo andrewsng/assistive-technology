@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Speech.Synthesis;
 using System.Windows.Forms;
 using VirtualMorse.States;
 using VirtualMorse.Input;
@@ -15,15 +14,11 @@ namespace VirtualMorse
         FunctionKeyInput functionKeys;
         ArduinoComms Board;
 
-        State typingState;
-        State commandState;
-        State punctuationState;
-        State ConfirmationState;
-
-        State currentState;
+        State state;
 
         public string currentLetter = "";
         public string currentWord = "";
+        public string lastLetter = "";
 
         string directory;
         string file = "test.txt";
@@ -42,8 +37,8 @@ namespace VirtualMorse
 
             try
             {
-            Board = new ArduinoComms(textBox);
-            Board.buttonPressed += Handler_InputReceived;
+                Board = new ArduinoComms(textBox);
+                Board.buttonPressed += Handler_InputReceived;
             }
             catch
             {
@@ -51,9 +46,7 @@ namespace VirtualMorse
                 // TODO: Throw here or not?
             }
 
-            typingState = new TypingState(this);
-            commandState = new CommandState(this);
-            currentState = typingState;  //set initial state
+            state = new TypingState(this);
 
             directory = AppDomain.CurrentDomain.BaseDirectory;
             directory = directory.Replace("bin\\Debug\\", "Text_documents\\");
@@ -62,14 +55,11 @@ namespace VirtualMorse
             {
                 setDocument((Function.readFullFile(directory, file))[0]);
             }
-
-            punctuationState = new PunctuationState(this);
-            //ConfirmationState = new ConfirmationState(this, this.currentState);
         }
 
         private void Handler_InputReceived(object sender, SwitchInputEventArgs e)
         {
-            currentState.respond(e.switchInput);
+            state.respond(e.switchInput);
             Console.WriteLine("current letter: '" + getCurrentLetter() + "'");
             Console.WriteLine("current word: '" + getCurrentWord() + "'");
             Console.WriteLine("current document: '" + getDocument() + "'");
@@ -83,30 +73,9 @@ namespace VirtualMorse
             return textBox;
         }
 
-        public void setState(State state)
+        public void transitionToState(State state)
         {
-            this.currentState = state;
-        }
-
-
-        public State getState()
-        {
-            return currentState;
-        }
-
-        public State getTypingState()
-        {
-            return typingState;
-        }
-
-        public State getCommandState()
-        {
-            return commandState;
-        }
-
-        public State getPunctuationState()
-        {
-            return punctuationState;
+            this.state = state;
         }
 
         public string getCurrentWord()
