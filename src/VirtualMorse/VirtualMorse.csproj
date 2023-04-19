@@ -39,14 +39,17 @@
     <Reference Include="BouncyCastle.Crypto, Version=1.9.0.0, Culture=neutral, PublicKeyToken=0e99375e54769942, processorArchitecture=MSIL">
       <HintPath>packages\Portable.BouncyCastle.1.9.0\lib\net40\BouncyCastle.Crypto.dll</HintPath>
     </Reference>
+    <Reference Include="BouncyCastle.Cryptography, Version=2.0.0.0, Culture=neutral, PublicKeyToken=072edcf4a5328938, processorArchitecture=MSIL">
+      <HintPath>packages\BouncyCastle.Cryptography.2.1.1\lib\net461\BouncyCastle.Cryptography.dll</HintPath>
+    </Reference>
     <Reference Include="CsvHelper, Version=30.0.0.0, Culture=neutral, PublicKeyToken=8c4959082be5c823, processorArchitecture=MSIL">
       <HintPath>packages\CsvHelper.30.0.1\lib\net47\CsvHelper.dll</HintPath>
     </Reference>
     <Reference Include="DotNetEnv, Version=2.5.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\DotNetEnv.2.5.0\lib\netstandard1.3\DotNetEnv.dll</HintPath>
     </Reference>
-    <Reference Include="MailKit, Version=3.6.0.0, Culture=neutral, PublicKeyToken=4e064fe7c44a8f1b, processorArchitecture=MSIL">
-      <HintPath>packages\MailKit.3.6.0\lib\net48\MailKit.dll</HintPath>
+    <Reference Include="MailKit, Version=4.0.0.0, Culture=neutral, PublicKeyToken=4e064fe7c44a8f1b, processorArchitecture=MSIL">
+      <HintPath>packages\MailKit.4.0.0\lib\net48\MailKit.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>packages\Microsoft.Bcl.AsyncInterfaces.1.0.0\lib\net461\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
@@ -69,8 +72,8 @@
       <Private>True</Private>
       <Private>True</Private>
     </Reference>
-    <Reference Include="MimeKit, Version=3.6.0.0, Culture=neutral, PublicKeyToken=bede1c8a46c66814, processorArchitecture=MSIL">
-      <HintPath>packages\MimeKit.3.6.0\lib\net48\MimeKit.dll</HintPath>
+    <Reference Include="MimeKit, Version=4.0.0.0, Culture=neutral, PublicKeyToken=bede1c8a46c66814, processorArchitecture=MSIL">
+      <HintPath>packages\MimeKit.4.0.0\lib\net48\MimeKit.dll</HintPath>
     </Reference>
     <Reference Include="Sprache, Version=2.3.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\Sprache.2.3.1\lib\net45\Sprache.dll</HintPath>
@@ -231,6 +234,7 @@
     <None Include="App.config" />
     <None Include="packages.config" />
     <None Include=".env" />
+    <None Include="Text_documents\AddressBook.csv" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Function.cs" />

@@ -42,8 +42,8 @@ namespace VirtualMorse
             functionKeys.KeyPressed += Handler_InputReceived;
             textBox.KeyDown += functionKeys.TextBox_KeyDown;
 
-            //Board = new ArduinoComms(textBox);
-            //Board.buttonPressed += Handler_InputReceived;
+            Board = new ArduinoComms(textBox);
+            Board.buttonPressed += Handler_InputReceived;
 
             speaker = new SpeechSynthesizer();
             speaker.SetOutputToDefaultAudioDevice();
