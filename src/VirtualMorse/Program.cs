@@ -3,109 +3,39 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Speech.Synthesis;
 using System.Windows.Forms;
-using System.Drawing;
 
 namespace VirtualMorse
 {
-    public class ProgramForm : Form
+    public class Program : Form
     {
-        public StateMachine stateMachine = new StateMachine();
-        public FunctionKeyInput fKeys = new FunctionKeyInput();
-        public InputHandler handler = new InputHandler();
-        public RichTextBox textBox;
-        static String versionStr = "Virtual Morse 2023";
+        public WritingContext context;
+        public static string programName = "Virtual Morse";
+        public static string programVersion = "2023";
 
-        public ProgramForm()
+        public Program()
         {
-            fKeys.KeyPressed += handler.DeviceInputReceived;
-            handler.InputReceived += Handler_InputReceived;
+            context = new WritingContext();
 
-            textBox = new RichTextBox();
-            textBox.Dock = DockStyle.Fill;
-            textBox.SelectionFont = new Font("Arial", 12, FontStyle.Regular);
-            textBox.SelectionColor = Color.Black;
-            textBox.AutoWordSelection = false;
-            textBox.KeyDown += fKeys.TextBox_KeyDown;
-
-            this.Text = versionStr;
+            this.Text = programName + " " + programVersion;
+            this.Size = new System.Drawing.Size(1024, 512);
             this.StartPosition = FormStartPosition.CenterScreen;
             this.KeyPreview = true;
-            this.Controls.Add(textBox);
-        }
-
-        public void Handler_InputReceived(object sender, SwitchInputEventArgs e)
-        {
-            Switch input = e.switchInput;
-            switch (input)
-            {
-                // COMMAND MODE
-                case Switch.Switch1:  // Fall through
-                case Switch.Switch9:
-                    stateMachine.command();
-                    break;
-
-                // SHIFT [PRINT PAGE]
-                case Switch.Switch2:
-                    stateMachine.shift();
-                    break;
-
-                // SAVE [CLEAR DOCUMENT]
-                case Switch.Switch3:
-                    stateMachine.save();
-                    break;
-
-                // SPACE (ADD WORD)
-                case Switch.Switch4:
-                    stateMachine.space();
-                    break;
-
-                // DOT
-                case Switch.Switch5:
-                    stateMachine.dot();
-                    break;
-
-                // DASH
-                case Switch.Switch6:
-                    stateMachine.dash();
-                    break;
-
-                // ENTER LETTER
-                //
-                // If Command Mode:
-                //   'l' -> Reads last sentence.
-                //   'g' -> Checks email.
-                //   'd' -> Deletes email.
-                //   'h' -> Reads email headers.
-                //   'r' -> Reads email.
-                //   'y' -> Replies to email. (Not working in current)
-                //   'n' -> Adds email address nickname.
-                //   'a' -> Ties email address to nickname.
-                case Switch.Switch7:
-                    stateMachine.enter();
-                    break;
-
-                // BACKSPACE
-                case Switch.Switch8:
-                    stateMachine.backspace();
-                    break;
-            }
-            Console.WriteLine("current letter: '" + stateMachine.getCurrentLetter() + "'");
-            Console.WriteLine("current word: '" + stateMachine.getCurrentWord() + "'");
-            Console.WriteLine("current document: '" + stateMachine.getFile() + "'");
-            Console.WriteLine();
+            this.Controls.Add(context.getTextBox());
         }
 
         [STAThread]
         public static void Main(string[] args)
         {
-            SpeechSynthesizer synth = new SpeechSynthesizer();
-            synth.SetOutputToDefaultAudioDevice();
-            synth.Speak(versionStr);
+            List<string> test = new List<string>();
+            test = Function.readEmailHeader(2);
 
+            foreach(string str in test)
+            {
+                Console.WriteLine(str);
+            }
             Application.EnableVisualStyles();
-            Application.Run(new ProgramForm());
+            Application.Run(new Program());
         }
     }
 }
