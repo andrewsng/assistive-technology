@@ -60,7 +60,6 @@ namespace VirtualMorse.States
             char commandLetter = Function.morseToText(context.currentMorse);
             string address = "";
             string contents = "";
-            string index = "";
             switch (commandLetter)
             {
                 case 'l':
@@ -196,7 +195,7 @@ namespace VirtualMorse.States
                         }
                         catch (Exception ex)
                         {
-                            Console.WriteLine("Failed to read email .");
+                            Console.WriteLine("Failed to read email.");
                             Console.WriteLine(ex.Message);
                             Function.speak("Failed to read email.");
                         }
@@ -205,38 +204,65 @@ namespace VirtualMorse.States
                         break;
                     }
                 case 'e':
-                    Console.WriteLine("create/send email");
-                    address = context.getCurrentWord();
-                    contents = context.getDocument();
-                    Function.sendEmail(address, contents);
-
-                    if(Function.has_executed == true)
                     {
-                        Function.speak("sent");
+                        Console.WriteLine("create/send email");
+                        address = context.getCurrentWord();
+                        address = Function.checkNickname(address);
+                        contents = context.getDocument();
+                        try
+                        {
+                            Function.sendEmail(address, contents);
+                            Console.WriteLine($"Sending email to {address}.");
+                            Function.speak($"Sending email to {address}.");
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine("Failed to send email.");
+                            Console.WriteLine(ex.Message);
+                            Function.speak("Failed to send email.");
+                        }
+                        context.clearMorse();
+                        context.clearWord();
+                        break;
                     }
-                    else
-                    {
-                        Function.speak("Email failed to send");
-                    }
-                    context.clearMorse();
-                    context.clearWord();
-                    break;
-
                 case 'y':
                     {
-                        List<string> header;
                         Console.WriteLine("reply to email");
-                        index = context.getCurrentWord();
-                        contents = context.getDocument();
-                        header = Function.getEmailHeader(Int32.Parse(index));
-                        Function.sendEmail(header[3], contents);
-                        if (Function.has_executed == true)
+                        int emailIndex;
+                        try
                         {
+                            emailIndex = Int32.Parse(context.getCurrentWord());
+                        }
+                        catch
+                        {
+                            Console.WriteLine("Error parsing index from current word");
+                            break;
+                        }
+
+                        List<string> header = new List<string>();
+                        try
+                        {
+                            header = Function.getEmailHeader(emailIndex);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine("Failed to read email header.");
+                            Console.WriteLine(ex.Message);
+                            Function.speak("Failed to read email header.");
+                            break;
+                        }
+
+                        contents = context.getDocument();
+                        try
+                        {
+                            Function.sendEmail(header[3], contents);
                             Function.speak("replied to " + header[3]);
                         }
-                        else
+                        catch (Exception ex)
                         {
-                            Function.speak("failed to reply to email");
+                            Console.WriteLine("Failed to reply to email.");
+                            Console.WriteLine(ex.Message);
+                            Function.speak("Failed to reply to email.");
                         }
                         context.clearMorse();
                         context.clearWord();

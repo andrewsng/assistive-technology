@@ -166,13 +166,11 @@ namespace VirtualMorse
 
         public static void sendEmail(string address, string contents)
         {
-            address = checkNickname(address);
-
             var message = new MimeMessage();
-            string test = DotNetEnv.Env.GetString("EMAIL__ACCOUNT") + "@gmail.com";
-            Console.WriteLine(test);
-            Console.WriteLine(address);
-            message.From.Add(new MailboxAddress("Sender Name", test));
+            //string test = DotNetEnv.Env.GetString("EMAIL__ACCOUNT") + "@gmail.com";
+            //Console.WriteLine(test);
+            //Console.WriteLine(address);
+            message.From.Add(new MailboxAddress("Sender Name", DotNetEnv.Env.GetString("EMAIL__ACCOUNT") + "@gmail.com"));
             message.To.Add(new MailboxAddress("Receiver Name", address));
             message.Subject = "This message sent with Virtual Morse " + virtualMorseVersion;
 
@@ -186,29 +184,18 @@ namespace VirtualMorse
                 try
                 {
                     client.Connect("smtp.gmail.com", 587);
-
-                client.AuthenticationMechanisms.Remove("XOAUTH2");
-
-                // Note: only needed if the SMTP server requires authentication.
-                client.Authenticate(DotNetEnv.Env.GetString("EMAIL__ACCOUNT"), DotNetEnv.Env.GetString("APP__PASSWORD"));
-
-                // Speaks name & email destination (spells out email address).
-                Console.WriteLine(">> Sending email to [LOCATION].");
-                
-                    client.Send(message);
-                    has_executed = true;
+                    client.AuthenticationMechanisms.Remove("XOAUTH2");
+                    // Note: only needed if the SMTP server requires authentication.
+                    client.Authenticate(DotNetEnv.Env.GetString("EMAIL__ACCOUNT"), DotNetEnv.Env.GetString("APP__PASSWORD"));
                 }
-                catch(Exception e)
+                catch
                 {
-                    Console.WriteLine("Email failed to send");
-                    has_executed = false;
-
-                }
-                finally
-                {
-                    client.Disconnect(true);
+                    Console.WriteLine("Error connecting or authenticating SMTP client.");
+                    throw;
                 }
                 
+                client.Send(message);
+                client.Disconnect(true);
             }
         }
 
