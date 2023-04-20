@@ -58,8 +58,6 @@ namespace VirtualMorse.States
         void enterCommand()
         {
             char commandLetter = Function.morseToText(context.currentMorse);
-            string address = "";
-            string contents = "";
             switch (commandLetter)
             {
                 case 'l':
@@ -67,8 +65,6 @@ namespace VirtualMorse.States
                     string sentence = Function.getLastSentence(context.getDocument());
                     Console.WriteLine(sentence);
                     Function.speak(sentence);
-                    context.clearMorse();
-                    context.clearWord();
                     break;
 
                 case 'g':
@@ -90,8 +86,6 @@ namespace VirtualMorse.States
                         Console.WriteLine("Failed to check emails.");
                         Function.speak("Failed to check emails.");
                     }
-                    context.clearMorse();
-                    context.clearWord();
                     break;
                 case 'd':
                     {
@@ -118,8 +112,6 @@ namespace VirtualMorse.States
                             Console.WriteLine(ex.Message);
                             Function.speak("Failed to delete email.");
                         }
-                        context.clearMorse();
-                        context.clearWord();
                         break;
                     }
                 case 'h':
@@ -157,8 +149,6 @@ namespace VirtualMorse.States
                             Console.WriteLine(ex.Message);
                             Function.speak("Failed to read email header.");
                         }
-                        context.clearMorse();
-                        context.clearWord();
                         break;
                     }
                 case 'r':
@@ -199,16 +189,14 @@ namespace VirtualMorse.States
                             Console.WriteLine(ex.Message);
                             Function.speak("Failed to read email.");
                         }
-                        context.clearMorse();
-                        context.clearWord();
                         break;
                     }
                 case 'e':
                     {
                         Console.WriteLine("create/send email");
-                        address = context.getCurrentWord();
+                        string address = context.getCurrentWord();
                         address = Function.checkNickname(address);
-                        contents = context.getDocument();
+                        string contents = context.getDocument();
                         try
                         {
                             Function.sendEmail(address, contents);
@@ -221,8 +209,6 @@ namespace VirtualMorse.States
                             Console.WriteLine(ex.Message);
                             Function.speak("Failed to send email.");
                         }
-                        context.clearMorse();
-                        context.clearWord();
                         break;
                     }
                 case 'y':
@@ -252,7 +238,7 @@ namespace VirtualMorse.States
                             break;
                         }
 
-                        contents = context.getDocument();
+                        string contents = context.getDocument();
                         try
                         {
                             Function.sendEmail(header[3], contents);
@@ -264,8 +250,6 @@ namespace VirtualMorse.States
                             Console.WriteLine(ex.Message);
                             Function.speak("Failed to reply to email.");
                         }
-                        context.clearMorse();
-                        context.clearWord();
                         break;
                     }
                 case 'n':
@@ -273,17 +257,13 @@ namespace VirtualMorse.States
                     nickname = context.getCurrentWord();
                     Function.createNickname(nickname);
                     Function.speak("added nickname " + nickname);
-                    context.clearMorse();
-                    context.clearWord();
                     break;
 
                 case 'a':
                     Console.WriteLine("ties email address to nickname");
-                    address = context.getCurrentWord();
+                    string address = context.getCurrentWord();
                     Function.addEmailToBook(address);
                     Function.speak("added email address " + address);
-                    context.clearMorse();
-                    context.clearWord();
                     break;
 
                 default:
@@ -291,6 +271,8 @@ namespace VirtualMorse.States
                     sayUnprogrammedError();
                     break;
             }
+            context.clearMorse();
+            context.clearWord();
             moveToTypingState();
         }
 
