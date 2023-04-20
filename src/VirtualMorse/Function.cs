@@ -11,6 +11,7 @@ using CsvHelper.Configuration;
 using System.Globalization;
 using MailKit.Search;
 using MailKit.Net.Imap;
+using MailKit.Security;
 
 
 
@@ -32,7 +33,6 @@ namespace VirtualMorse
         static string addressBook;
         static string virtualMorseVersion = "2023";
         static string nickname = "";
-        static public bool has_executed = true;
         static SpeechSynthesizer speaker;
         static Function()
         {
@@ -167,9 +167,6 @@ namespace VirtualMorse
         public static void sendEmail(string address, string contents)
         {
             var message = new MimeMessage();
-            //string test = DotNetEnv.Env.GetString("EMAIL__ACCOUNT") + "@gmail.com";
-            //Console.WriteLine(test);
-            //Console.WriteLine(address);
             message.From.Add(new MailboxAddress("Sender Name", DotNetEnv.Env.GetString("EMAIL__ACCOUNT") + "@gmail.com"));
             message.To.Add(new MailboxAddress("Receiver Name", address));
             message.Subject = "This message sent with Virtual Morse " + virtualMorseVersion;
@@ -181,18 +178,7 @@ namespace VirtualMorse
 
             using (var client = new SmtpClient())
             {
-                try
-                {
-                    client.Connect("smtp.gmail.com", 587);
-                    client.AuthenticationMechanisms.Remove("XOAUTH2");
-                    // Note: only needed if the SMTP server requires authentication.
-                    client.Authenticate(DotNetEnv.Env.GetString("EMAIL__ACCOUNT"), DotNetEnv.Env.GetString("APP__PASSWORD"));
-                }
-                catch
-                {
-                    Console.WriteLine("Error connecting or authenticating SMTP client.");
-                    throw;
-                }
+                connectSmtpClient(client);
                 
                 client.Send(message);
                 client.Disconnect(true);
@@ -206,27 +192,11 @@ namespace VirtualMorse
             string body = "";
             using (var client = new ImapClient())
             {
-                try
-                {
-                    client.Connect("imap.gmail.com", 993, true);
-                    client.Authenticate(DotNetEnv.Env.GetString("EMAIL__ACCOUNT"), DotNetEnv.Env.GetString("APP__PASSWORD"));
-                }
-                catch
-                {
-                    Console.WriteLine("Error connecting or authenticating IMAP client.");
-                    throw;
-                }
+                connectImapClient(client);
 
                 var inbox = client.Inbox;
                 inbox.Open(FolderAccess.ReadOnly);
 
-                // Email header number 
-                // Oldest email = 1 vs. newest email = nth inbox location.
-                if (index >= inbox.Count)
-                {
-                    client.Disconnect(true);
-                    throw new ArgumentException("Index greater than number of emails");
-                }
                 var message = inbox.GetMessage(index);
 
                 body = message.TextBody;
@@ -244,32 +214,12 @@ namespace VirtualMorse
             List<string> emailHeader = new List<string>();
             using (var client = new ImapClient())
             {
-                try
-                {
-                    client.Connect("imap.gmail.com", 993, true);
-                    client.Authenticate(DotNetEnv.Env.GetString("EMAIL__ACCOUNT"), DotNetEnv.Env.GetString("APP__PASSWORD"));
-                }
-                catch
-                {
-                    Console.WriteLine("Error connecting or authenticating IMAP client.");
-                    throw;
-                }
+                connectImapClient(client);
 
                 var inbox = client.Inbox;
                 inbox.Open(FolderAccess.ReadOnly);
 
-                // Email header number 
-                // Oldest email = 1 vs. newest email = nth inbox location.
-                if (index >= inbox.Count)
-                {
-                    client.Disconnect(true);
-                    throw new ArgumentException("Index greater than number of emails");
-                }
                 var message = inbox.GetMessage(index);
-                /*var dateSent = message.Date;
-                var senderName = message.From;
-                var senderAddress = message.From.Mailboxes.FirstOrDefault().Address;
-                var subjectLine = message.Subject;*/
 
                 emailHeader.Add((index + 1).ToString());
                 emailHeader.Add(message.Date.ToString());
@@ -287,28 +237,18 @@ namespace VirtualMorse
             List<int> emailCounts = new List<int>();
             using (var client = new ImapClient())
             {
-                try
-                {
-                    client.Connect("imap.gmail.com", 993, true);
-                    client.Authenticate(DotNetEnv.Env.GetString("EMAIL__ACCOUNT"), DotNetEnv.Env.GetString("APP__PASSWORD"));
-                    var inbox = client.Inbox;
-                    inbox.Open(FolderAccess.ReadOnly);
+                connectImapClient(client);
 
-                    // FIXME: How to deal with threaded conversations within the inbox.
+                var inbox = client.Inbox;
+                inbox.Open(FolderAccess.ReadOnly);
 
-                    emailCounts.Add(inbox.Search(SearchQuery.New).Count());
-                    emailCounts.Add(inbox.Search(SearchQuery.NotSeen).Count());
-                    emailCounts.Add(inbox.Count);
-                }
-                catch
-                {
-                    Console.WriteLine("Error connecting or authenticating IMAP client.");
-                    throw;
-                }
-                finally
-                {
-                    client.Disconnect(true);
-                }
+                // FIXME: How to deal with threaded conversations within the inbox.
+
+                emailCounts.Add(inbox.Search(SearchQuery.New).Count());
+                emailCounts.Add(inbox.Search(SearchQuery.NotSeen).Count());
+                emailCounts.Add(inbox.Count);
+
+                client.Disconnect(true);
             }
             return emailCounts;
         }
@@ -318,19 +258,11 @@ namespace VirtualMorse
             index--;
             using (var client = new ImapClient())
             {
-                try
-                {
-                    client.Connect("imap.gmail.com", 993, true);
-                    client.Authenticate(DotNetEnv.Env.GetString("EMAIL__ACCOUNT"), DotNetEnv.Env.GetString("APP__PASSWORD"));
-                }
-                catch
-                {
-                    Console.WriteLine("Error connecting or authenticating IMAP client.");
-                    throw;
-                }
+                connectImapClient(client);
 
                 var inbox = client.Inbox;
                 inbox.Open(FolderAccess.ReadWrite);
+
                 if (index >= inbox.Count)
                 {
                     client.Disconnect(true);
@@ -388,6 +320,33 @@ namespace VirtualMorse
                 }
             }
             return email;
+        }
+
+        static void connectMailService(MailService mailService, string host, int port, string errorMessage)
+        {
+            try
+            {
+                mailService.Connect(host, port, SecureSocketOptions.SslOnConnect);
+                mailService.AuthenticationMechanisms.Remove("XOAUTH2");
+                mailService.Authenticate(DotNetEnv.Env.GetString("EMAIL__ACCOUNT"), DotNetEnv.Env.GetString("APP__PASSWORD"));
+            }
+            catch
+            {
+                Console.WriteLine(errorMessage);
+                throw;
+            }
+        }
+
+        static void connectSmtpClient(SmtpClient smtpClient)
+        {
+            connectMailService(smtpClient, "smtp.gmail.com", 465,
+                "Error connecting or authenticating SMTP client.");
+        }
+
+        static void connectImapClient(ImapClient imapClient)
+        {
+            connectMailService(imapClient, "imap.gmail.com", 993,
+                "Error connecting or authenticating IMAP client.");
         }
     }
 }

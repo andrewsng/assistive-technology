@@ -35,6 +35,7 @@ namespace VirtualMorse.States
                 sayUnprogrammedError();
             }
         }
+
         void command()
         {
             context.transitionToState(new PunctuationState(context));
