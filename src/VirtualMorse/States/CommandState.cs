@@ -74,38 +74,53 @@ namespace VirtualMorse.States
 
                 case 'g':
                     Console.WriteLine("checks email");
-                    List<int> email_count = Function.checkEmail();
-                    if (Function.has_executed == true)
+                    try
                     {
-                        int unread = email_count[0];
-                        int total = email_count[1];
+                        List<int> email_count = Function.getEmailCounts();
+                        int newEmails = email_count[0];
+                        int unread = email_count[1];
+                        int total = email_count[2];
+                        Console.WriteLine(">> You have {0} new emails.", newEmails);
+                        Console.WriteLine(">> You have {0} unread emails.", unread);
+                        Console.WriteLine(">> Total messages: {0}", total);
                         Function.speak("you have " + unread + " unread emails.");
                         Function.speak("you have " + total + " total emails.");
                     }
-                    else
+                    catch
                     {
-                        Function.speak("failed to retrieve email header");
+                        Console.WriteLine("Failed to check emails.");
+                        Function.speak("Failed to check emails.");
                     }
                     context.clearMorse();
                     context.clearWord();
                     break;
-
                 case 'd':
                     Console.WriteLine("deletes email");
-                    index = context.getCurrentWord();
-                    Function.deleteEmail(Int32.Parse(index));
-                    if (Function.has_executed == true)
+                    int emailIndex;
+                    try
                     {
-                        Function.speak("email number " + index + " deleted");
+                        emailIndex = Int32.Parse(context.getCurrentWord());
                     }
-                    else
+                    catch
                     {
-                        Function.speak("failed to delete email");
+                        Console.WriteLine("Error parsing index from current word");
+                        break;
+                    }
+
+                    try
+                    {
+                        Function.deleteEmail(emailIndex);
+                        Function.speak("email number " + emailIndex + " deleted");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Failed to delete email.");
+                        Console.WriteLine(ex.Message);
+                        Function.speak("Failed to delete email.");
                     }
                     context.clearMorse();
                     context.clearWord();
                     break;
-
                 case 'h':
                     Console.WriteLine("read email headers");
                     index = context.getCurrentWord();

@@ -317,103 +317,65 @@ namespace VirtualMorse
             return return_string;
         }
 
-        public static List<int> checkEmail()
+        public static List<int> getEmailCounts()
         {
-            List<int> return_list = new List<int>();
-
-
+            List<int> emailCounts = new List<int>();
             using (var client = new ImapClient())
             {
                 try
                 {
                     client.Connect("imap.gmail.com", 993, true);
-
-                    client.Authenticate(DotNetEnv.Env.GetString("EMAIL__ACCOUNT"), DotNetEnv.Env.GetString("APP__PASSWORD"));
-
+                    client.Authenticate(DotNetEnv.Env.GetString("EMAIL__ACCONT"), DotNetEnv.Env.GetString("APP__PASSWORD"));
                     var inbox = client.Inbox;
                     inbox.Open(FolderAccess.ReadOnly);
 
-                    Console.WriteLine(">> Checking mail server...");
-
-                    var unreadEmails = inbox.Search(SearchQuery.NotSeen);
-
-                    if (unreadEmails.Count == 1)
-                    {
-                        Console.WriteLine(">> You have {0} unread email.", unreadEmails.Count);
-                    }
-                    else
-                    {
-                        Console.WriteLine(">> You have {0} unread emails.", unreadEmails.Count);
-                    }
-
-                    var totalMessages = inbox.Count;
-
                     // FIXME: How to deal with threaded conversations within the inbox.
 
-                    Console.WriteLine(">> Total messages: {0}", totalMessages);
-
-                    return_list.Add(unreadEmails.Count);
-                    return_list.Add(inbox.Count);
-
-
-                    client.Disconnect(true);
-                    has_executed = true;
+                    emailCounts.Add(inbox.Search(SearchQuery.New).Count());
+                    emailCounts.Add(inbox.Search(SearchQuery.NotSeen).Count());
+                    emailCounts.Add(inbox.Count);
                 }
                 catch
                 {
-                    Console.WriteLine("failed to check email");
-                    has_executed = false;
+                    Console.WriteLine("Error connecting or authenticating IMAP client.");
+                    throw;
                 }
                 finally
                 {
                     client.Disconnect(true);
                 }
-
-
             }
-
-            return return_list;
+            return emailCounts;
         }
 
 
         public static void deleteEmail(int index)
         {
             index--;
-
             using (var client = new ImapClient())
             {
                 try
                 {
                     client.Connect("imap.gmail.com", 993, true);
-
                     client.Authenticate(DotNetEnv.Env.GetString("EMAIL__ACCOUNT"), DotNetEnv.Env.GetString("APP__PASSWORD"));
-
-                    var inbox = client.Inbox;
-                    inbox.Open(FolderAccess.ReadWrite);
-
-                    if (index >= 0 && index < inbox.Count)
-                    {
-                        inbox.AddFlags(index, MessageFlags.Deleted, true);
-
-                        inbox.Expunge();
-
-                        Console.WriteLine(">> Deleted.");
-                    }
-
-                    client.Disconnect(true);
-                    has_executed = true;
                 }
                 catch
                 {
-                    Console.WriteLine("failed to delete email");
-                    has_executed = false;
+                    Console.WriteLine("Error connecting or authenticating IMAP client.");
+                    throw;
                 }
-                finally
-                {
-                    client.Disconnect(true);
-                }
-            }
 
+                var inbox = client.Inbox;
+                inbox.Open(FolderAccess.ReadWrite);
+                if (index >= inbox.Count)
+                {
+                    throw new ArgumentException("Index greater than number of emails");
+                }
+                inbox.AddFlags(index, MessageFlags.Deleted, true);
+                inbox.Expunge();
+
+                client.Disconnect(true);
+            }
         }
 
 
