@@ -39,14 +39,14 @@ namespace VirtualMorse.States
         void dot()
 		{
 			Console.WriteLine("storing dot");
-			addDot();
-		}
+            context.currentMorse += '.';
+        }
 
 		void dash()
 		{
 			Console.WriteLine("storing dash");
-			addDash();
-		}
+            context.currentMorse += '-';
+        }
 
 		void space()
 		{
@@ -67,33 +67,36 @@ namespace VirtualMorse.States
 
 		void shift()
 		{
-			toggleCapitalized();
-			Console.WriteLine("capitalization set to: " + isCapitalized);
+            isCapitalized = !isCapitalized;
+            Console.WriteLine("capitalization set to: " + isCapitalized);
 			Function.speak("shift");
 		}
 
 		void enter()
 		{
-			string spokenMessage;
-			string letter;
-			if (context.currentLetter == "" && context.lastLetter != "")
+			string morseString = context.currentMorse;
+            char nextLetter;
+            if (morseString == "" && context.lastLetter != '\0')
 			{
-				letter = context.lastLetter;
+                nextLetter = context.lastLetter;
 			}
 			else
 			{
-				letter = Function.morseToText(context.currentLetter);
+				nextLetter = Function.morseToText(morseString);
 				if (isCapitalized)
 				{
-					letter = letter.ToUpper();
+					nextLetter = char.ToUpper(nextLetter);
 					isCapitalized = false;
 				}
 			}
 
-			if (letter != "")
+            string spokenMessage;
+            if (nextLetter != '\0')
 			{
-				addLetterToWord(letter);
-				Console.WriteLine("added letter: " + letter);
+                context.currentWord += nextLetter;
+                context.lastLetter = nextLetter;
+                context.clearMorse();
+                Console.WriteLine("added letter: " + nextLetter);
 				if (context.currentWord == "ttt")
 				{
 					context.clearWord();
@@ -106,8 +109,8 @@ namespace VirtualMorse.States
                 }
 				else
                 {
-                    spokenMessage = letter;
-                    if (Char.IsUpper(letter, 0))
+                    spokenMessage = nextLetter.ToString();
+                    if (char.IsUpper(nextLetter))
                     {
                         spokenMessage = "Capital " + spokenMessage;
                     }
@@ -115,7 +118,7 @@ namespace VirtualMorse.States
 			}
 			else
 			{
-				context.clearLetter();
+				context.clearMorse();
 				Console.WriteLine("not a valid letter, try again");
 				spokenMessage = "Try again";
 			}
@@ -151,28 +154,5 @@ namespace VirtualMorse.States
             Console.WriteLine("move to command state");
 			Function.speak("Command On.");
         }
-
-		//helper functions
-		void addDot()
-		{
-			context.currentLetter += '.';
-		}
-
-		void addDash()
-		{
-			context.currentLetter += '-';
-		}
-
-		void addLetterToWord(string c)
-		{
-			context.currentWord += c;
-			context.lastLetter = c;
-			context.clearLetter();
-        }
-
-		void toggleCapitalized()
-		{
-			isCapitalized = !isCapitalized;
-		}
 	}
 }

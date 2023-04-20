@@ -16,9 +16,9 @@ namespace VirtualMorse
 
         State state;
 
-        public string currentLetter = "";
+        public string currentMorse = "";
         public string currentWord = "";
-        public string lastLetter = "";
+        public char lastLetter = '\0';
 
         string directory;
         string file = "test.txt";
@@ -60,7 +60,7 @@ namespace VirtualMorse
         private void Handler_InputReceived(object sender, SwitchInputEventArgs e)
         {
             state.respond(e.switchInput);
-            Console.WriteLine("current letter: '" + getCurrentLetter() + "'");
+            Console.WriteLine("current letter: '" + getCurrentMorse() + "'");
             Console.WriteLine("current word: '" + getCurrentWord() + "'");
             Console.WriteLine("current document: '" + getDocument() + "'");
             Console.WriteLine();
@@ -83,9 +83,9 @@ namespace VirtualMorse
             return currentWord;
         }
 
-        public string getCurrentLetter()
+        public string getCurrentMorse()
         {
-            return currentLetter;
+            return currentMorse;
         }
 
         public string getDocument()
@@ -93,9 +93,9 @@ namespace VirtualMorse
             return textBox.Text;
         }
 
-        public void clearLetter()
+        public void clearMorse()
         {
-            currentLetter = "";
+            currentMorse = "";
         }
 
         public void clearWord()
