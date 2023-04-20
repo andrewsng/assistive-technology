@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using VirtualMorse.Input;
 
 namespace VirtualMorse.States
@@ -57,7 +58,6 @@ namespace VirtualMorse.States
         void enterCommand()
         {
             char commandLetter = Function.morseToText(context.currentMorse);
-            List<string> header;
             string address = "";
             string contents = "";
             string index = "";
@@ -95,74 +95,115 @@ namespace VirtualMorse.States
                     context.clearWord();
                     break;
                 case 'd':
-                    Console.WriteLine("deletes email");
-                    int emailIndex;
-                    try
                     {
-                        emailIndex = Int32.Parse(context.getCurrentWord());
-                    }
-                    catch
-                    {
-                        Console.WriteLine("Error parsing index from current word");
+                        Console.WriteLine("deletes email");
+                        int emailIndex;
+                        try
+                        {
+                            emailIndex = Int32.Parse(context.getCurrentWord());
+                        }
+                        catch
+                        {
+                            Console.WriteLine("Error parsing index from current word");
+                            break;
+                        }
+
+                        try
+                        {
+                            Function.deleteEmail(emailIndex);
+                            Function.speak("email number " + emailIndex + " deleted");
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine("Failed to delete email.");
+                            Console.WriteLine(ex.Message);
+                            Function.speak("Failed to delete email.");
+                        }
+                        context.clearMorse();
+                        context.clearWord();
                         break;
                     }
-
-                    try
-                    {
-                        Function.deleteEmail(emailIndex);
-                        Function.speak("email number " + emailIndex + " deleted");
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine("Failed to delete email.");
-                        Console.WriteLine(ex.Message);
-                        Function.speak("Failed to delete email.");
-                    }
-                    context.clearMorse();
-                    context.clearWord();
-                    break;
                 case 'h':
-                    Console.WriteLine("read email headers");
-                    index = context.getCurrentWord();
-                    header = Function.readEmailHeader(Int32.Parse(index));
-                    if (Function.has_executed == true)
                     {
-                        Function.speak("Email header number: " + header[0]);
-                        Function.speak("Date and time sent: " + header[1]);
-                        Function.speak("Sender's display name: " + header[2]);
-                        Function.speak("Sender's address: " + header[3]);
-                        Function.speak("Email subject line: " + header[4]);
-                    }
-                    else
-                    {
-                        Function.speak("failed to read email header");
-                    }
-                    context.clearMorse();
-                    context.clearWord();
-                    break;
+                        Console.WriteLine("read email headers");
+                        int emailIndex;
+                        try
+                        {
+                            emailIndex = Int32.Parse(context.getCurrentWord());
+                        }
+                        catch
+                        {
+                            Console.WriteLine("Error parsing index from current word");
+                            break;
+                        }
 
+                        List<string> header;
+                        try
+                        {
+                            header = Function.getEmailHeader(emailIndex);
+
+                            Console.WriteLine("Date Sent: {0}", header[1]);
+                            Console.WriteLine("Sender Name: {0}", header[2]);
+                            Console.WriteLine("Sender Address: {0}", header[3]);
+                            Console.WriteLine("Subject Line: {0}", header[4]);
+                            Function.speak("Email header number: " + header[0]);
+                            Function.speak("Date and time sent: " + header[1]);
+                            Function.speak("Sender's display name: " + header[2]);
+                            Function.speak("Sender's address: " + header[3]);
+                            Function.speak("Email subject line: " + header[4]);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine("Failed to read email header.");
+                            Console.WriteLine(ex.Message);
+                            Function.speak("Failed to read email header.");
+                        }
+                        context.clearMorse();
+                        context.clearWord();
+                        break;
+                    }
                 case 'r':
-                    Console.WriteLine("reads email");
-                    index = context.getCurrentWord();
-                    header = Function.readEmailHeader(Int32.Parse(index));
-                    if (Function.has_executed == true)
                     {
-                        Function.speak("Email header number: " + header[0]);
-                        Function.speak("Date and time sent: " + header[1]);
-                        Function.speak("Sender's display name: " + header[2]);
-                        Function.speak("Sender's address: " + header[3]);
-                        Function.speak("Email subject line: " + header[4]);
-                        string email = Function.readEmail(Int32.Parse(index));
-                        Function.speak("Email Contents: " + email);
-                    }
-                    else
-                    {
-                        Function.speak("failed to read email");
-                    }
-                    context.clearMorse();
-                    context.clearWord();
-                    break;
+                        Console.WriteLine("reads email");
+                        int emailIndex;
+                        try
+                        {
+                            emailIndex = Int32.Parse(context.getCurrentWord());
+                        }
+                        catch
+                        {
+                            Console.WriteLine("Error parsing index from current word");
+                            break;
+                        }
 
+                        List<string> header;
+                        try
+                        {
+                            header = Function.getEmailHeader(emailIndex);
+                            string body = Function.readEmail(emailIndex);
+
+                            Console.WriteLine("Date Sent: {0}", header[1]);
+                            Console.WriteLine("Sender Name: {0}", header[2]);
+                            Console.WriteLine("Sender Address: {0}", header[3]);
+                            Console.WriteLine("Subject Line: {0}", header[4]);
+                            Console.WriteLine("Body: {0}", body);
+                            Function.speak("Email header number: " + header[0]);
+                            Function.speak("Date and time sent: " + header[1]);
+                            Function.speak("Sender's display name: " + header[2]);
+                            Function.speak("Sender's address: " + header[3]);
+                            Function.speak("Email subject line: " + header[4]);
+                            Function.speak("Email Contents: " + body);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine("Failed to read email .");
+                            Console.WriteLine(ex.Message);
+                            Function.speak("Failed to read email.");
+                        }
+                        context.clearMorse();
+                        context.clearWord();
+                        break;
+                    }
                 case 'e':
                     Console.WriteLine("create/send email");
                     address = context.getCurrentWord();
@@ -182,23 +223,25 @@ namespace VirtualMorse.States
                     break;
 
                 case 'y':
-                    Console.WriteLine("reply to email");
-                    index = context.getCurrentWord();
-                    contents = context.getDocument();
-                    header = Function.readEmailHeader(Int32.Parse(index));
-                    Function.sendEmail(header[3], contents);
-                    if (Function.has_executed == true)
                     {
-                        Function.speak("replied to " + header[3]);
+                        List<string> header;
+                        Console.WriteLine("reply to email");
+                        index = context.getCurrentWord();
+                        contents = context.getDocument();
+                        header = Function.getEmailHeader(Int32.Parse(index));
+                        Function.sendEmail(header[3], contents);
+                        if (Function.has_executed == true)
+                        {
+                            Function.speak("replied to " + header[3]);
+                        }
+                        else
+                        {
+                            Function.speak("failed to reply to email");
+                        }
+                        context.clearMorse();
+                        context.clearWord();
+                        break;
                     }
-                    else
-                    {
-                        Function.speak("failed to reply to email");
-                    }
-                    context.clearMorse();
-                    context.clearWord();
-                    break;
-
                 case 'n':
                     Console.WriteLine("adds email address nickname");
                     nickname = context.getCurrentWord();

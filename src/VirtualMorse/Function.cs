@@ -212,109 +212,87 @@ namespace VirtualMorse
             }
         }
 
-
         public static string readEmail(int index)
         {
+            // Decrement emailNumber by 1 to get the correct email header number.
             index--;
             string body = "";
-
             using (var client = new ImapClient())
             {
                 try
                 {
                     client.Connect("imap.gmail.com", 993, true);
-
                     client.Authenticate(DotNetEnv.Env.GetString("EMAIL__ACCOUNT"), DotNetEnv.Env.GetString("APP__PASSWORD"));
-
-                    var inbox = client.Inbox;
-                    inbox.Open(FolderAccess.ReadOnly);
-
-                    // Email header number 
-                    // Oldest email = 1 vs. newest email = nth inbox location.
-
-                    // Decrement emailNumber by 1 to get the correct email header number.
-                    if (index >= 0 && index < inbox.Count)
-                    {
-                        var message = inbox.GetMessage(index);
-                        body = message.TextBody;
-                    }
-
-                    // TODO: Detect hyperlinks in email body and avoid reading them out loud.
-
-                    Console.WriteLine("Body: {0}", body);
-
-                    client.Disconnect(true);
-                    has_executed = true;
                 }
                 catch
                 {
-                    Console.WriteLine("failed to read email");
-                    has_executed = false;
+                    Console.WriteLine("Error connecting or authenticating IMAP client.");
+                    throw;
                 }
-                finally
+
+                var inbox = client.Inbox;
+                inbox.Open(FolderAccess.ReadOnly);
+
+                // Email header number 
+                // Oldest email = 1 vs. newest email = nth inbox location.
+                if (index >= inbox.Count)
                 {
                     client.Disconnect(true);
+                    throw new ArgumentException("Index greater than number of emails");
                 }
+                var message = inbox.GetMessage(index);
+
+                body = message.TextBody;
+
+                // TODO: Detect hyperlinks in email body and avoid reading them out loud.
+
+                client.Disconnect(true);
             }
             return body;
         }
 
-
-        public static List<string> readEmailHeader(int index)
+        public static List<string> getEmailHeader(int index)
         {
             index--;
-            List<string> return_string = new List<string>();
-
-
+            List<string> emailHeader = new List<string>();
             using (var client = new ImapClient())
             {
                 try
                 {
                     client.Connect("imap.gmail.com", 993, true);
-
-                client.Authenticate(DotNetEnv.Env.GetString("EMAIL__ACCOUNT"), DotNetEnv.Env.GetString("APP__PASSWORD"));
-                
-                    var inbox = client.Inbox;
-                    inbox.Open(FolderAccess.ReadOnly);
-
-                    // Email header number 
-                    // Oldest email = 1 vs. newest email = nth inbox location.
-                    if (index >= 0 && index < inbox.Count)
-                    {
-                        var message = inbox.GetMessage(index);
-                        var dateSent = message.Date;
-                        var senderName = message.From;
-                        var senderAddress = message.From.Mailboxes.FirstOrDefault().Address;
-                        var subjectLine = message.Subject;
-
-                        Console.WriteLine("Date Sent: {0}", dateSent);
-                        Console.WriteLine("Sender Name: {0}", senderName);
-                        Console.WriteLine("Sender Address: {0}", senderAddress);
-                        Console.WriteLine("Subject Line: {0}", subjectLine);
-
-                        return_string.Add((index + 1).ToString());
-                        return_string.Add(dateSent.ToString());
-                        return_string.Add(senderName.ToString());
-                        return_string.Add(senderAddress.ToString());
-                        return_string.Add(subjectLine.ToString());
-
-                    }
-
-                    client.Disconnect(true);
-                    has_executed = true;
+                    client.Authenticate(DotNetEnv.Env.GetString("EMAIL__ACCOUNT"), DotNetEnv.Env.GetString("APP__PASSWORD"));
                 }
                 catch
                 {
-                    Console.WriteLine("failed to retrieve header");
-                    has_executed = false;
+                    Console.WriteLine("Error connecting or authenticating IMAP client.");
+                    throw;
                 }
-                finally
+
+                var inbox = client.Inbox;
+                inbox.Open(FolderAccess.ReadOnly);
+
+                // Email header number 
+                // Oldest email = 1 vs. newest email = nth inbox location.
+                if (index >= inbox.Count)
                 {
                     client.Disconnect(true);
+                    throw new ArgumentException("Index greater than number of emails");
                 }
-            }
+                var message = inbox.GetMessage(index);
+                /*var dateSent = message.Date;
+                var senderName = message.From;
+                var senderAddress = message.From.Mailboxes.FirstOrDefault().Address;
+                var subjectLine = message.Subject;*/
 
-            return return_string;
+                emailHeader.Add((index + 1).ToString());
+                emailHeader.Add(message.Date.ToString());
+                emailHeader.Add(message.From.ToString());
+                emailHeader.Add(message.From.Mailboxes.FirstOrDefault().Address.ToString());
+                emailHeader.Add(message.Subject.ToString());
+
+                client.Disconnect(true);
+            }
+            return emailHeader;
         }
 
         public static List<int> getEmailCounts()
@@ -325,7 +303,7 @@ namespace VirtualMorse
                 try
                 {
                     client.Connect("imap.gmail.com", 993, true);
-                    client.Authenticate(DotNetEnv.Env.GetString("EMAIL__ACCONT"), DotNetEnv.Env.GetString("APP__PASSWORD"));
+                    client.Authenticate(DotNetEnv.Env.GetString("EMAIL__ACCOUNT"), DotNetEnv.Env.GetString("APP__PASSWORD"));
                     var inbox = client.Inbox;
                     inbox.Open(FolderAccess.ReadOnly);
 
@@ -348,7 +326,6 @@ namespace VirtualMorse
             return emailCounts;
         }
 
-
         public static void deleteEmail(int index)
         {
             index--;
@@ -369,6 +346,7 @@ namespace VirtualMorse
                 inbox.Open(FolderAccess.ReadWrite);
                 if (index >= inbox.Count)
                 {
+                    client.Disconnect(true);
                     throw new ArgumentException("Index greater than number of emails");
                 }
                 inbox.AddFlags(index, MessageFlags.Deleted, true);
@@ -377,8 +355,6 @@ namespace VirtualMorse
                 client.Disconnect(true);
             }
         }
-
-
         public static void createNickname(string nickname)
         {
             Function.nickname = nickname;
@@ -404,7 +380,6 @@ namespace VirtualMorse
             }
         }
 
-
         public static string checkNickname(string address)
         {
             string email = address;
@@ -427,7 +402,6 @@ namespace VirtualMorse
             }
             return email;
         }
-
     }
 }
 
