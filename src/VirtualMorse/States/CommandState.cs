@@ -253,19 +253,21 @@ namespace VirtualMorse.States
                         break;
                     }
                 case 'n':
-                    Console.WriteLine("adds email address nickname");
-                    nickname = context.getCurrentWord();
-                    Function.createNickname(nickname);
-                    Function.speak("added nickname " + nickname);
-                    break;
-
+                    {
+                        Console.WriteLine("adds email address nickname");
+                        nickname = context.getCurrentWord();
+                        Function.createNickname(nickname);
+                        Function.speak("added nickname " + nickname);
+                        break;
+                    }
                 case 'a':
-                    Console.WriteLine("ties email address to nickname");
-                    string address = context.getCurrentWord();
-                    Function.addEmailToBook(address);
-                    Function.speak("added email address " + address);
-                    break;
-
+                    {
+                        Console.WriteLine("ties email address to nickname");
+                        string address = context.getCurrentWord();
+                        Function.addEmailToBook(address);
+                        Function.speak("added email address " + address);
+                        break;
+                    }
                 default:
                     Console.WriteLine("invalid command");
                     sayUnprogrammedError();
