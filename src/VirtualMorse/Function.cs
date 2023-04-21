@@ -22,9 +22,6 @@ namespace VirtualMorse
         public string Email { get; set; }
     }
 
-
-
-
     public static class Function
     {
         static string directory;
@@ -32,6 +29,7 @@ namespace VirtualMorse
         static string virtualMorseVersion = "2023";
         static string nickname = "";
         static SpeechSynthesizer speaker;
+
         static Function()
         {
             directory = AppDomain.CurrentDomain.BaseDirectory;
@@ -42,6 +40,7 @@ namespace VirtualMorse
             speaker = new SpeechSynthesizer();
             speaker.SetOutputToDefaultAudioDevice();
         }
+
         static Dictionary<string, char> morse_map = new Dictionary<string, char>() {
             // Letters
             {".-", 'a'},
@@ -138,6 +137,7 @@ namespace VirtualMorse
                 writer.WriteLine(text);
             }
         }
+
         public static List<string> readFullFile(string directory, string file)
         {
             List<string> return_string = new List<string>();
@@ -263,50 +263,6 @@ namespace VirtualMorse
                 client.Disconnect(true);
             }
             return message;
-        }
-
-        public static string readEmail(int index)
-        {
-            string body = "";
-            using (var client = new ImapClient())
-            {
-                connectImapClient(client);
-
-                var inbox = client.Inbox;
-                inbox.Open(FolderAccess.ReadOnly);
-
-                var message = inbox.GetMessage(index);
-
-                body = message.TextBody;
-
-                // TODO: Detect hyperlinks in email body and avoid reading them out loud.
-
-                client.Disconnect(true);
-            }
-            return body;
-        }
-
-        public static List<string> getEmailHeader(int index)
-        {
-            List<string> emailHeader = new List<string>();
-            using (var client = new ImapClient())
-            {
-                connectImapClient(client);
-
-                var inbox = client.Inbox;
-                inbox.Open(FolderAccess.ReadOnly);
-
-                var message = inbox.GetMessage(index);
-
-                emailHeader.Add((index + 1).ToString());
-                emailHeader.Add(message.Date.ToString());
-                emailHeader.Add(message.From.ToString());
-                emailHeader.Add(message.From.Mailboxes.FirstOrDefault().Address.ToString());
-                emailHeader.Add(message.Subject.ToString());
-
-                client.Disconnect(true);
-            }
-            return emailHeader;
         }
 
         public static List<int> getEmailCounts()

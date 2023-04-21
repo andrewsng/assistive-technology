@@ -114,12 +114,13 @@ namespace VirtualMorse.States
                     tryEmailFunction(
                         context => {
                             int emailIndex = parseIndex(context.getCurrentWord());
-                            List<string> header = Function.getEmailHeader(emailIndex);
-                            return $"Email header number: {header[0]}\n" +
-                                   $"Date and time sent: {header[1]}\n" +
-                                   $"Sender's display name: {header[2]}\n" +
-                                   $"Sender's address: {header[3]}\n" +
-                                   $"Email subject line: {header[4]}";
+                            var message = Function.getEmail(emailIndex);
+                            var sender = message.Sender ?? message.From.Mailboxes.FirstOrDefault();
+                            return $"Email header number: {context.getCurrentWord()}\n" +
+                                   $"Date and time sent: {message.Date}\n" +
+                                   $"Sender's display name: {sender.Name}\n" +
+                                   $"Sender's address: {sender.Address}\n" +
+                                   $"Email subject line: {message.Subject}";
 
                         },
                         "Failed to read email header."
@@ -130,14 +131,14 @@ namespace VirtualMorse.States
                     tryEmailFunction(
                         context => {
                             int emailIndex = parseIndex(context.getCurrentWord());
-                            List<string> header = Function.getEmailHeader(emailIndex);
-                            string body = Function.readEmail(emailIndex);
-                            return $"Email header number: {header[0]}\n" +
-                                   $"Date and time sent: {header[1]}\n" +
-                                   $"Sender's display name: {header[2]}\n" +
-                                   $"Sender's address: {header[3]}\n" +
-                                   $"Email subject line: {header[4]}\n" +
-                                   $"Email Contents: {body}";
+                            var message = Function.getEmail(emailIndex);
+                            var sender = message.Sender ?? message.From.Mailboxes.FirstOrDefault();
+                            return $"Email header number: {context.getCurrentWord()}\n" +
+                                   $"Date and time sent: {message.Date}\n" +
+                                   $"Sender's display name: {sender.Name}\n" +
+                                   $"Sender's address: {sender.Address}\n" +
+                                   $"Email subject line: {message.Subject}\n" +
+                                   $"Email Contents: {message.TextBody}";
                         },
                         "Failed to read email."
                         );
