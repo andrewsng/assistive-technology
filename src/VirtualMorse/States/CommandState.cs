@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using VirtualMorse.Input;
 
 namespace VirtualMorse.States
@@ -163,7 +164,7 @@ namespace VirtualMorse.States
                         string address = context.getCurrentWord();
                         address = Function.checkNickname(address);
                         string contents = context.getDocument();
-                        Function.sendEmail(address, contents);
+                        Function.sendEmail(Function.createEmail(address, contents));
                         Console.WriteLine($"Sending email to {address}.");
                         Function.speak($"Sending email to {address}.");
                     }
@@ -175,36 +176,24 @@ namespace VirtualMorse.States
                     }
                     break;
                 case 'y':
+                    Console.WriteLine("reply to email");
+                    try
                     {
-                        Console.WriteLine("reply to email");
-                        List<string> header = new List<string>();
-                        try
-                        {
-                            int emailIndex = Int32.Parse(context.getCurrentWord());
-                            header = Function.getEmailHeader(emailIndex);
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine("Failed to read email header.");
-                            Console.WriteLine(ex.Message);
-                            Function.speak("Failed to read email header.");
-                            break;
-                        }
+                        int emailIndex = Int32.Parse(context.getCurrentWord());
+                        var message = Function.getEmail(emailIndex);
 
-                        try
-                        {
-                            string contents = context.getDocument();
-                            Function.sendEmail(header[3], contents);
-                            Function.speak("replied to " + header[3]);
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine("Failed to reply to email.");
-                            Console.WriteLine(ex.Message);
-                            Function.speak("Failed to reply to email.");
-                        }
-                        break;
+                        string contents = context.getDocument();
+                        Function.sendEmail(Function.createReply(message, contents));
+                        var sender = message.Sender ?? message.From.Mailboxes.FirstOrDefault();
+                        Function.speak("replied to " + (!string.IsNullOrEmpty(sender.Name) ? sender.Name : sender.Address));
                     }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Failed to reply to email.");
+                        Console.WriteLine(ex.Message);
+                        Function.speak("Failed to reply to email.");
+                    }
+                    break;
                 case 'n':
                     Console.WriteLine("adds email address nickname");
                     nickname = context.getCurrentWord();
@@ -248,17 +237,6 @@ namespace VirtualMorse.States
         void sayUnprogrammedError()
         {
             Function.speak("That command is not programmed.");
-        }
-
-        bool tryParseIndex(string indexString, out int result)
-        {
-            bool success = Int32.TryParse(indexString, out int emailIndex);
-            result = emailIndex;
-            if (!success)
-            {
-                Console.WriteLine("Error parsing index from current word");
-            }
-            return success;
         }
     }
 }

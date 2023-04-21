@@ -12,9 +12,7 @@ using System.Globalization;
 using MailKit.Search;
 using MailKit.Net.Imap;
 using MailKit.Security;
-
-
-
+using MimeKit.Encodings;
 
 namespace VirtualMorse
 {
@@ -164,9 +162,10 @@ namespace VirtualMorse
             speaker.SpeakAsyncCancelAll();
         }
 
-        public static void sendEmail(string address, string contents)
+        public static MimeMessage createEmail(string address, string contents)
         {
             var message = new MimeMessage();
+
             message.From.Add(new MailboxAddress("Sender Name", DotNetEnv.Env.GetString("EMAIL__ACCOUNT") + "@gmail.com"));
             message.To.Add(new MailboxAddress("Receiver Name", address));
             message.Subject = "This message sent with Virtual Morse " + virtualMorseVersion;
@@ -176,13 +175,95 @@ namespace VirtualMorse
                 Text = contents
             };
 
+            return message;
+        }
+
+        // https://github.com/jstedfast/MailKit/blob/master/FAQ.md#reply-message
+        public static MimeMessage createReply(MimeMessage message, string contents)
+        {
+            var reply = new MimeMessage();
+
+            reply.From.Add(new MailboxAddress("Sender Name", DotNetEnv.Env.GetString("EMAIL__ACCOUNT") + "@gmail.com"));
+            
+            if (message.ReplyTo.Count > 0)
+            {
+                reply.To.AddRange(message.ReplyTo);
+            }
+            else if (message.From.Count > 0)
+            {
+                reply.To.AddRange(message.From);
+            }
+            else if (message.Sender != null)
+            {
+                reply.To.Add(message.Sender);
+            }
+
+            if (!message.Subject.StartsWith("Re: ", StringComparison.OrdinalIgnoreCase))
+            {
+                reply.Subject = "Re: " + message.Subject;
+            }
+            else
+            {
+                reply.Subject = message.Subject;
+            }
+
+            reply.InReplyTo = message.MessageId;
+            foreach (var id in message.References)
+            {
+                reply.References.Add(id);
+            }
+            reply.References.Add(message.MessageId);
+
+            using (var quoted = new StringWriter())
+            {
+                var sender = message.Sender ?? message.From.Mailboxes.FirstOrDefault();
+                quoted.WriteLine("On {0} {1} wrote:", message.Date.ToString("f"), !string.IsNullOrEmpty(sender.Name) ? sender.Name : sender.Address);
+                using (var reader = new StringReader(message.TextBody))
+                {
+                    string line;
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        quoted.Write("> ");
+                        quoted.WriteLine(line);
+                    }
+                }
+
+                reply.Body = new TextPart("plain")
+                {
+                    Text = contents + "\n\n" + quoted.ToString()
+                };
+            }
+            return reply;
+        }
+
+        public static void sendEmail(MimeMessage message)
+        {
             using (var client = new SmtpClient())
             {
                 connectSmtpClient(client);
                 
                 client.Send(message);
+
                 client.Disconnect(true);
             }
+        }
+
+        public static MimeMessage getEmail(int index)
+        {
+            index--;
+            MimeMessage message;
+            using (var client = new ImapClient())
+            {
+                connectImapClient(client);
+
+                var inbox = client.Inbox;
+                inbox.Open(FolderAccess.ReadOnly);
+
+                message = inbox.GetMessage(index);
+
+                client.Disconnect(true);
+            }
+            return message;
         }
 
         public static string readEmail(int index)
