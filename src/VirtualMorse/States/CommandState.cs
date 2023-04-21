@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading;
 using VirtualMorse.Input;
 
 namespace VirtualMorse.States
@@ -57,6 +58,22 @@ namespace VirtualMorse.States
             Function.speak("Document cleared.");
         }
 
+        void tryEmailFunction(Func<WritingContext, string> function, string errorMessage)
+        {
+            string output;
+            try
+            {
+                output = function(context);
+            }
+            catch (Exception ex)
+            {
+                output = errorMessage;
+                Console.WriteLine(ex.Message);
+            }
+            Console.WriteLine(output);
+            Function.speak(output);
+        }
+
         void enterCommand()
         {
             char commandLetter = Function.morseToText(context.currentMorse);
@@ -71,128 +88,87 @@ namespace VirtualMorse.States
 
                 case 'g':
                     Console.WriteLine("checks email");
-                    try
-                    {
-                        List<int> email_count = Function.getEmailCounts();
-                        int newEmails = email_count[0];
-                        int unread = email_count[1];
-                        int total = email_count[2];
-                        Console.WriteLine(">> You have {0} new emails.", newEmails);
-                        Console.WriteLine(">> You have {0} unread emails.", unread);
-                        Console.WriteLine(">> Total messages: {0}", total);
-                        Function.speak("you have " + unread + " unread emails.");
-                        Function.speak("you have " + total + " total emails.");
-                    }
-                    catch
-                    {
-                        Console.WriteLine("Failed to check emails.");
-                        Function.speak("Failed to check emails.");
-                    }
+                    tryEmailFunction(
+                        context => {
+                            List<int> email_count = Function.getEmailCounts();
+                            return $"You have {email_count[0]} new emails.\n" +
+                                   $"You have {email_count[1]} unread emails.\n" +
+                                   $"You have {email_count[2]} total emails.";
+                        },
+                        "Failed to check emails."
+                    );
                     break;
                 case 'd':
                     Console.WriteLine("deletes email");
-                    try
-                    {
-                        int emailIndex = Int32.Parse(context.getCurrentWord());
-                        Function.deleteEmail(emailIndex);
-                        Function.speak("email number " + emailIndex + " deleted");
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine("Failed to delete email.");
-                        Console.WriteLine(ex.Message);
-                        Function.speak("Failed to delete email.");
-                    }
+                    tryEmailFunction(
+                        context => {
+                            int emailIndex = parseIndex(context.getCurrentWord());
+                            Function.deleteEmail(emailIndex);
+                            return $"Email number {context.getCurrentWord()} deleted.";
+                        },
+                        "Failed to delete email."
+                        );
                     break;
                 case 'h':
                     Console.WriteLine("read email headers");
-                    try
-                    {
-                        List<string> header;
-                        int emailIndex = Int32.Parse(context.getCurrentWord());
-                        header = Function.getEmailHeader(emailIndex);
+                    tryEmailFunction(
+                        context => {
+                            int emailIndex = parseIndex(context.getCurrentWord());
+                            List<string> header = Function.getEmailHeader(emailIndex);
+                            return $"Email header number: {header[0]}\n" +
+                                   $"Date and time sent: {header[1]}\n" +
+                                   $"Sender's display name: {header[2]}\n" +
+                                   $"Sender's address: {header[3]}\n" +
+                                   $"Email subject line: {header[4]}";
 
-                        Console.WriteLine("Date Sent: {0}", header[1]);
-                        Console.WriteLine("Sender Name: {0}", header[2]);
-                        Console.WriteLine("Sender Address: {0}", header[3]);
-                        Console.WriteLine("Subject Line: {0}", header[4]);
-                        Function.speak("Email header number: " + header[0]);
-                        Function.speak("Date and time sent: " + header[1]);
-                        Function.speak("Sender's display name: " + header[2]);
-                        Function.speak("Sender's address: " + header[3]);
-                        Function.speak("Email subject line: " + header[4]);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine("Failed to read email header.");
-                        Console.WriteLine(ex.Message);
-                        Function.speak("Failed to read email header.");
-                    }
+                        },
+                        "Failed to read email header."
+                        );
                     break;
                 case 'r':
                     Console.WriteLine("reads email");
-                    try
-                    {
-                        List<string> header;
-                        int emailIndex = Int32.Parse(context.getCurrentWord());
-                        header = Function.getEmailHeader(emailIndex);
-                        string body = Function.readEmail(emailIndex);
-
-                        Console.WriteLine("Date Sent: {0}", header[1]);
-                        Console.WriteLine("Sender Name: {0}", header[2]);
-                        Console.WriteLine("Sender Address: {0}", header[3]);
-                        Console.WriteLine("Subject Line: {0}", header[4]);
-                        Console.WriteLine("Body: {0}", body);
-                        Function.speak("Email header number: " + header[0]);
-                        Function.speak("Date and time sent: " + header[1]);
-                        Function.speak("Sender's display name: " + header[2]);
-                        Function.speak("Sender's address: " + header[3]);
-                        Function.speak("Email subject line: " + header[4]);
-                        Function.speak("Email Contents: " + body);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine("Failed to read email.");
-                        Console.WriteLine(ex.Message);
-                        Function.speak("Failed to read email.");
-                    }
+                    tryEmailFunction(
+                        context => {
+                            int emailIndex = parseIndex(context.getCurrentWord());
+                            List<string> header = Function.getEmailHeader(emailIndex);
+                            string body = Function.readEmail(emailIndex);
+                            return $"Email header number: {header[0]}\n" +
+                                   $"Date and time sent: {header[1]}\n" +
+                                   $"Sender's display name: {header[2]}\n" +
+                                   $"Sender's address: {header[3]}\n" +
+                                   $"Email subject line: {header[4]}\n" +
+                                   $"Email Contents: {body}";
+                        },
+                        "Failed to read email."
+                        );
                     break;
                 case 'e':
                     Console.WriteLine("create/send email");
-                    try
-                    {
-                        string address = context.getCurrentWord();
-                        address = Function.checkNickname(address);
-                        string contents = context.getDocument();
-                        Function.sendEmail(Function.createEmail(address, contents));
-                        Console.WriteLine($"Sending email to {address}.");
-                        Function.speak($"Sending email to {address}.");
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine("Failed to send email.");
-                        Console.WriteLine(ex.Message);
-                        Function.speak("Failed to send email.");
-                    }
+                    tryEmailFunction(
+                        context => {
+                            string address = context.getCurrentWord();
+                            address = Function.checkNickname(address);
+                            string contents = context.getDocument();
+                            Function.sendEmail(Function.createEmail(address, contents));
+                            return $"Sending email to {address}.";
+                        },
+                        "Failed to send email."
+                        );
                     break;
                 case 'y':
                     Console.WriteLine("reply to email");
-                    try
-                    {
-                        int emailIndex = Int32.Parse(context.getCurrentWord());
-                        var message = Function.getEmail(emailIndex);
+                    tryEmailFunction(
+                        context => {
+                            int emailIndex = parseIndex(context.getCurrentWord());
+                            var message = Function.getEmail(emailIndex);
 
-                        string contents = context.getDocument();
-                        Function.sendEmail(Function.createReply(message, contents));
-                        var sender = message.Sender ?? message.From.Mailboxes.FirstOrDefault();
-                        Function.speak("replied to " + (!string.IsNullOrEmpty(sender.Name) ? sender.Name : sender.Address));
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine("Failed to reply to email.");
-                        Console.WriteLine(ex.Message);
-                        Function.speak("Failed to reply to email.");
-                    }
+                            string contents = context.getDocument();
+                            Function.sendEmail(Function.createReply(message, contents));
+                            var sender = message.Sender ?? message.From.Mailboxes.FirstOrDefault();
+                            return $"Replied to {(!string.IsNullOrEmpty(sender.Name) ? sender.Name : sender.Address)}.";
+                        },
+                        "Failed to reply to email."
+                        );
                     break;
                 case 'n':
                     Console.WriteLine("adds email address nickname");
@@ -202,18 +178,14 @@ namespace VirtualMorse.States
                     break;
                 case 'a':
                     Console.WriteLine("ties email address to nickname");
-                    try
-                    {
-                        string address = context.getCurrentWord();
-                        Function.addEmailToBook(address);
-                        Function.speak("added email address " + address);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine("Failed to add email as a nickname.");
-                        Console.WriteLine(ex.Message);
-                        Function.speak("Failed to add email as a nickname.");
-                    }
+                    tryEmailFunction(
+                        context => {
+                            string address = context.getCurrentWord();
+                            Function.addEmailToBook(address);
+                            return $"Added email address {address}";
+                        },
+                        "Failed to add email as a nickname."
+                        );
                     break;
                 default:
                     Console.WriteLine("invalid command");
@@ -237,6 +209,11 @@ namespace VirtualMorse.States
         void sayUnprogrammedError()
         {
             Function.speak("That command is not programmed.");
+        }
+
+        int parseIndex(string str)
+        {
+            return Int32.Parse(str) - 1;
         }
     }
 }

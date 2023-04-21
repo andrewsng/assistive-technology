@@ -250,7 +250,6 @@ namespace VirtualMorse
 
         public static MimeMessage getEmail(int index)
         {
-            index--;
             MimeMessage message;
             using (var client = new ImapClient())
             {
@@ -268,8 +267,6 @@ namespace VirtualMorse
 
         public static string readEmail(int index)
         {
-            // Decrement emailNumber by 1 to get the correct email header number.
-            index--;
             string body = "";
             using (var client = new ImapClient())
             {
@@ -291,7 +288,6 @@ namespace VirtualMorse
 
         public static List<string> getEmailHeader(int index)
         {
-            index--;
             List<string> emailHeader = new List<string>();
             using (var client = new ImapClient())
             {
@@ -336,7 +332,6 @@ namespace VirtualMorse
 
         public static void deleteEmail(int index)
         {
-            index--;
             using (var client = new ImapClient())
             {
                 connectImapClient(client);
