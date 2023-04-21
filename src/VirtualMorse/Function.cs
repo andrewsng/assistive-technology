@@ -311,22 +311,36 @@ namespace VirtualMorse
             Function.nickname = nickname;
         }
 
+        public static List<AddressBook> readAddressBook()
+        {
+            List<AddressBook> records = new List<AddressBook>();
+            try
+            {
+                using (var reader = new StreamReader(directory + addressBook))
+                {
+                    using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+                    {
+                        records = csv.GetRecords<AddressBook>().ToList();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Failed to read from Address Book");
+                Console.WriteLine(ex.Message);
+            }
+            return records;
+        }
+
         public static void addEmailToBook(string email)
         {
-
-            var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+            var records = readAddressBook();
+            using (var writer = new StreamWriter(directory + addressBook))
             {
-                HasHeaderRecord = false,
-            };
-
-            using (var writer = new StreamWriter(directory + addressBook, true))
-            {
-                using (var csv = new CsvWriter(writer, config))
+                using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
                 {
-                    csv.NextRecord();
-                    AddressBook new_entry = new AddressBook { Nickname = Function.nickname, Email = email };
-                    csv.WriteRecord(new_entry);
-
+                    records.Add(new AddressBook { Nickname = Function.nickname, Email = email });
+                    csv.WriteRecords(records);
                 }
             }
         }
@@ -334,23 +348,14 @@ namespace VirtualMorse
         public static string checkNickname(string address)
         {
             string email = address;
-
-            using (var reader = new StreamReader(directory + addressBook))
+            var records = readAddressBook();
+            records.ForEach(record =>
             {
-                using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+                if (record.Nickname.Equals(address))
                 {
-                    var records = csv.GetRecords<AddressBook>();
-
-                    records.ToList().ForEach(record =>
-                    {
-                        if (record.Nickname.Equals(address))
-                        {
-                            email = record.Email;
-                        }
-
-                    });
+                    email = record.Email;
                 }
-            }
+            });
             return email;
         }
 

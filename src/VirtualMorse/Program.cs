@@ -27,7 +27,7 @@ namespace VirtualMorse
         [STAThread]
         public static void Main(string[] args)
         {
-            Function.speak(Program.programName + " " + Program.programVersion);
+            Function.speak(programName + " " + programVersion);
             Application.EnableVisualStyles();
             Application.Run(new Program());
         }

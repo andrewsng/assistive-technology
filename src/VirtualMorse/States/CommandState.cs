@@ -9,8 +9,6 @@ namespace VirtualMorse.States
 {
     public class CommandState : State
     {
-        static string nickname = "";
-
         Dictionary<Switch, Action> switchResponses;
 
         public CommandState(WritingContext context) : base(context)
@@ -173,7 +171,7 @@ namespace VirtualMorse.States
                     break;
                 case 'n':
                     Console.WriteLine("adds email address nickname");
-                    nickname = context.getCurrentWord();
+                    string nickname = context.getCurrentWord();
                     Function.createNickname(nickname);
                     Function.speak("added nickname " + nickname);
                     break;
