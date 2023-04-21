@@ -152,7 +152,7 @@ namespace VirtualMorse.States
 		{
 			context.transitionToState(new CommandState(context));
             Console.WriteLine("move to command state");
-			Function.speak("Command 1.");
+			Function.speak("Command Level 1.");
         }
 	}
 }

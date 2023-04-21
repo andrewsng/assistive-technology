@@ -154,6 +154,7 @@ namespace VirtualMorse
 
         public static void speak(string message)
         {
+            cancelSpeech();
             speaker.SpeakAsync(message);
         }
 
