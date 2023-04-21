@@ -39,13 +39,15 @@ namespace VirtualMorse.States
                 context.appendToDocument(punctuation);
                 Function.speak(spokenMessage);
                 context.transitionToState(new TypingState(context));
+                Console.WriteLine("Move to typing state.");
             };
         }
 
         void command()
         {
-            Function.speak("Move to typing state");
             context.transitionToState(new TypingState(context));
+            Console.WriteLine("Move to punctuation state.");
+            Function.speak("Command off.");
         }
     }
 }

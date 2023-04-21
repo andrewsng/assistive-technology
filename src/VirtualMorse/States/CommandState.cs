@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MimeKit;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -39,7 +40,8 @@ namespace VirtualMorse.States
         void command()
         {
             context.transitionToState(new PunctuationState(context));
-            Function.speak("move to punctuation state.");
+            Console.WriteLine("Move to punctuation state.");
+            Function.speak("Command 2.");
         }
 
         void printPage()
@@ -56,20 +58,23 @@ namespace VirtualMorse.States
             Function.speak("Document cleared.");
         }
 
-        void tryEmailFunction(Func<WritingContext, string> function, string errorMessage)
+        bool tryEmailFunction(Func<WritingContext, string> function, string errorMessage)
         {
             string output;
+            bool success = true;
             try
             {
                 output = function(context);
             }
             catch (Exception ex)
             {
+                success = false;
                 output = errorMessage;
                 Console.WriteLine(ex.Message);
             }
             Console.WriteLine(output);
             Function.speak(output);
+            return success;
         }
 
         void enterCommand()
@@ -105,7 +110,7 @@ namespace VirtualMorse.States
                             return $"Email number {context.getCurrentWord()} deleted.";
                         },
                         "Failed to delete email."
-                        );
+                    );
                     break;
                 case 'h':
                     Console.WriteLine("read email headers");
@@ -122,7 +127,7 @@ namespace VirtualMorse.States
 
                         },
                         "Failed to read email header."
-                        );
+                    );
                     break;
                 case 'r':
                     Console.WriteLine("reads email");
@@ -139,7 +144,7 @@ namespace VirtualMorse.States
                                    $"Email Contents: {message.TextBody}";
                         },
                         "Failed to read email."
-                        );
+                    );
                     break;
                 case 'e':
                     Console.WriteLine("create/send email");
@@ -152,23 +157,45 @@ namespace VirtualMorse.States
                             return $"Sending email to {address}.";
                         },
                         "Failed to send email."
-                        );
+                    );
                     break;
                 case 'y':
                     Console.WriteLine("reply to email");
-                    tryEmailFunction(
+                    MimeMessage saveMessage = null;
+                    string senderName = null;
+                    bool success = tryEmailFunction(
                         context => {
                             int emailIndex = parseIndex(context.getCurrentWord());
-                            var message = Function.getEmail(emailIndex);
-
-                            string contents = context.getDocument();
-                            Function.sendEmail(Function.createReply(message, contents));
-                            var sender = message.Sender ?? message.From.Mailboxes.FirstOrDefault();
-                            return $"Replied to {(!string.IsNullOrEmpty(sender.Name) ? sender.Name : sender.Address)}.";
+                            saveMessage = Function.getEmail(emailIndex);
+                            var sender = saveMessage.Sender ?? saveMessage.From.Mailboxes.FirstOrDefault();
+                            senderName = (!string.IsNullOrEmpty(sender.Name) ? sender.Name : sender.Address);
+                            return $"Reply to email number {context.getCurrentWord()} from {sender.Name ?? ""} {sender.Address}.";
                         },
                         "Failed to reply to email."
-                        );
-                    break;
+                    );
+                    if (!success)
+                    {
+                        break;
+                    }
+                    context.transitionToState(
+                        new ConfirmationState(
+                            context,
+                            () => {
+                                tryEmailFunction(
+                                    context =>
+                                    {
+                                        string contents = context.getDocument();
+                                        Function.sendEmail(Function.createReply(saveMessage, contents));
+                                        return $"Reply to {senderName} has been sent.";
+                                    },
+                                    "Failed to send reply."
+                                );
+                            }
+                        )
+                    );
+                    context.clearMorse();
+                    context.clearWord();
+                    return;
                 case 'n':
                     Console.WriteLine("adds email address nickname");
                     string nickname = context.getCurrentWord();
@@ -184,7 +211,7 @@ namespace VirtualMorse.States
                             return $"Added email address {address}";
                         },
                         "Failed to add email as a nickname."
-                        );
+                    );
                     break;
                 default:
                     Console.WriteLine("invalid command");
