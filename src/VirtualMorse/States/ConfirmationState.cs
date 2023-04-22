@@ -1,64 +1,45 @@
 ﻿using System;
+using System.Collections.Generic;
+using VirtualMorse.Input;
 
 namespace VirtualMorse.States
 {
     public class ConfirmationState : State
     {
-        protected WritingContext context;
+        Action actionToConfirm;
 
-        protected bool confirmation;
-        State previousState;
-        public ConfirmationState(WritingContext context, State previousState)
+        Dictionary<Switch, Action> switchResponses;
+
+        public ConfirmationState(WritingContext context, Action actionToConfirm) : base(context)
         {
-            this.context = context;
-            this.previousState = previousState;
+            this.actionToConfirm = actionToConfirm;
+
+            switchResponses = new Dictionary<Switch, Action>(){
+                { Switch.Switch4,  confirm },
+                { Switch.Switch8,  cancel },
+            };
         }
 
-        public override void shift()
+        public override void respond(Switch input)
         {
-
+            if (switchResponses.ContainsKey(input))
+            {
+                switchResponses[input]();
+            }
         }
 
-        public override void command()
+        void confirm()
         {
-
+            actionToConfirm();
+            context.transitionToState(new TypingState(context));
+            Console.WriteLine("Move to typing state.");
         }
 
-        public override void save()
+        void cancel()
         {
-
-        }
-
-        public override void space()
-        {
-            confirmation = true;
-            context.setState(previousState);
-        }
-
-        public override void dot()
-        {
-
-        }
-
-        public override void dash()
-        {
-
-        }
-
-        public override void enter()
-        {
-
-
-        }
-
-        public override void backspace()
-        {
-            confirmation = false;
-            context.setState(context.getCommandState());
-        }
-        public void speak(string message)
-        {
-
+            context.transitionToState(new TypingState(context));
+            Console.WriteLine("Move to typing state.");
+            Function.speak("Operation cancelled.");
         }
     }
 }

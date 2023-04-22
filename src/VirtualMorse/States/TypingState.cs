@@ -1,81 +1,105 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Windows.Forms;
+using VirtualMorse.Input;
 
 namespace VirtualMorse.States
 {
 	public class TypingState : State
-	{
-		protected WritingContext context;
+    {
+        bool isCapitalized = false;
 
-		string lastLetter = "";
-		bool isCapitalized = false;
+        Dictionary<Switch, Action> switchResponses;
 
 		//state functions
-		public TypingState(WritingContext context)
+		public TypingState(WritingContext context) : base(context)
 		{
-			this.context = context;
-		}
+			switchResponses = new Dictionary<Switch, Action>(){
+				{ Switch.Switch1,  command },
+				{ Switch.Switch2,  shift },
+				{ Switch.Switch3,  save },
+				{ Switch.Switch4,  space },
+				{ Switch.Switch5,  dot },
+				{ Switch.Switch6,  dash },
+				{ Switch.Switch7,  enter },
+				{ Switch.Switch8,  backspace },
+				{ Switch.Switch9,  command },
+				{ Switch.Switch10, command },
+			};
+        }
 
-		public override void dot()
+        public override void respond(Switch input)
+        {
+            if (switchResponses.ContainsKey(input))
+            {
+                switchResponses[input]();
+            }
+        }
+
+        void dot()
 		{
 			Console.WriteLine("storing dot");
-			addDot();
-		}
+            context.currentMorse += '.';
+        }
 
-		public override void dash()
+		void dash()
 		{
 			Console.WriteLine("storing dash");
-			addDash();
-		}
+            context.currentMorse += '-';
+        }
 
-		public override void space()
+		void space()
 		{
 			if (context.currentWord != "")
 			{
 				context.appendToDocument(context.currentWord);
 				Console.WriteLine("added word to file: " + context.currentWord);
-				speak(context.currentWord);
-                clearWord();
+				Function.speak(context.currentWord);
+                context.clearWord();
             }
 			else
 			{
 				context.appendToDocument(" ");
 				Console.WriteLine("SPACE added to file");
-				speak("Space.");
+				Function.speak("Space.");
 			}
 		}
 
-		public override void shift()
+		void shift()
 		{
-			toggleCapitalized();
-			Console.WriteLine("capitalization set to: " + isCapitalized);
-			speak("shift");
+            isCapitalized = !isCapitalized;
+            Console.WriteLine("capitalization set to: " + isCapitalized);
+			Function.speak("shift");
 		}
 
-		public override void enter()
+		void enter()
 		{
-			string spokenMessage;
-			string letter;
-			if (context.currentLetter == "" && lastLetter != "")
+			string morseString = context.currentMorse;
+            char nextLetter;
+            if (morseString == "" && context.lastLetter != '\0')
 			{
-				letter = lastLetter;
+                nextLetter = context.lastLetter;
 			}
 			else
 			{
-				letter = Function.morseToText(context.currentLetter);
+				nextLetter = Function.morseToText(morseString);
 				if (isCapitalized)
 				{
-					letter = letter.ToUpper();
+					nextLetter = char.ToUpper(nextLetter);
 					isCapitalized = false;
 				}
 			}
 
-			if (letter != "")
+            string spokenMessage;
+            if (nextLetter != '\0')
 			{
-				addLetterToWord(letter);
-				Console.WriteLine("added letter: " + letter);
+                context.currentWord += nextLetter;
+                context.lastLetter = nextLetter;
+                context.clearMorse();
+                Console.WriteLine("added letter: " + nextLetter);
 				if (context.currentWord == "ttt")
 				{
-					clearWord();
+					context.clearWord();
 					spokenMessage = context.getDocument();
 					if (spokenMessage == "")
 					{
@@ -85,8 +109,8 @@ namespace VirtualMorse.States
                 }
 				else
                 {
-                    spokenMessage = letter;
-                    if (Char.IsUpper(letter, 0))
+                    spokenMessage = nextLetter.ToString();
+                    if (char.IsUpper(nextLetter))
                     {
                         spokenMessage = "Capital " + spokenMessage;
                     }
@@ -94,89 +118,41 @@ namespace VirtualMorse.States
 			}
 			else
 			{
-				clearLetter();
+				context.clearMorse();
 				Console.WriteLine("not a valid letter, try again");
 				spokenMessage = "Try again";
 			}
-			speak(spokenMessage);
+			Function.speak(spokenMessage);
 		}
 
-		public override void backspace()
+		void backspace()
 		{
 			if (context.currentWord.Length > 0)
 			{
 				context.currentWord = context.currentWord.Remove(context.currentWord.Length - 1, 1);
 				Console.WriteLine("Delete");
-				speak("Delete.");
+				Function.speak("Delete.");
 			}
 			else
 			{
 				context.backspaceDocument();
 				Console.WriteLine("Backspace");
-				speak("Backspace.");
+				Function.speak("Backspace.");
 			}
 		}
 
-		public override void save()
+		void save()
 		{
 			Console.WriteLine("save text doc as is");
 			context.saveDocumentFile();
-			speak("Now saving.");
+			Function.speak("Now saving.");
 		}
 
-		public override void command()
+		void command()
 		{
-			context.setState(context.getCommandState());
+			context.transitionToState(new CommandState(context));
             Console.WriteLine("move to command state");
-			speak("Command On.");
-        }
-
-		//helper functions
-		public void addDot()
-		{
-			context.currentLetter += '.';
-		}
-
-		public void addDash()
-		{
-			context.currentLetter += '-';
-		}
-
-		public void clearLetter()
-		{
-			context.currentLetter = "";
-		}
-
-		public void addLetterToWord(string c)
-		{
-			context.currentWord += c;
-			lastLetter = c;
-			clearLetter();
-        }
-		public void clearWord()
-		{
-			context.currentWord = "";
-		}
-
-		public void toggleCapitalized()
-		{
-			isCapitalized = !isCapitalized;
-		}
-
-		public void speak(string message)
-		{
-			//context.speaker.SpeakAsyncCancelAll();
-			context.speaker.SpeakAsync(message);
-		}
-
-		public void speakLetter(string letter)
-		{
-            string message = letter;
-            if (Char.IsUpper(letter, 0))
-            {
-                message = "Capital " + letter;
-            }
-            speak(message);
+			Function.speak("Command Level 1.");
         }
 	}
 }

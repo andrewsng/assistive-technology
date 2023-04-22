@@ -27,13 +27,7 @@ namespace VirtualMorse
         [STAThread]
         public static void Main(string[] args)
         {
-            List<string> test = new List<string>();
-            test = Function.readEmailHeader(2);
-
-            foreach(string str in test)
-            {
-                Console.WriteLine(str);
-            }
+            Function.speak(programName + " " + programVersion);
             Application.EnableVisualStyles();
             Application.Run(new Program());
         }

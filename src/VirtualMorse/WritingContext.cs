@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Speech.Synthesis;
 using System.Windows.Forms;
 using VirtualMorse.States;
 using VirtualMorse.Input;
@@ -15,17 +14,11 @@ namespace VirtualMorse
         FunctionKeyInput functionKeys;
         ArduinoComms Board;
 
-        public SpeechSynthesizer speaker;
+        State state;
 
-        State typingState;
-        State commandState;
-        State punctuationState;
-        State ConfirmationState;
-
-        State currentState;
-
-        public string currentLetter = "";
+        public string currentMorse = "";
         public string currentWord = "";
+        public char lastLetter = '\0';
 
         string directory;
         string file = "test.txt";
@@ -42,16 +35,18 @@ namespace VirtualMorse
             functionKeys.KeyPressed += Handler_InputReceived;
             textBox.KeyDown += functionKeys.TextBox_KeyDown;
 
-            Board = new ArduinoComms(textBox);
-            Board.buttonPressed += Handler_InputReceived;
+            try
+            {
+                Board = new ArduinoComms(textBox);
+                Board.buttonPressed += Handler_InputReceived;
+            }
+            catch
+            {
+                Console.WriteLine("Error opening serial port");
+                // TODO: Throw here or not?
+            }
 
-            speaker = new SpeechSynthesizer();
-            speaker.SetOutputToDefaultAudioDevice();
-            speaker.SpeakAsync(Program.programName + " " + Program.programVersion);
-
-            typingState = new TypingState(this);
-            commandState = new CommandState(this);
-            currentState = typingState;  //set initial state
+            state = new TypingState(this);
 
             directory = AppDomain.CurrentDomain.BaseDirectory;
             directory = directory.Replace("bin\\Debug\\", "Text_documents\\");
@@ -60,43 +55,12 @@ namespace VirtualMorse
             {
                 setDocument((Function.readFullFile(directory, file))[0]);
             }
-
-            punctuationState = new PunctuationState(this);
-            ConfirmationState = new ConfirmationState(this, this.currentState);
         }
 
         private void Handler_InputReceived(object sender, SwitchInputEventArgs e)
         {
-            Switch input = e.switchInput;
-            switch (input)
-            {
-                case Switch.Switch1:  // Fall through
-                case Switch.Switch9:
-                    currentState.command();
-                    break;
-                case Switch.Switch2:
-                    currentState.shift();
-                    break;
-                case Switch.Switch3:
-                    currentState.save();
-                    break;
-                case Switch.Switch4:
-                    currentState.space();
-                    break;
-                case Switch.Switch5:
-                    currentState.dot();
-                    break;
-                case Switch.Switch6:
-                    currentState.dash();
-                    break;
-                case Switch.Switch7:
-                    currentState.enter();
-                    break;
-                case Switch.Switch8:
-                    currentState.backspace();
-                    break;
-            }
-            Console.WriteLine("current letter: '" + getCurrentLetter() + "'");
+            state.respond(e.switchInput);
+            Console.WriteLine("current letter: '" + getCurrentMorse() + "'");
             Console.WriteLine("current word: '" + getCurrentWord() + "'");
             Console.WriteLine("current document: '" + getDocument() + "'");
             Console.WriteLine();
@@ -109,30 +73,9 @@ namespace VirtualMorse
             return textBox;
         }
 
-        public void setState(State state)
+        public void transitionToState(State state)
         {
-            this.currentState = state;
-        }
-
-
-        public State getState()
-        {
-            return currentState;
-        }
-
-        public State getTypingState()
-        {
-            return typingState;
-        }
-
-        public State getCommandState()
-        {
-            return commandState;
-        }
-
-        public State getPunctuationState()
-        {
-            return punctuationState;
+            this.state = state;
         }
 
         public string getCurrentWord()
@@ -140,14 +83,24 @@ namespace VirtualMorse
             return currentWord;
         }
 
-        public string getCurrentLetter()
+        public string getCurrentMorse()
         {
-            return currentLetter;
+            return currentMorse;
         }
 
         public string getDocument()
         {
             return textBox.Text;
+        }
+
+        public void clearMorse()
+        {
+            currentMorse = "";
+        }
+
+        public void clearWord()
+        {
+            currentWord = "";
         }
 
         public void setDocument(string text)
