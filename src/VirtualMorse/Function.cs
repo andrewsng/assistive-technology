@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Speech.Synthesis;
 using MailKit.Net.Smtp;
 using MailKit;
 using MimeKit;
@@ -10,9 +11,8 @@ using CsvHelper.Configuration;
 using System.Globalization;
 using MailKit.Search;
 using MailKit.Net.Imap;
-
-
-
+using MailKit.Security;
+using MimeKit.Encodings;
 
 namespace VirtualMorse
 {
@@ -22,16 +22,14 @@ namespace VirtualMorse
         public string Email { get; set; }
     }
 
-
-
-
     public static class Function
     {
         static string directory;
         static string addressBook;
         static string virtualMorseVersion = "2023";
         static string nickname = "";
-        static public bool has_executed = true;
+        static SpeechSynthesizer speaker;
+
         static Function()
         {
             directory = AppDomain.CurrentDomain.BaseDirectory;
@@ -39,72 +37,75 @@ namespace VirtualMorse
             addressBook = "AddressBook.csv";
             DotNetEnv.Env.TraversePath().Load();
 
+            speaker = new SpeechSynthesizer();
+            speaker.SetOutputToDefaultAudioDevice();
         }
-        static Dictionary<string, string> morse_map = new Dictionary<string, string>() {
+
+        static Dictionary<string, char> morse_map = new Dictionary<string, char>() {
             // Letters
-            {".-", "a"},
-            {"-...", "b"},
-            {"-.-.", "c"},
-            {"-..", "d"},
-            {".", "e"},
-            {"..-.", "f"},
-            {"--.", "g"},
-            {"....", "h"},
-            {"..", "i"},
-            {".---", "j"},
-            {"-.-", "k"},
-            {".-..", "l"},
-            {"--", "m"},
-            {"-.", "n"},
-            {"---", "o"},
-            {".--.", "p"},
-            {"--.-", "q"},
-            {".-.", "r"},
-            {"...", "s"},
-            {"-", "t"},
-            {"..-", "u"},
-            {"...-", "v"},
-            {".--", "w"},
-            {"-..-", "x"},
-            {"-.--", "y"},
-            {"--..", "z"},
+            {".-", 'a'},
+            {"-...", 'b'},
+            {"-.-.", 'c'},
+            {"-..", 'd'},
+            {".", 'e'},
+            {"..-.", 'f'},
+            {"--.", 'g'},
+            {"....", 'h'},
+            {"..", 'i'},
+            {".---", 'j'},
+            {"-.-", 'k'},
+            {".-..", 'l'},
+            {"--", 'm'},
+            {"-.", 'n'},
+            {"---", 'o'},
+            {".--.", 'p'},
+            {"--.-", 'q'},
+            {".-.", 'r'},
+            {"...", 's'},
+            {"-", 't'},
+            {"..-", 'u'},
+            {"...-", 'v'},
+            {".--", 'w'},
+            {"-..-", 'x'},
+            {"-.--", 'y'},
+            {"--..", 'z'},
 
             // Numbers
-            {".----", "1"},
-            {"..---", "2"},
-            {"...--", "3"},
-            {"....-", "4"},
-            {".....", "5"},
-            {"-....", "6"},
-            {"--...", "7"},
-            {"---..", "8"},
-            {"----.", "9"},
-            {"-----", "0"},
+            {".----", '1'},
+            {"..---", '2'},
+            {"...--", '3'},
+            {"....-", '4'},
+            {".....", '5'},
+            {"-....", '6'},
+            {"--...", '7'},
+            {"---..", '8'},
+            {"----.", '9'},
+            {"-----", '0'},
 
             // Special Characters
-            {".-.-.-", "."},
-            {"--..--", ","},
-            {"..--..", "?"},
-            {"-..-.", "/"},
-            {".......", "!"},
-            {".----.", "'"},
-            {"-.-.-", ";"},
-            {"---...", ":"},
-            {"-....-", "-"},
-            {"..--.-", "_"},
-            {"-.--.-", "("},
-            {"-.--..", ")"},
+            {".-.-.-", '.'},
+            {"--..--", ','},
+            {"..--..", '?'},
+            {"-..-.", '/'},
+            {".......", '!'},
+            {".----.", '\''},
+            {"-.-.-", ';'},
+            {"---...", ':'},
+            {"-....-", '-'},
+            {"..--.-", '_'},
+            {"-.--.-", '('},
+            {"-.--..", ')'},
 
             // Custom Symbol (Email)
-            {"..--", "@"}
+            {"..--", '@'}
         };
 
-        public static string morseToText(string morse)
+        public static char morseToText(string morse)
         {
             if (morse_map.ContainsKey(morse))
                 return morse_map[morse];
             else
-                return "";
+                return '\0';
         }
 
         public static string getLastSentence(string document)
@@ -136,6 +137,7 @@ namespace VirtualMorse
                 writer.WriteLine(text);
             }
         }
+
         public static List<string> readFullFile(string directory, string file)
         {
             List<string> return_string = new List<string>();
@@ -150,16 +152,22 @@ namespace VirtualMorse
             return return_string;
         }
 
-
-        public static void sendEmail(string address, string contents)
+        public static void speak(string message)
         {
-            address = checkNickname(address);
+            cancelSpeech();
+            speaker.SpeakAsync(message);
+        }
 
+        public static void cancelSpeech()
+        {
+            speaker.SpeakAsyncCancelAll();
+        }
+
+        public static MimeMessage createEmail(string address, string contents)
+        {
             var message = new MimeMessage();
-            string test = DotNetEnv.Env.GetString("EMAIL__ACCOUNT") + "@gmail.com";
-            Console.WriteLine(test);
-            Console.WriteLine(address);
-            message.From.Add(new MailboxAddress("Sender Name", test));
+
+            message.From.Add(new MailboxAddress("Sender Name", DotNetEnv.Env.GetString("EMAIL__ACCOUNT") + "@gmail.com"));
             message.To.Add(new MailboxAddress("Receiver Name", address));
             message.Subject = "This message sent with Virtual Morse " + virtualMorseVersion;
 
@@ -168,291 +176,216 @@ namespace VirtualMorse
                 Text = contents
             };
 
+            return message;
+        }
+
+        // https://github.com/jstedfast/MailKit/blob/master/FAQ.md#reply-message
+        public static MimeMessage createReply(MimeMessage message, string contents)
+        {
+            var reply = new MimeMessage();
+
+            reply.From.Add(new MailboxAddress("Sender Name", DotNetEnv.Env.GetString("EMAIL__ACCOUNT") + "@gmail.com"));
+            
+            if (message.ReplyTo.Count > 0)
+            {
+                reply.To.AddRange(message.ReplyTo);
+            }
+            else if (message.From.Count > 0)
+            {
+                reply.To.AddRange(message.From);
+            }
+            else if (message.Sender != null)
+            {
+                reply.To.Add(message.Sender);
+            }
+
+            if (!message.Subject.StartsWith("Re: ", StringComparison.OrdinalIgnoreCase))
+            {
+                reply.Subject = "Re: " + message.Subject;
+            }
+            else
+            {
+                reply.Subject = message.Subject;
+            }
+
+            reply.InReplyTo = message.MessageId;
+            foreach (var id in message.References)
+            {
+                reply.References.Add(id);
+            }
+            reply.References.Add(message.MessageId);
+
+            using (var quoted = new StringWriter())
+            {
+                var sender = message.Sender ?? message.From.Mailboxes.FirstOrDefault();
+                quoted.WriteLine("On {0} {1} wrote:", message.Date.ToString("f"), !string.IsNullOrEmpty(sender.Name) ? sender.Name : sender.Address);
+                using (var reader = new StringReader(message.TextBody))
+                {
+                    string line;
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        quoted.Write("> ");
+                        quoted.WriteLine(line);
+                    }
+                }
+
+                reply.Body = new TextPart("plain")
+                {
+                    Text = contents + "\n\n" + quoted.ToString()
+                };
+            }
+            return reply;
+        }
+
+        public static void sendEmail(MimeMessage message)
+        {
             using (var client = new SmtpClient())
             {
-                try
-                {
-                    client.Connect("smtp.gmail.com", 587);
-
-                client.AuthenticationMechanisms.Remove("XOAUTH2");
-
-                // Note: only needed if the SMTP server requires authentication.
-                client.Authenticate(DotNetEnv.Env.GetString("EMAIL__ACCOUNT"), DotNetEnv.Env.GetString("APP__PASSWORD"));
-
-                // Speaks name & email destination (spells out email address).
-                Console.WriteLine(">> Sending email to [LOCATION].");
+                connectSmtpClient(client);
                 
-                    client.Send(message);
-                    has_executed = true;
-                }
-                catch(Exception e)
-                {
-                    Console.WriteLine("Email failed to send");
-                    has_executed = false;
+                client.Send(message);
 
-                }
-                finally
-                {
-                    client.Disconnect(true);
-                }
-                
+                client.Disconnect(true);
             }
         }
 
-
-        public static string readEmail(int index)
+        public static MimeMessage getEmail(int index)
         {
-            index--;
-            string body = "";
-
+            MimeMessage message;
             using (var client = new ImapClient())
             {
-                try
-                {
-                    client.Connect("imap.gmail.com", 993, true);
+                connectImapClient(client);
 
-                    client.Authenticate(DotNetEnv.Env.GetString("EMAIL__ACCOUNT"), DotNetEnv.Env.GetString("APP__PASSWORD"));
+                var inbox = client.Inbox;
+                inbox.Open(FolderAccess.ReadOnly);
 
-                    var inbox = client.Inbox;
-                    inbox.Open(FolderAccess.ReadOnly);
+                message = inbox.GetMessage(index);
 
-                    // Email header number 
-                    // Oldest email = 1 vs. newest email = nth inbox location.
-
-                    // Decrement emailNumber by 1 to get the correct email header number.
-                    if (index >= 0 && index < inbox.Count)
-                    {
-                        var message = inbox.GetMessage(index);
-                        body = message.TextBody;
-                    }
-
-                    // TODO: Detect hyperlinks in email body and avoid reading them out loud.
-
-                    Console.WriteLine("Body: {0}", body);
-
-                    client.Disconnect(true);
-                    has_executed = true;
-                }
-                catch
-                {
-                    Console.WriteLine("failed to read email");
-                    has_executed = false;
-                }
-                finally
-                {
-                    client.Disconnect(true);
-                }
+                client.Disconnect(true);
             }
-            return body;
+            return message;
         }
 
-
-        public static List<string> readEmailHeader(int index)
+        public static List<int> getEmailCounts()
         {
-            index--;
-            List<string> return_string = new List<string>();
-
-
+            List<int> emailCounts = new List<int>();
             using (var client = new ImapClient())
             {
-                try
-                {
-                    client.Connect("imap.gmail.com", 993, true);
+                connectImapClient(client);
 
-                client.Authenticate(DotNetEnv.Env.GetString("EMAIL__ACCOUNT"), DotNetEnv.Env.GetString("APP__PASSWORD"));
-                
-                    var inbox = client.Inbox;
-                    inbox.Open(FolderAccess.ReadOnly);
+                var inbox = client.Inbox;
+                inbox.Open(FolderAccess.ReadOnly);
 
-                    // Email header number 
-                    // Oldest email = 1 vs. newest email = nth inbox location.
-                    if (index >= 0 && index < inbox.Count)
-                    {
-                        var message = inbox.GetMessage(index);
-                        var dateSent = message.Date;
-                        var senderName = message.From;
-                        var senderAddress = message.From.Mailboxes.FirstOrDefault().Address;
-                        var subjectLine = message.Subject;
+                // FIXME: How to deal with threaded conversations within the inbox.
 
-                        Console.WriteLine("Date Sent: {0}", dateSent);
-                        Console.WriteLine("Sender Name: {0}", senderName);
-                        Console.WriteLine("Sender Address: {0}", senderAddress);
-                        Console.WriteLine("Subject Line: {0}", subjectLine);
+                emailCounts.Add(inbox.Search(SearchQuery.New).Count());
+                emailCounts.Add(inbox.Search(SearchQuery.NotSeen).Count());
+                emailCounts.Add(inbox.Count);
 
-                        return_string.Add((index + 1).ToString());
-                        return_string.Add(dateSent.ToString());
-                        return_string.Add(senderName.ToString());
-                        return_string.Add(senderAddress.ToString());
-                        return_string.Add(subjectLine.ToString());
-
-                    }
-
-                    client.Disconnect(true);
-                    has_executed = true;
-                }
-                catch
-                {
-                    Console.WriteLine("failed to retrieve header");
-                    has_executed = false;
-                }
-                finally
-                {
-                    client.Disconnect(true);
-                }
+                client.Disconnect(true);
             }
-
-            return return_string;
+            return emailCounts;
         }
-
-        public static List<int> checkEmail()
-        {
-            List<int> return_list = new List<int>();
-
-
-            using (var client = new ImapClient())
-            {
-                try
-                {
-                    client.Connect("imap.gmail.com", 993, true);
-
-                    client.Authenticate(DotNetEnv.Env.GetString("EMAIL__ACCOUNT"), DotNetEnv.Env.GetString("APP__PASSWORD"));
-
-                    var inbox = client.Inbox;
-                    inbox.Open(FolderAccess.ReadOnly);
-
-                    Console.WriteLine(">> Checking mail server...");
-
-                    var unreadEmails = inbox.Search(SearchQuery.NotSeen);
-
-                    if (unreadEmails.Count == 1)
-                    {
-                        Console.WriteLine(">> You have {0} unread email.", unreadEmails.Count);
-                    }
-                    else
-                    {
-                        Console.WriteLine(">> You have {0} unread emails.", unreadEmails.Count);
-                    }
-
-                    var totalMessages = inbox.Count;
-
-                    // FIXME: How to deal with threaded conversations within the inbox.
-
-                    Console.WriteLine(">> Total messages: {0}", totalMessages);
-
-                    return_list.Add(unreadEmails.Count);
-                    return_list.Add(inbox.Count);
-
-
-                    client.Disconnect(true);
-                    has_executed = true;
-                }
-                catch
-                {
-                    Console.WriteLine("failed to check email");
-                    has_executed = false;
-                }
-                finally
-                {
-                    client.Disconnect(true);
-                }
-
-
-            }
-
-            return return_list;
-        }
-
 
         public static void deleteEmail(int index)
         {
-            index--;
-
             using (var client = new ImapClient())
             {
-                try
-                {
-                    client.Connect("imap.gmail.com", 993, true);
+                connectImapClient(client);
 
-                    client.Authenticate(DotNetEnv.Env.GetString("EMAIL__ACCOUNT"), DotNetEnv.Env.GetString("APP__PASSWORD"));
+                var inbox = client.Inbox;
+                inbox.Open(FolderAccess.ReadWrite);
 
-                    var inbox = client.Inbox;
-                    inbox.Open(FolderAccess.ReadWrite);
-
-                    if (index >= 0 && index < inbox.Count)
-                    {
-                        inbox.AddFlags(index, MessageFlags.Deleted, true);
-
-                        inbox.Expunge();
-
-                        Console.WriteLine(">> Deleted.");
-                    }
-
-                    client.Disconnect(true);
-                    has_executed = true;
-                }
-                catch
-                {
-                    Console.WriteLine("failed to delete email");
-                    has_executed = false;
-                }
-                finally
+                if (index >= inbox.Count)
                 {
                     client.Disconnect(true);
+                    throw new ArgumentException("Index greater than number of emails");
                 }
+                inbox.AddFlags(index, MessageFlags.Deleted, true);
+                inbox.Expunge();
+
+                client.Disconnect(true);
             }
-
         }
-
-
         public static void createNickname(string nickname)
         {
             Function.nickname = nickname;
         }
 
+        public static List<AddressBook> readAddressBook()
+        {
+            List<AddressBook> records = new List<AddressBook>();
+            try
+            {
+                using (var reader = new StreamReader(directory + addressBook))
+                {
+                    using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+                    {
+                        records = csv.GetRecords<AddressBook>().ToList();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Failed to read from Address Book");
+                Console.WriteLine(ex.Message);
+            }
+            return records;
+        }
+
         public static void addEmailToBook(string email)
         {
-
-            var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+            var records = readAddressBook();
+            using (var writer = new StreamWriter(directory + addressBook))
             {
-                HasHeaderRecord = false,
-            };
-
-            using (var writer = new StreamWriter(directory + addressBook, true))
-            {
-                using (var csv = new CsvWriter(writer, config))
+                using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
                 {
-                    csv.NextRecord();
-                    AddressBook new_entry = new AddressBook { Nickname = Function.nickname, Email = email };
-                    csv.WriteRecord(new_entry);
-
+                    records.Add(new AddressBook { Nickname = Function.nickname, Email = email });
+                    csv.WriteRecords(records);
                 }
             }
         }
-
 
         public static string checkNickname(string address)
         {
             string email = address;
-
-            using (var reader = new StreamReader(directory + addressBook))
+            var records = readAddressBook();
+            records.ForEach(record =>
             {
-                using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+                if (record.Nickname.Equals(address))
                 {
-                    var records = csv.GetRecords<AddressBook>();
-
-                    records.ToList().ForEach(record =>
-                    {
-                        if (record.Nickname.Equals(address))
-                        {
-                            email = record.Email;
-                        }
-
-                    });
+                    email = record.Email;
                 }
-            }
+            });
             return email;
         }
 
+        static void connectMailService(MailService mailService, string host, int port, string errorMessage)
+        {
+            try
+            {
+                mailService.Connect(host, port, SecureSocketOptions.SslOnConnect);
+                mailService.AuthenticationMechanisms.Remove("XOAUTH2");
+                mailService.Authenticate(DotNetEnv.Env.GetString("EMAIL__ACCOUNT"), DotNetEnv.Env.GetString("APP__PASSWORD"));
+            }
+            catch
+            {
+                Console.WriteLine(errorMessage);
+                throw;
+            }
+        }
+
+        static void connectSmtpClient(SmtpClient smtpClient)
+        {
+            connectMailService(smtpClient, "smtp.gmail.com", 465,
+                "Error connecting or authenticating SMTP client.");
+        }
+
+        static void connectImapClient(ImapClient imapClient)
+        {
+            connectMailService(imapClient, "imap.gmail.com", 993,
+                "Error connecting or authenticating IMAP client.");
+        }
     }
 }
 

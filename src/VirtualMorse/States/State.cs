@@ -1,51 +1,20 @@
 ﻿using System;
+using VirtualMorse.Input;
 
 namespace VirtualMorse.States
 {
     public class State
     {
-        public State()
+        protected WritingContext context;
+
+        public State(WritingContext context)
         {
+            this.context = context;
         }
 
-        public virtual void shift()
+        public virtual void respond(Switch input)
         {
-
-        }
-
-        public virtual void command()
-        {
-
-        }
-
-        public virtual void save()
-        {
-
-        }
-
-        public virtual void space()
-        {
-
-        }
-
-        public virtual void dot()
-        {
-
-        }
-
-        public virtual void dash()
-        {
-
-        }
-
-        public virtual void enter()
-        {
-
-        }
-
-        public virtual void backspace()
-        {
-
+        
         }
     }
 }

@@ -1,216 +1,245 @@
-﻿using System;
+using MimeKit;
+using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Threading;
+using VirtualMorse.Input;
 
 namespace VirtualMorse.States
 {
-    public class CommandState : TypingState
+    public class CommandState : State
     {
+        Dictionary<Switch, Action> switchResponses;
+
         public CommandState(WritingContext context) : base(context)
         {
+            switchResponses = new Dictionary<Switch, Action>(){
+                { Switch.Switch1,  command },
+                { Switch.Switch2,  printPage },
+                { Switch.Switch3,  clearDocument },
+                { Switch.Switch7,  enterCommand },
+                { Switch.Switch9,  command },
+                { Switch.Switch10, command },
+            };
         }
 
-        static string nickname = "";
+        public override void respond(Switch input)
+        {
+            if (switchResponses.ContainsKey(input))
+            {
+                switchResponses[input]();
+            }
+            else
+            {
+                moveToTypingState();
+                sayUnprogrammedError();
+            }
+        }
 
-        public override void shift()
+        void command()
+        {
+            context.transitionToState(new PunctuationState(context));
+            Console.WriteLine("Move to punctuation state.");
+            Function.speak("Command Level 2, Punctuation.");
+        }
+
+        void printPage()
         {
             Console.WriteLine("Print page");
             moveToTypingState();
         }
 
-        public override void save()
+        void clearDocument()
         {
             context.setDocument("");
             moveToTypingState();
-            Console.WriteLine("Clear document");
-            speak("Document cleared.");
+            Console.WriteLine("clear document");
+            Function.speak("Document cleared.");
         }
 
-        public override void space()
+        bool tryEmailFunction(Func<WritingContext, string> function, string errorMessage)
         {
-            moveToTypingState();
-            sayUnprogrammedError();
+            string output;
+            bool success = true;
+            try
+            {
+                output = function(context);
+            }
+            catch (Exception ex)
+            {
+                success = false;
+                output = errorMessage;
+                Console.WriteLine(ex.Message);
+            }
+            Console.WriteLine(output);
+            Function.speak(output);
+            return success;
         }
 
-        public override void backspace()
+        void enterCommand()
         {
-            moveToTypingState();
-            sayUnprogrammedError();
-        }
-
-        public override void enter()
-        {
-            string commandLetter = Function.morseToText(context.currentLetter);
-            List<string> header;
-            string address = "";
-            string contents = "";
-            string index = "";
+            char commandLetter = Function.morseToText(context.currentMorse);
             switch (commandLetter)
             {
-                case "l":
+                case 'l':
                     Console.WriteLine("read last sentence");
                     string sentence = Function.getLastSentence(context.getDocument());
                     Console.WriteLine(sentence);
-                    speak(sentence);
-                    clearLetter();
-                    clearWord();
+                    Function.speak(sentence);
                     break;
 
-                case "g":
+                case 'g':
                     Console.WriteLine("checks email");
-                    List<int> email_count = Function.checkEmail();
-                    if (Function.has_executed == true)
-                    {
-                        int unread = email_count[0];
-                        int total = email_count[1];
-                        speak("you have " + unread + " unread emails.");
-                        speak("you have " + total + " total emails.");
-                    }
-                    else
-                    {
-                        speak("failed to retrieve email header");
-                    }
-                    clearLetter();
-                    clearWord();
+                    tryEmailFunction(
+                        context => {
+                            List<int> email_count = Function.getEmailCounts();
+                            return $"You have {email_count[0]} new emails.\n" +
+                                   $"You have {email_count[1]} unread emails.\n" +
+                                   $"You have {email_count[2]} total emails.";
+                        },
+                        "Failed to check emails."
+                    );
                     break;
-
-                case "d":
+                case 'd':
                     Console.WriteLine("deletes email");
-                    index = context.getCurrentWord();
-                    Function.deleteEmail(Int32.Parse(index));
-                    if (Function.has_executed == true)
-                    {
-                        speak("email number " + index + " deleted");
-                    }
-                    else
-                    {
-                        speak("failed to delete email");
-                    }
-                    clearLetter();
-                    clearWord();
+                    tryEmailFunction(
+                        context => {
+                            int emailIndex = parseIndex(context.getCurrentWord());
+                            Function.deleteEmail(emailIndex);
+                            return $"Email number {context.getCurrentWord()} deleted.";
+                        },
+                        "Failed to delete email."
+                    );
                     break;
-
-                case "h":
+                case 'h':
                     Console.WriteLine("read email headers");
-                    index = context.getCurrentWord();
-                    header = Function.readEmailHeader(Int32.Parse(index));
-                    if (Function.has_executed == true)
-                    {
-                        speak("Email header number: " + header[0]);
-                        speak("Date and time sent: " + header[1]);
-                        speak("Sender's display name: " + header[2]);
-                        speak("Sender's address: " + header[3]);
-                        speak("Email subject line: " + header[4]);
-                    }
-                    else
-                    {
-                        speak("failed to read email header");
-                    }
-                    clearLetter();
-                    clearWord();
-                    break;
+                    tryEmailFunction(
+                        context => {
+                            int emailIndex = parseIndex(context.getCurrentWord());
+                            var message = Function.getEmail(emailIndex);
+                            var sender = message.Sender ?? message.From.Mailboxes.FirstOrDefault();
+                            return $"Email header number: {context.getCurrentWord()}\n" +
+                                   $"Date and time sent: {message.Date}\n" +
+                                   $"Sender's display name: {sender.Name}\n" +
+                                   $"Sender's address: {sender.Address}\n" +
+                                   $"Email subject line: {message.Subject}";
 
-                case "r":
+                        },
+                        "Failed to read email header."
+                    );
+                    break;
+                case 'r':
                     Console.WriteLine("reads email");
-                    index = context.getCurrentWord();
-                    header = Function.readEmailHeader(Int32.Parse(index));
-                    if (Function.has_executed == true)
-                    {
-                        speak("Email header number: " + header[0]);
-                        speak("Date and time sent: " + header[1]);
-                        speak("Sender's display name: " + header[2]);
-                        speak("Sender's address: " + header[3]);
-                        speak("Email subject line: " + header[4]);
-                        string email = Function.readEmail(Int32.Parse(index));
-                        speak("Email Contents: " + email);
-                    }
-                    else
-                    {
-                        speak("failed to read email");
-                    }
-                    clearLetter();
-                    clearWord();
+                    tryEmailFunction(
+                        context => {
+                            int emailIndex = parseIndex(context.getCurrentWord());
+                            var message = Function.getEmail(emailIndex);
+                            var sender = message.Sender ?? message.From.Mailboxes.FirstOrDefault();
+                            return $"Email header number: {context.getCurrentWord()}\n" +
+                                   $"Date and time sent: {message.Date}\n" +
+                                   $"Sender's display name: {sender.Name}\n" +
+                                   $"Sender's address: {sender.Address}\n" +
+                                   $"Email subject line: {message.Subject}\n" +
+                                   $"Email Contents: {message.TextBody}";
+                        },
+                        "Failed to read email."
+                    );
                     break;
-
-                case "e":
+                case 'e':
                     Console.WriteLine("create/send email");
-                    address = context.getCurrentWord();
-                    contents = context.getDocument();
-                    Function.sendEmail(address, contents);
-
-                    if(Function.has_executed == true)
-                    {
-                        speak("sent");
-                    }
-                    else
-                    {
-                        speak("Email failed to send");
-                    }
-                    clearLetter();
-                    clearWord();
+                    tryEmailFunction(
+                        context => {
+                            string address = context.getCurrentWord();
+                            address = Function.checkNickname(address);
+                            string contents = context.getDocument();
+                            Function.sendEmail(Function.createEmail(address, contents));
+                            return $"Sending email to {address}.";
+                        },
+                        "Failed to send email."
+                    );
                     break;
-
-                case "y":
+                case 'y':
                     Console.WriteLine("reply to email");
-                    index = context.getCurrentWord();
-                    contents = context.getDocument();
-                    header = Function.readEmailHeader(Int32.Parse(index));
-                    Function.sendEmail(header[3], contents);
-                    if (Function.has_executed == true)
+                    MimeMessage saveMessage = null;
+                    string senderName = null;
+                    bool success = tryEmailFunction(
+                        context => {
+                            int emailIndex = parseIndex(context.getCurrentWord());
+                            saveMessage = Function.getEmail(emailIndex);
+                            var sender = saveMessage.Sender ?? saveMessage.From.Mailboxes.FirstOrDefault();
+                            senderName = (!string.IsNullOrEmpty(sender.Name) ? sender.Name : sender.Address);
+                            return $"Reply to email number {context.getCurrentWord()} from {sender.Name ?? ""} {sender.Address}.";
+                        },
+                        "Failed to reply to email."
+                    );
+                    if (!success)
                     {
-                        speak("replied to " + header[3]);
+                        break;
                     }
-                    else
-                    {
-                        speak("failed to reply to email");
-                    }
-                    clearLetter();
-                    clearWord();
-                    break;
-
-                case "n":
+                    context.transitionToState(
+                        new ConfirmationState(
+                            context,
+                            () => {
+                                tryEmailFunction(
+                                    context =>
+                                    {
+                                        string contents = context.getDocument();
+                                        Function.sendEmail(Function.createReply(saveMessage, contents));
+                                        return $"Reply to {senderName} has been sent.";
+                                    },
+                                    "Failed to send reply."
+                                );
+                            }
+                        )
+                    );
+                    context.clearMorse();
+                    context.clearWord();
+                    return;
+                case 'n':
                     Console.WriteLine("adds email address nickname");
-                    nickname = context.getCurrentWord();
+                    string nickname = context.getCurrentWord();
                     Function.createNickname(nickname);
-                    speak("added nickname " + nickname);
-                    clearLetter();
-                    clearWord();
+                    Function.speak("added nickname " + nickname);
                     break;
-
-                case "a":
+                case 'a':
                     Console.WriteLine("ties email address to nickname");
-                    address = context.getCurrentWord();
-                    Function.addEmailToBook(address);
-                    speak("added email address " + address);
-                    clearLetter();
-                    clearWord();
+                    tryEmailFunction(
+                        context => {
+                            string address = context.getCurrentWord();
+                            Function.addEmailToBook(address);
+                            return $"Added email address {address}";
+                        },
+                        "Failed to add email as a nickname."
+                    );
                     break;
-
                 default:
                     Console.WriteLine("invalid command");
                     sayUnprogrammedError();
                     break;
             }
+            context.clearMorse();
+            context.clearWord();
             moveToTypingState();
-        }
-
-        public override void command()
-        {
-            context.setState(context.getPunctuationState());
-            speak("move to punctuation state.");
         }
 
         // Helper functions
 
         void moveToTypingState()
         {
-            clearLetter();
-            context.setState(context.getTypingState());
+            context.clearMorse();
+            context.transitionToState(new TypingState(context));
             Console.WriteLine("move to typing state");
         }
 
         void sayUnprogrammedError()
         {
-            speak("That command is not programmed.");
+            Function.speak("That command is not programmed.");
+        }
+
+        int parseIndex(string str)
+        {
+            return Int32.Parse(str) - 1;
         }
     }
 }

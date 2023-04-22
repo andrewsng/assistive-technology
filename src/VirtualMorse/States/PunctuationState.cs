@@ -1,74 +1,53 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
+using VirtualMorse.Input;
 
 namespace VirtualMorse.States
 {
     public class PunctuationState : State
     {
-        protected WritingContext context;
-        public PunctuationState(WritingContext context)
+        Dictionary<Switch, Action> switchResponses;
+
+        public PunctuationState(WritingContext context) : base(context)
         {
-            this.context = context;
+            switchResponses = new Dictionary<Switch, Action>(){
+                { Switch.Switch1,  command },
+                { Switch.Switch2,  enterPunctuation("'",  "apostrophe") },
+                { Switch.Switch3,  enterPunctuation("\"", "quotation mark") },
+                { Switch.Switch4,  enterPunctuation("!",  "exclamation mark") },
+                { Switch.Switch5,  enterPunctuation(".",  "period") },
+                { Switch.Switch6,  enterPunctuation(",",  "comma") },
+                { Switch.Switch7,  enterPunctuation("?",  "question mark") },
+                { Switch.Switch8,  enterPunctuation("-",  "hyphen") },
+                { Switch.Switch9,  command },
+                { Switch.Switch10, command },
+            };
         }
 
-        public override void shift()
+        public override void respond(Switch input)
         {
-            context.appendToDocument("'");
-            speak("apostrophe");
-            context.setState(context.getTypingState());
+            if (switchResponses.ContainsKey(input))
+            {
+                switchResponses[input]();
+            }
         }
 
-        public override void command()
+        Action enterPunctuation(string punctuation, string spokenMessage)
         {
-            speak("Move to typing state");
-            context.setState(context.getTypingState());
+            return () =>
+            {
+                context.appendToDocument(punctuation);
+                Function.speak(spokenMessage);
+                context.transitionToState(new TypingState(context));
+                Console.WriteLine("Move to typing state.");
+            };
         }
 
-        public override void save()
+        void command()
         {
-            context.appendToDocument("\"");
-            speak("quotation mark");
-            context.setState(context.getTypingState());
-        }
-
-        public override void space()
-        {
-            context.appendToDocument("!");
-            speak("exclamation mark");
-            context.setState(context.getTypingState());
-        }
-
-        public override void dot()
-        {
-            context.appendToDocument(".");
-            speak("period");
-            context.setState(context.getTypingState());
-        }
-
-        public override void dash()
-        {
-            context.appendToDocument(",");
-            speak("comma");
-            context.setState(context.getTypingState());
-        }
-
-        public override void enter()
-        {
-            context.appendToDocument("?");
-            speak("question mark");
-            context.setState(context.getTypingState());
-
-        }
-
-        public override void backspace()
-        {
-            context.appendToDocument("-");
-            speak("hyphen");
-            context.setState(context.getTypingState());
-        }
-        public void speak(string message)
-        {
-            context.speaker.SpeakAsyncCancelAll();
-            context.speaker.SpeakAsync(message);
+            context.transitionToState(new TypingState(context));
+            Console.WriteLine("Move to punctuation state.");
+            Function.speak("Command off.");
         }
     }
 }
