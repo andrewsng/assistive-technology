@@ -386,6 +386,57 @@ namespace VirtualMorse
             connectMailService(imapClient, "imap.gmail.com", 993,
                 "Error connecting or authenticating IMAP client.");
         }
+
+
+        public static void createNickname(string nickname)
+        {
+            Function.nickname = nickname;
+        }
+
+        public static void addEmailToBook(string email)
+        {
+
+            var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                HasHeaderRecord = false,
+            };
+
+            using (var writer = new StreamWriter(directory + addressBook, true))
+            {
+                using (var csv = new CsvWriter(writer, config))
+                {
+                    csv.NextRecord();
+                    AddressBook new_entry = new AddressBook { Nickname = Function.nickname, Email = email };
+                    csv.WriteRecord(new_entry);
+
+                }
+            }
+        }
+
+
+        public static string checkNickname(string address)
+        {
+            string email = address;
+
+            using (var reader = new StreamReader(directory + addressBook))
+            {
+                using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+                {
+                    var records = csv.GetRecords<AddressBook>();
+
+                    records.ToList().ForEach(record =>
+                    {
+                        if (record.Nickname.Equals(address))
+                        {
+                            email = record.Email;
+                        }
+
+                    });
+                }
+            }
+            return email;
+        }
+
     }
 }
 
