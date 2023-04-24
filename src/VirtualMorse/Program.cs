@@ -30,6 +30,15 @@ namespace VirtualMorse
             Function.speak(programName + " " + programVersion);
             Application.EnableVisualStyles();
             Application.Run(new Program());
+
+            string sampleName = Environment.GetCommandLineArgs()[0];
+            if (args.Length != 1)
+            {
+                Console.WriteLine("Usage: " + sampleName + " <file path>");
+                return;
+            }
+            // filePath = args[0];
+            new PrintingExample();
         }
     }
 }
