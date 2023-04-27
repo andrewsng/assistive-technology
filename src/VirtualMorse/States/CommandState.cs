@@ -41,7 +41,7 @@ namespace VirtualMorse.States
         {
             context.transitionToState(new PunctuationState(context));
             Console.WriteLine("Move to punctuation state.");
-            Function.speak("Command Level 2, Punctuation.");
+            Speech.speak("Command Level 2, Punctuation.");
         }
 
         void printPage()
@@ -55,7 +55,7 @@ namespace VirtualMorse.States
             context.setDocument("");
             moveToTypingState();
             Console.WriteLine("clear document");
-            Function.speak("Document cleared.");
+            Speech.speak("Document cleared.");
         }
 
         bool tryEmailFunction(Func<WritingContext, string> function, string errorMessage)
@@ -73,7 +73,7 @@ namespace VirtualMorse.States
                 Console.WriteLine(ex.Message);
             }
             Console.WriteLine(output);
-            Function.speak(output);
+            Speech.speak(output);
             return success;
         }
 
@@ -86,12 +86,12 @@ namespace VirtualMorse.States
                     Console.WriteLine("read last sentence");
                     string sentence = Function.getLastSentence(context.getDocument());
                     Console.WriteLine(sentence);
-                    Function.speak(sentence);
+                    Speech.speak(sentence);
                     break;
 
                 case 'g':
                     Console.WriteLine("checks email");
-                    Function.speakFully("Checking email.");
+                    Speech.speakFully("Checking email.");
                     tryEmailFunction(
                         context => {
                             List<int> email_count = Function.getEmailCounts();
@@ -104,7 +104,7 @@ namespace VirtualMorse.States
                     break;
                 case 'd':
                     Console.WriteLine("deletes email");
-                    Function.speakFully("Deleting email.");
+                    Speech.speakFully("Deleting email.");
                     tryEmailFunction(
                         context => {
                             int emailIndex = parseIndex(context.getCurrentWord());
@@ -116,7 +116,7 @@ namespace VirtualMorse.States
                     break;
                 case 'h':
                     Console.WriteLine("read email headers");
-                    Function.speakFully("Reading email header.");
+                    Speech.speakFully("Reading email header.");
                     tryEmailFunction(
                         context => {
                             int emailIndex = parseIndex(context.getCurrentWord());
@@ -134,7 +134,7 @@ namespace VirtualMorse.States
                     break;
                 case 'r':
                     Console.WriteLine("reads email");
-                    Function.speakFully("Reading email.");
+                    Speech.speakFully("Reading email.");
                     tryEmailFunction(
                         context => {
                             int emailIndex = parseIndex(context.getCurrentWord());
@@ -152,7 +152,7 @@ namespace VirtualMorse.States
                     break;
                 case 'e':
                     Console.WriteLine("create/send email");
-                    Function.speakFully("Sending email.");
+                    Speech.speakFully("Sending email.");
                     tryEmailFunction(
                         context => {
                             string address = context.getCurrentWord();
@@ -166,7 +166,7 @@ namespace VirtualMorse.States
                     break;
                 case 'y':
                     Console.WriteLine("reply to email");
-                    Function.speakFully("Replying to email.");
+                    Speech.speakFully("Replying to email.");
                     MimeMessage saveMessage = null;
                     string senderName = null;
                     bool success = tryEmailFunction(
@@ -206,7 +206,7 @@ namespace VirtualMorse.States
                     Console.WriteLine("adds email address nickname");
                     string nickname = context.getCurrentWord();
                     Function.createNickname(nickname);
-                    Function.speakFully("Nickname " + nickname);
+                    Speech.speakFully("Nickname " + nickname);
                     break;
                 case 'a':
                     Console.WriteLine("ties email address to nickname");
@@ -240,7 +240,7 @@ namespace VirtualMorse.States
 
         void sayUnprogrammedError()
         {
-            Function.speak("That command is not programmed.");
+            Speech.speak("That command is not programmed.");
         }
 
         int parseIndex(string str)

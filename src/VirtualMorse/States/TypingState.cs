@@ -54,14 +54,14 @@ namespace VirtualMorse.States
 			{
 				context.appendToDocument(context.currentWord);
 				Console.WriteLine("added word to file: " + context.currentWord);
-				Function.speak(context.currentWord);
+				Speech.speak(context.currentWord);
                 context.clearWord();
             }
 			else
 			{
 				context.appendToDocument(" ");
 				Console.WriteLine("SPACE added to file");
-				Function.speak("Space.");
+				Speech.speak("Space.");
 			}
 		}
 
@@ -69,7 +69,7 @@ namespace VirtualMorse.States
 		{
             isCapitalized = !isCapitalized;
             Console.WriteLine("capitalization set to: " + isCapitalized);
-			Function.speak("shift");
+			Speech.speak("shift");
 		}
 
 		void enter()
@@ -123,7 +123,7 @@ namespace VirtualMorse.States
 				Console.WriteLine("not a valid letter, try again");
 				spokenMessage.AppendText("Try again");
             }
-            Function.speak(spokenMessage);
+            Speech.speak(spokenMessage);
 		}
 
 		void backspace()
@@ -132,19 +132,19 @@ namespace VirtualMorse.States
 			{
 				context.currentWord = context.currentWord.Remove(context.currentWord.Length - 1, 1);
 				Console.WriteLine("Delete");
-				Function.speak("Delete.");
+				Speech.speak("Delete.");
 			}
 			else
 			{
 				context.backspaceDocument();
 				Console.WriteLine("Backspace");
-				Function.speak("Backspace.");
+				Speech.speak("Backspace.");
 			}
 		}
 
 		void save()
         {
-            Function.speak("Now saving.");
+            Speech.speak("Now saving.");
             Console.WriteLine("save text doc as is");
 			try
             {
@@ -153,7 +153,7 @@ namespace VirtualMorse.States
             catch (Exception ex)
             {
                 Console.WriteLine("Error saving file");
-                Function.speak("Error saving file");
+                Speech.speak("Error saving file");
                 Console.WriteLine(ex.Message);
             }
 		}
@@ -162,7 +162,7 @@ namespace VirtualMorse.States
 		{
 			context.transitionToState(new CommandState(context));
             Console.WriteLine("move to command state");
-			Function.speak("Command Level 1.");
+			Speech.speak("Command Level 1.");
         }
 	}
 }

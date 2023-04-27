@@ -48,7 +48,7 @@ namespace VirtualMorse.States
                 PromptBuilder spokenMessage = new PromptBuilder();
                 spokenMessage.AppendTextWithHint(punctuation, SayAs.SpellOut);
                 spokenMessage.AppendText(".");
-                Function.speak(spokenMessage);
+                Speech.speak(spokenMessage);
                 context.transitionToState(new TypingState(context));
                 Console.WriteLine("Move to typing state.");
             };
@@ -58,7 +58,7 @@ namespace VirtualMorse.States
         {
             context.transitionToState(new TypingState(context));
             Console.WriteLine("Move to typing state.");
-            Function.speak("Command off.");
+            Speech.speak("Command off.");
         }
     }
 }

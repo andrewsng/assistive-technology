@@ -20,7 +20,7 @@ namespace VirtualMorse.States
                 { Switch.Switch8,  cancel },
             };
 
-            Function.speakFully(instructions);
+            Speech.speakFully(instructions);
         }
 
         public override void respond(Switch input)
@@ -31,13 +31,13 @@ namespace VirtualMorse.States
             }
             else
             {
-                Function.speak("Invalid entry. " + instructions);
+                Speech.speak("Invalid entry. " + instructions);
             }
         }
 
         void confirm()
         {
-            Function.speakFully("Confirmed.");
+            Speech.speakFully("Confirmed.");
             actionToConfirm();
             context.transitionToState(new TypingState(context));
             Console.WriteLine("Move to typing state.");
@@ -45,7 +45,7 @@ namespace VirtualMorse.States
 
         void cancel()
         {
-            Function.speakFully("Cancelled.");
+            Speech.speakFully("Cancelled.");
             context.transitionToState(new TypingState(context));
             Console.WriteLine("Move to typing state.");
         }

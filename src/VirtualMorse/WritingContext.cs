@@ -62,15 +62,14 @@ namespace VirtualMorse
             catch (Exception ex)
             {
                 Console.WriteLine("Error reading file");
-                Function.speak("Error reading file");
+                Speech.speak("Error reading file");
                 Console.WriteLine(ex.Message);
             }
         }
 
         private void Handler_InputReceived(object sender, SwitchInputEventArgs e)
         {
-            if (Function.speaker.State == SynthesizerState.Speaking
-             && Function.blockInputs)
+            if (Speech.isBlockingInputs())
             {
                 return;
             }

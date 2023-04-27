@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Speech.Synthesis;
 using MailKit.Net.Smtp;
 using MailKit;
 using MimeKit;
@@ -28,8 +27,6 @@ namespace VirtualMorse
         static string addressBook;
         static string virtualMorseVersion = "2023";
         static string nickname = "";
-        public static SpeechSynthesizer speaker;
-        public static bool blockInputs = false;
 
         static Function()
         {
@@ -37,10 +34,6 @@ namespace VirtualMorse
             directory = directory.Replace("bin\\Debug\\", "Text_documents\\");
             addressBook = "AddressBook.csv";
             DotNetEnv.Env.TraversePath().Load();
-
-            speaker = new SpeechSynthesizer();
-            speaker.SetOutputToDefaultAudioDevice();
-            speaker.SpeakCompleted += synth_SpeakCompleted;
         }
 
         static Dictionary<string, char> morse_map = new Dictionary<string, char>() {
@@ -129,39 +122,6 @@ namespace VirtualMorse
                 sentences[sentences.Count - 1] = sentences.Last().Trim();
             }
             return sentences.Last();
-        }
-
-        public static void speakFully(string message)
-        {
-            speak(message);
-            blockInputs = true;
-        }
-
-        public static void speak(string message)
-        {
-            cancelSpeech();
-            speaker.SpeakAsync(message);
-        }
-        public static void speak(PromptBuilder message)
-        {
-            cancelSpeech();
-            speaker.SpeakAsync(message);
-        }
-
-        public static void cancelSpeech()
-        {
-            if (!blockInputs)
-            {
-                speaker.SpeakAsyncCancelAll();
-            }
-        }
-
-        static void synth_SpeakCompleted(object sender, SpeakCompletedEventArgs e)
-        {
-            if (blockInputs && ( !e.Cancelled ))
-            {
-                blockInputs = false;
-            }
         }
 
         public static MimeMessage createEmail(string address, string contents)
