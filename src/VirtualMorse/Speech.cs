@@ -8,11 +8,13 @@ namespace VirtualMorse
     {
         static SpeechSynthesizer speaker;
         static bool blockInputs = false;
+        static int speechRate = -2;  // Possible values [-10, 10]
 
         static Speech()
         {
             speaker = new SpeechSynthesizer();
             speaker.SetOutputToDefaultAudioDevice();
+            speaker.Rate = speechRate;
             speaker.SpeakCompleted += synth_SpeakCompleted;
         }
 

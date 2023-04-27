@@ -108,10 +108,7 @@ namespace VirtualMorse.States
 				{
 					context.clearWord();
 					string document = context.getDocument();
-					if (document == "")
-					{
-						spokenMessage.AppendText("This page is blank.");
-					}
+					spokenMessage.AppendText((document != "") ? document : "This page is blank.");
                     Console.WriteLine("\"ttt\" entered - reading entire page");
                 }
 				else
