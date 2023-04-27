@@ -28,7 +28,8 @@ namespace VirtualMorse
         static string addressBook;
         static string virtualMorseVersion = "2023";
         static string nickname = "";
-        static SpeechSynthesizer speaker;
+        public static SpeechSynthesizer speaker;
+        public static bool blockInputs = false;
 
         static Function()
         {
@@ -39,6 +40,7 @@ namespace VirtualMorse
 
             speaker = new SpeechSynthesizer();
             speaker.SetOutputToDefaultAudioDevice();
+            speaker.SpeakCompleted += synth_SpeakCompleted;
         }
 
         static Dictionary<string, char> morse_map = new Dictionary<string, char>() {
@@ -129,6 +131,12 @@ namespace VirtualMorse
             return sentences.Last();
         }
 
+        public static void speakFully(string message)
+        {
+            speak(message);
+            blockInputs = true;
+        }
+
         public static void speak(string message)
         {
             cancelSpeech();
@@ -142,7 +150,18 @@ namespace VirtualMorse
 
         public static void cancelSpeech()
         {
-            speaker.SpeakAsyncCancelAll();
+            if (!blockInputs)
+            {
+                speaker.SpeakAsyncCancelAll();
+            }
+        }
+
+        static void synth_SpeakCompleted(object sender, SpeakCompletedEventArgs e)
+        {
+            if (blockInputs && ( !e.Cancelled ))
+            {
+                blockInputs = false;
+            }
         }
 
         public static MimeMessage createEmail(string address, string contents)

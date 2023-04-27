@@ -91,6 +91,7 @@ namespace VirtualMorse.States
 
                 case 'g':
                     Console.WriteLine("checks email");
+                    Function.speakFully("Checking email.");
                     tryEmailFunction(
                         context => {
                             List<int> email_count = Function.getEmailCounts();
@@ -103,6 +104,7 @@ namespace VirtualMorse.States
                     break;
                 case 'd':
                     Console.WriteLine("deletes email");
+                    Function.speakFully("Deleting email.");
                     tryEmailFunction(
                         context => {
                             int emailIndex = parseIndex(context.getCurrentWord());
@@ -114,6 +116,7 @@ namespace VirtualMorse.States
                     break;
                 case 'h':
                     Console.WriteLine("read email headers");
+                    Function.speakFully("Reading email header.");
                     tryEmailFunction(
                         context => {
                             int emailIndex = parseIndex(context.getCurrentWord());
@@ -131,6 +134,7 @@ namespace VirtualMorse.States
                     break;
                 case 'r':
                     Console.WriteLine("reads email");
+                    Function.speakFully("Reading email.");
                     tryEmailFunction(
                         context => {
                             int emailIndex = parseIndex(context.getCurrentWord());
@@ -148,19 +152,21 @@ namespace VirtualMorse.States
                     break;
                 case 'e':
                     Console.WriteLine("create/send email");
+                    Function.speakFully("Sending email.");
                     tryEmailFunction(
                         context => {
                             string address = context.getCurrentWord();
                             address = Function.checkNickname(address);
                             string contents = context.getDocument();
                             Function.sendEmail(Function.createEmail(address, contents));
-                            return $"Sending email to {address}.";
+                            return $"Email sent to {address}.";
                         },
                         "Failed to send email."
                     );
                     break;
                 case 'y':
                     Console.WriteLine("reply to email");
+                    Function.speakFully("Replying to email.");
                     MimeMessage saveMessage = null;
                     string senderName = null;
                     bool success = tryEmailFunction(
@@ -200,7 +206,7 @@ namespace VirtualMorse.States
                     Console.WriteLine("adds email address nickname");
                     string nickname = context.getCurrentWord();
                     Function.createNickname(nickname);
-                    Function.speak("added nickname " + nickname);
+                    Function.speakFully("Nickname " + nickname);
                     break;
                 case 'a':
                     Console.WriteLine("ties email address to nickname");

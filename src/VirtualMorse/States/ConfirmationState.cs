@@ -7,6 +7,7 @@ namespace VirtualMorse.States
     public class ConfirmationState : State
     {
         Action actionToConfirm;
+        static string instructions = "Press space to confirm or backspace to cancel.";
 
         Dictionary<Switch, Action> switchResponses;
 
@@ -18,6 +19,8 @@ namespace VirtualMorse.States
                 { Switch.Switch4,  confirm },
                 { Switch.Switch8,  cancel },
             };
+
+            Function.speakFully(instructions);
         }
 
         public override void respond(Switch input)
@@ -26,10 +29,15 @@ namespace VirtualMorse.States
             {
                 switchResponses[input]();
             }
+            else
+            {
+                Function.speak("Invalid entry. " + instructions);
+            }
         }
 
         void confirm()
         {
+            Function.speakFully("Confirmed.");
             actionToConfirm();
             context.transitionToState(new TypingState(context));
             Console.WriteLine("Move to typing state.");
@@ -37,9 +45,9 @@ namespace VirtualMorse.States
 
         void cancel()
         {
+            Function.speakFully("Cancelled.");
             context.transitionToState(new TypingState(context));
             Console.WriteLine("Move to typing state.");
-            Function.speak("Operation cancelled.");
         }
     }
 }

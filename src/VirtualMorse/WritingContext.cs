@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using VirtualMorse.States;
 using VirtualMorse.Input;
 using System.IO;
+using System.Speech.Synthesis;
 
 namespace VirtualMorse
 {
@@ -68,6 +69,11 @@ namespace VirtualMorse
 
         private void Handler_InputReceived(object sender, SwitchInputEventArgs e)
         {
+            if (Function.speaker.State == SynthesizerState.Speaking
+             && Function.blockInputs)
+            {
+                return;
+            }
             state.respond(e.switchInput);
             Console.WriteLine("current letter: '" + getCurrentMorse() + "'");
             Console.WriteLine("current word: '" + getCurrentWord() + "'");
