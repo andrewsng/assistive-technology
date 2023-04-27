@@ -129,11 +129,11 @@ namespace VirtualMorse.States
                             int emailIndex = parseIndex(context.getCurrentWord());
                             var message = Function.getEmail(emailIndex);
                             var sender = message.Sender ?? message.From.Mailboxes.FirstOrDefault();
-                            return $"Email header number: {context.getCurrentWord()}\n" +
-                                   $"Date and time sent: {message.Date}\n" +
-                                   $"Sender's display name: {sender.Name}\n" +
-                                   $"Sender's address: {sender.Address}\n" +
-                                   $"Email subject line: {message.Subject}";
+                            return $"Email {context.getCurrentWord()} " +
+                                   $"is from {sender.Name} " +
+                                   $"with address {sender.Address} " +
+                                   $"on {message.Date.Date.ToString("d")}.\n" +
+                                   $"Subject: {message.Subject}.\n";
 
                         },
                         "Failed to read email header."
@@ -147,12 +147,12 @@ namespace VirtualMorse.States
                             int emailIndex = parseIndex(context.getCurrentWord());
                             var message = Function.getEmail(emailIndex);
                             var sender = message.Sender ?? message.From.Mailboxes.FirstOrDefault();
-                            return $"Email header number: {context.getCurrentWord()}\n" +
-                                   $"Date and time sent: {message.Date}\n" +
-                                   $"Sender's display name: {sender.Name}\n" +
-                                   $"Sender's address: {sender.Address}\n" +
-                                   $"Email subject line: {message.Subject}\n" +
-                                   $"Email Contents: {message.TextBody}";
+                            return $"Email {context.getCurrentWord()} " +
+                                   $"is from {sender.Name} " +
+                                   $"with address {sender.Address} " +
+                                   $"on {message.Date.Date.ToString("d")}.\n" +
+                                   $"Subject: {message.Subject}\n" +
+                                   $"Email Contents:\n{message.TextBody}\n";
                         },
                         "Failed to read email."
                     );
