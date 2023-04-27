@@ -52,10 +52,17 @@ namespace VirtualMorse.States
 
         void clearDocument()
         {
-            context.setDocument("");
-            moveToTypingState();
             Console.WriteLine("clear document");
-            Speech.speak("Document cleared.");
+            Speech.speakFully("Clear document.");
+            context.transitionToState(
+                new ConfirmationState(
+                    context,
+                    () => {
+                        context.setDocument("");
+                        Speech.speak("Document cleared.");
+                    }
+                )
+            );
         }
 
         bool tryEmailFunction(Func<WritingContext, string> function, string errorMessage)
