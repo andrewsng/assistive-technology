@@ -48,14 +48,17 @@ namespace VirtualMorse
 
         public static bool isBlockingInputs()
         {
-            return (speaker.State == SynthesizerState.Speaking) && blockInputs;
+            return blockInputs;
         }
 
         static void synth_SpeakCompleted(object sender, SpeakCompletedEventArgs e)
         {
-            if (blockInputs && (!e.Cancelled))
+            if (!e.Cancelled)  // Only when speech ran to completion (was not cancelled)
             {
-                blockInputs = false;
+                if (blockInputs)
+                {
+                    blockInputs = false;
+                }
             }
         }
     }
