@@ -36,7 +36,14 @@ namespace VirtualMorse.States
         {
             return () =>
             {
-                context.appendToDocument(punctuation);
+                if (context.currentWord != "")
+                {
+                    context.currentWord += punctuation;
+                }
+                else
+                {
+                    context.appendToDocument(punctuation);
+                }
                 Function.speak(spokenMessage);
                 context.transitionToState(new TypingState(context));
                 Console.WriteLine("Move to typing state.");
@@ -46,7 +53,7 @@ namespace VirtualMorse.States
         void command()
         {
             context.transitionToState(new TypingState(context));
-            Console.WriteLine("Move to punctuation state.");
+            Console.WriteLine("Move to typing state.");
             Function.speak("Command off.");
         }
     }
