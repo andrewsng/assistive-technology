@@ -41,7 +41,7 @@ namespace VirtualMorse.States
         {
             context.transitionToState(new PunctuationState(context));
             Console.WriteLine("Move to punctuation state.");
-            Speech.speak("Command Level 2, Punctuation.");
+            Speech.speak("Punctuation Mode.");
         }
 
         void printPage()

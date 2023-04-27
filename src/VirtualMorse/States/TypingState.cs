@@ -169,7 +169,7 @@ namespace VirtualMorse.States
 		{
 			context.transitionToState(new CommandState(context));
             Console.WriteLine("move to command state");
-			Speech.speak("Command Level 1.");
+			Speech.speak("Command Mode.");
         }
 	}
 }

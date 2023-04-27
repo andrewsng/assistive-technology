@@ -58,7 +58,7 @@ namespace VirtualMorse.States
         {
             context.transitionToState(new TypingState(context));
             Console.WriteLine("Move to typing state.");
-            Speech.speak("Command off.");
+            Speech.speak("Typing Mode.");
         }
     }
 }
