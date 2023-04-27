@@ -210,7 +210,7 @@ namespace VirtualMorse
             }
         }
 
-        public static MimeMessage getEmail(int index)
+        public static MimeMessage getEmail(int index, bool markAsRead = false)
         {
             MimeMessage message;
             using (var client = new ImapClient())
@@ -218,10 +218,19 @@ namespace VirtualMorse
                 connectImapClient(client);
 
                 var inbox = client.Inbox;
-                inbox.Open(FolderAccess.ReadOnly);
+
+                if (markAsRead)
+                {
+                    inbox.Open(FolderAccess.ReadWrite);
+                    inbox.AddFlags(index, MessageFlags.Seen, true);
+                }
+                else
+                {
+                    inbox.Open(FolderAccess.ReadOnly);
+                }
 
                 message = inbox.GetMessage(index);
-
+                
                 client.Disconnect(true);
             }
             return message;

@@ -145,7 +145,7 @@ namespace VirtualMorse.States
                     tryEmailFunction(
                         context => {
                             int emailIndex = parseIndex(context.getCurrentWord());
-                            var message = Function.getEmail(emailIndex);
+                            var message = Function.getEmail(emailIndex, true);
                             var sender = message.Sender ?? message.From.Mailboxes.FirstOrDefault();
                             return $"Email {context.getCurrentWord()} " +
                                    $"is from {sender.Name} " +
