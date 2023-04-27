@@ -176,19 +176,23 @@ namespace VirtualMorse.States
                     Speech.speakFully("Replying to email.");
                     MimeMessage saveMessage = null;
                     string senderName = null;
-                    bool success = tryEmailFunction(
-                        context => {
-                            int emailIndex = parseIndex(context.getCurrentWord());
-                            saveMessage = Function.getEmail(emailIndex);
-                            var sender = saveMessage.Sender ?? saveMessage.From.Mailboxes.FirstOrDefault();
-                            senderName = (!string.IsNullOrEmpty(sender.Name) ? sender.Name : sender.Address);
-                            return $"Reply to email number {context.getCurrentWord()} from {sender.Name ?? ""} {sender.Address}.";
-                        },
-                        "Failed to reply to email."
-                    );
-                    if (!success)
+                    string output = "Failed to reply to email.";
+                    try {
+                        int emailIndex = parseIndex(context.getCurrentWord());
+                        saveMessage = Function.getEmail(emailIndex);
+                        var sender = saveMessage.Sender ?? saveMessage.From.Mailboxes.FirstOrDefault();
+                        senderName = (!string.IsNullOrEmpty(sender.Name) ? sender.Name : sender.Address);
+                        output = $"Reply to email number {context.getCurrentWord()} from {sender.Name ?? ""} {sender.Address}.";
+                    }
+                    catch (Exception ex)
                     {
+                        Console.WriteLine(ex.Message);
                         break;
+                    }
+                    finally
+                    {
+                        Console.WriteLine(output);
+                        Speech.speakFully(output);
                     }
                     context.transitionToState(
                         new ConfirmationState(

@@ -20,7 +20,7 @@ namespace VirtualMorse.States
                 { Switch.Switch8,  cancel },
             };
 
-            Speech.speakFully(instructions);
+            Speech.speak(instructions);
         }
 
         public override void respond(Switch input)
