@@ -7,8 +7,8 @@ namespace VirtualMorse
     public static class Speech
     {
         static SpeechSynthesizer speaker;
-        static bool blockInputs = false;
         static int speechRate = -2;  // Possible values [-10, 10]
+        static Queue<(Prompt, bool)> messageQueue = new Queue<(Prompt, bool)>();
 
         static Speech()
         {
@@ -20,47 +20,54 @@ namespace VirtualMorse
 
         public static void speak(string message)
         {
-            cancelSpeech();
-            speaker.SpeakAsync(message);
+            queuePrompt(new Prompt(message), false);
         }
         public static void speak(PromptBuilder message)
         {
-            cancelSpeech();
-            speaker.SpeakAsync(message);
+            queuePrompt(new Prompt(message), false);
         }
 
         public static void speakFully(string message)
         {
-            speak(message);
-            blockInputs = true;
+            queuePrompt(new Prompt(message), true);
         }
         public static void speakFully(PromptBuilder message)
         {
-            speak(message);
-            blockInputs = true;
+            queuePrompt(new Prompt(message), true);
         }
 
         public static void cancelSpeech()
         {
-            if (!blockInputs)
+            if (!isBlockingInputs())
             {
-                speaker.SpeakAsyncCancelAll();
+                speaker.SpeakAsyncCancel(messageQueue.Peek().Item1);
             }
         }
 
         public static bool isBlockingInputs()
         {
-            return blockInputs;
+            if (messageQueue.Count > 0)
+            {
+                return messageQueue.Peek().Item2;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        static void queuePrompt(Prompt prompt, bool canBeCancelled)
+        {
+            messageQueue.Enqueue((prompt, canBeCancelled));
+            cancelSpeech();
+            speaker.SpeakAsync(prompt);
         }
 
         static void synth_SpeakCompleted(object sender, SpeakCompletedEventArgs e)
         {
-            if (!e.Cancelled)  // Only when speech ran to completion (was not cancelled)
+            if (messageQueue.Count > 0)
             {
-                if (blockInputs)
-                {
-                    blockInputs = false;
-                }
+                messageQueue.Dequeue();
             }
         }
     }
