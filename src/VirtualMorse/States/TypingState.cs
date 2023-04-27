@@ -67,9 +67,16 @@ namespace VirtualMorse.States
 
 		void shift()
 		{
+			if (isCapitalized)
+			{
+                Speech.speak("Shift cancelled.");
+            }
+			else
+			{
+				Speech.speak("Shift.");
+			}
             isCapitalized = !isCapitalized;
             Console.WriteLine("capitalization set to: " + isCapitalized);
-			Speech.speak("shift");
 		}
 
 		void enter()
