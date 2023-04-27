@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using VirtualMorse.States;
 using VirtualMorse.Input;
+using System.IO;
 
 namespace VirtualMorse
 {
@@ -50,10 +51,18 @@ namespace VirtualMorse
 
             directory = AppDomain.CurrentDomain.BaseDirectory;
             directory = directory.Replace("bin\\Debug\\", "Text_documents\\");
-            List<string> fileContents = Function.readFullFile(directory, file);
-            if (fileContents.Count > 0)
+            try
             {
-                setDocument((Function.readFullFile(directory, file))[0]);
+                using (var reader = new StreamReader(directory + file))
+                {
+                    setDocument(reader.ReadToEnd());
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error reading file");
+                Function.speak("Error reading file");
+                Console.WriteLine(ex.Message);
             }
         }
 
@@ -132,7 +141,7 @@ namespace VirtualMorse
 
         public void saveDocumentFile()
         {
-            Function.addToFile(directory, file, getDocument());
+            File.WriteAllText(directory + file, getDocument());
         }
     }
 }

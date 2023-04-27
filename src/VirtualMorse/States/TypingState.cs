@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Windows.Forms;
 using VirtualMorse.Input;
 
 namespace VirtualMorse.States
@@ -142,10 +141,19 @@ namespace VirtualMorse.States
 		}
 
 		void save()
-		{
-			Console.WriteLine("save text doc as is");
-			context.saveDocumentFile();
-			Function.speak("Now saving.");
+        {
+            Function.speak("Now saving.");
+            Console.WriteLine("save text doc as is");
+			try
+            {
+                context.saveDocumentFile();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error saving file");
+                Function.speak("Error saving file");
+                Console.WriteLine(ex.Message);
+            }
 		}
 
 		void command()
