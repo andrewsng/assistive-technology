@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Speech.Synthesis;
 using VirtualMorse.Input;
 
 namespace VirtualMorse.States
@@ -89,7 +90,7 @@ namespace VirtualMorse.States
 				}
 			}
 
-            string spokenMessage;
+            PromptBuilder spokenMessage = new PromptBuilder();
             if (nextLetter != '\0')
 			{
                 context.currentWord += nextLetter;
@@ -99,29 +100,30 @@ namespace VirtualMorse.States
 				if (context.currentWord == "ttt")
 				{
 					context.clearWord();
-					spokenMessage = context.getDocument();
-					if (spokenMessage == "")
+					string document = context.getDocument();
+					if (document == "")
 					{
-						spokenMessage = "This page is blank.";
+						spokenMessage.AppendText("This page is blank.");
 					}
                     Console.WriteLine("\"ttt\" entered - reading entire page");
                 }
 				else
                 {
-                    spokenMessage = nextLetter.ToString();
-                    if (char.IsUpper(nextLetter))
+					if (char.IsUpper(nextLetter))
                     {
-                        spokenMessage = "Capital " + spokenMessage;
+                        spokenMessage.AppendText("Capital ");
                     }
+                    spokenMessage.AppendTextWithHint(nextLetter.ToString(), SayAs.SpellOut);
+                    spokenMessage.AppendText(".");
                 }
-			}
+            }
 			else
 			{
 				context.clearMorse();
 				Console.WriteLine("not a valid letter, try again");
-				spokenMessage = "Try again";
-			}
-			Function.speak(spokenMessage);
+				spokenMessage.AppendText("Try again");
+            }
+            Function.speak(spokenMessage);
 		}
 
 		void backspace()

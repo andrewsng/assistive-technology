@@ -134,6 +134,11 @@ namespace VirtualMorse
             cancelSpeech();
             speaker.SpeakAsync(message);
         }
+        public static void speak(PromptBuilder message)
+        {
+            cancelSpeech();
+            speaker.SpeakAsync(message);
+        }
 
         public static void cancelSpeech()
         {

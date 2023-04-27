@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Speech.Synthesis;
 using VirtualMorse.Input;
 
 namespace VirtualMorse.States
@@ -12,13 +13,13 @@ namespace VirtualMorse.States
         {
             switchResponses = new Dictionary<Switch, Action>(){
                 { Switch.Switch1,  command },
-                { Switch.Switch2,  enterPunctuation("'",  "apostrophe") },
-                { Switch.Switch3,  enterPunctuation("\"", "quotation mark") },
-                { Switch.Switch4,  enterPunctuation("!",  "exclamation mark") },
-                { Switch.Switch5,  enterPunctuation(".",  "period") },
-                { Switch.Switch6,  enterPunctuation(",",  "comma") },
-                { Switch.Switch7,  enterPunctuation("?",  "question mark") },
-                { Switch.Switch8,  enterPunctuation("-",  "hyphen") },
+                { Switch.Switch2,  enterPunctuation("'") },
+                { Switch.Switch3,  enterPunctuation("\"") },
+                { Switch.Switch4,  enterPunctuation("!") },
+                { Switch.Switch5,  enterPunctuation(".") },
+                { Switch.Switch6,  enterPunctuation(",") },
+                { Switch.Switch7,  enterPunctuation("?") },
+                { Switch.Switch8,  enterPunctuation("-") },
                 { Switch.Switch9,  command },
                 { Switch.Switch10, command },
             };
@@ -32,7 +33,7 @@ namespace VirtualMorse.States
             }
         }
 
-        Action enterPunctuation(string punctuation, string spokenMessage)
+        Action enterPunctuation(string punctuation)
         {
             return () =>
             {
@@ -44,6 +45,9 @@ namespace VirtualMorse.States
                 {
                     context.appendToDocument(punctuation);
                 }
+                PromptBuilder spokenMessage = new PromptBuilder();
+                spokenMessage.AppendTextWithHint(punctuation, SayAs.SpellOut);
+                spokenMessage.AppendText(".");
                 Function.speak(spokenMessage);
                 context.transitionToState(new TypingState(context));
                 Console.WriteLine("Move to typing state.");
