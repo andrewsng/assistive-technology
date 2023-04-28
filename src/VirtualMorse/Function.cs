@@ -25,7 +25,6 @@ namespace VirtualMorse
     {
         static string directory;
         static string addressBook;
-        static string virtualMorseVersion = "2023";
         static string nickname = "";
 
         static Function()
@@ -130,7 +129,7 @@ namespace VirtualMorse
 
             message.From.Add(new MailboxAddress("Sender Name", DotNetEnv.Env.GetString("EMAIL__ACCOUNT") + "@gmail.com"));
             message.To.Add(new MailboxAddress("Receiver Name", address));
-            message.Subject = "This message sent with Virtual Morse " + virtualMorseVersion;
+            message.Subject = "This message sent with Virtual Morse " + Program.programVersion;
 
             message.Body = new TextPart("plain")
             {
