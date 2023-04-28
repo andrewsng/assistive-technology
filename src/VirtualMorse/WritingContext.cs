@@ -22,8 +22,7 @@ namespace VirtualMorse
         public string currentWord = "";
         public char lastLetter = '\0';
 
-        string directory;
-        string file = "test.txt";
+        string textFileName;
 
         public WritingContext()
         {
@@ -49,22 +48,6 @@ namespace VirtualMorse
             }
 
             state = new TypingState(this);
-
-            directory = AppDomain.CurrentDomain.BaseDirectory;
-            directory = directory.Replace("bin\\Debug\\", "Text_documents\\");
-            try
-            {
-                using (var reader = new StreamReader(directory + file))
-                {
-                    setDocument(reader.ReadToEnd());
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error reading file");
-                Speech.speak("Error reading file");
-                Console.WriteLine(ex.Message);
-            }
         }
 
         private void Handler_InputReceived(object sender, SwitchInputEventArgs e)
@@ -117,6 +100,19 @@ namespace VirtualMorse
             currentWord = "";
         }
 
+        public void setTextFile(string textFile)
+        {
+            textFileName = textFile;
+        }
+
+        public void loadFromTextFile()
+        {
+            using (var reader = new StreamReader(Path.Combine(Program.fileDirectory, textFileName)))
+            {
+                setDocument(reader.ReadToEnd());
+            }
+        }
+
         public void setDocument(string text)
         {
             textBox.Focus();
@@ -146,7 +142,7 @@ namespace VirtualMorse
 
         public void saveDocumentFile()
         {
-            File.WriteAllText(directory + file, getDocument());
+            File.WriteAllText(Path.Combine(Program.fileDirectory, textFileName), getDocument());
         }
     }
 }
