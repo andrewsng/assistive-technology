@@ -54,7 +54,7 @@ public class PrintingExample
             streamToPrint = new StreamReader(filePath);
             try
             {
-                printFont = new Font("Arial", 10);
+                printFont = new Font("Arial", 16);
                 PrintDocument pd = new PrintDocument();
                 pd.PrintPage += new PrintPageEventHandler(pd_PrintPage);
                 // Print the document.
