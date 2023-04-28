@@ -48,6 +48,7 @@ namespace VirtualMorse.States
         {
             Console.WriteLine("Print page");
             moveToTypingState();
+            Function.speak("Printing page");
         }
 
         void clearDocument()
