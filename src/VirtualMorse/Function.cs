@@ -23,15 +23,11 @@ namespace VirtualMorse
 
     public static class Function
     {
-        static string directory;
-        static string addressBook;
+        static string addressBook = "AddressBook.csv";
         static string nickname = "";
 
         static Function()
         {
-            directory = AppDomain.CurrentDomain.BaseDirectory;
-            directory = directory.Replace("bin\\Debug\\", "Text_documents\\");
-            addressBook = "AddressBook.csv";
             DotNetEnv.Env.TraversePath().Load();
         }
 
@@ -286,7 +282,7 @@ namespace VirtualMorse
             List<AddressBook> records = new List<AddressBook>();
             try
             {
-                using (var reader = new StreamReader(directory + addressBook))
+                using (var reader = new StreamReader(Path.Combine(Program.fileDirectory, addressBook)))
                 {
                     using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
                     {
@@ -305,7 +301,7 @@ namespace VirtualMorse
         public static void addEmailToBook(string email)
         {
             var records = readAddressBook();
-            using (var writer = new StreamWriter(directory + addressBook))
+            using (var writer = new StreamWriter(Path.Combine(Program.fileDirectory, addressBook)))
             {
                 using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
                 {
