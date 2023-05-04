@@ -4,12 +4,12 @@ This serves as a reference guide for the Spring 2023 senior capstone project at 
 
 ## Table of Contents
 
-* [Email](docs/Email)
-* [Installation Instructions](docs/Installation-Instructions)
-* [Printing](docs/Printing)
-* [System Architecture](docs/System-Architecture)
-* [System Description](docs/System-Description)
-* [Unaddressed Notes and Questions](docs/Unaddressed-Notes-and-Questions)
+* [Email](Email.md)
+* [Installation Instructions](Installation-Instructions.md)
+* [Printing](Printing.md)
+* [System Architecture](System-Architecture.md)
+* [System Description](System-Description.md)
+* [Unaddressed Notes and Questions](Unaddressed-Notes-and-Questions.md)
 
 #### Project Description
 - To clone a local copy of the wiki without any source code: `git clone https://github.com/andrewsng/assistive-technology.wiki.git`
