@@ -1,3 +1,5 @@
+//typing state
+//has the implementation for the typing state, in which morse code input will be translated to the screen
 using System;
 using System.Collections.Generic;
 using System.Speech.Synthesis;
@@ -36,18 +38,22 @@ namespace VirtualMorse.States
             }
         }
 
+		//adds a dot to the current word
         void dot()
 		{
 			Console.WriteLine("storing dot");
             context.currentMorse += '.';
         }
 
+		//adds a dash to the current word
 		void dash()
 		{
 			Console.WriteLine("storing dash");
             context.currentMorse += '-';
         }
 
+		//if there is a current word, add word to the document
+		//if there is not a current word, add a space to the document
 		void space()
 		{
 			if (context.currentWord != "")
@@ -65,6 +71,7 @@ namespace VirtualMorse.States
 			}
 		}
 
+		//toggles capitalization
 		void shift()
 		{
 			if (isCapitalized)
@@ -79,6 +86,10 @@ namespace VirtualMorse.States
             Console.WriteLine("capitalization set to: " + isCapitalized);
 		}
 
+		//translates current morse code letter
+		//if it is a valid letter, add it to the current word
+		//if it isn't valid, alert user
+		//if adding the letter results in TTT, read current document and clear current word
 		void enter()
 		{
 			string morseString = context.currentMorse;
@@ -130,6 +141,8 @@ namespace VirtualMorse.States
             Speech.speak(spokenMessage);
 		}
 
+		//if a morse letter is in progress, delete all of it
+		//if not, remove last character
 		void backspace()
 		{
 			if (context.currentWord.Length > 0)
@@ -146,6 +159,7 @@ namespace VirtualMorse.States
 			}
 		}
 
+		//save text file
 		void save()
         {
             Speech.speak("Now saving.");
@@ -162,6 +176,7 @@ namespace VirtualMorse.States
             }
 		}
 
+		//move to  command state
 		void command()
 		{
 			context.transitionToState(new CommandState(context));

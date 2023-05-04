@@ -1,3 +1,5 @@
+//Command state
+//used for email, printing, and other functions
 using MimeKit;
 using System;
 using System.Collections.Generic;
@@ -37,6 +39,7 @@ namespace VirtualMorse.States
             }
         }
 
+        //move to punctuation state
         void command()
         {
             context.transitionToState(new PunctuationState(context));
@@ -44,12 +47,15 @@ namespace VirtualMorse.States
             Speech.speak("Punctuation Mode.");
         }
 
+        //prints the current page
         void printPage()
         {
             Console.WriteLine("Print page");
             moveToTypingState();
         }
 
+        //Erases the current text document
+        //has a confirmation
         void clearDocument()
         {
             Console.WriteLine("clear document");
@@ -65,6 +71,8 @@ namespace VirtualMorse.States
             );
         }
 
+        //Sends an email
+        //if the email fails to send, print the error message
         bool tryEmailFunction(Func<WritingContext, string> function, string errorMessage)
         {
             string output;
@@ -84,11 +92,13 @@ namespace VirtualMorse.States
             return success;
         }
 
+        //reads the current letter and performs the specified command
         void enterCommand()
         {
             char commandLetter = Function.morseToText(context.currentMorse);
             switch (commandLetter)
             {
+                //reads the last sentance of the current text document
                 case 'l':
                     Console.WriteLine("read last sentence");
                     string sentence = Function.getLastSentence(context.getDocument());
@@ -96,6 +106,8 @@ namespace VirtualMorse.States
                     Speech.speak(sentence);
                     break;
 
+                //checks email
+                //returns the number of new, unread, and total number of emails.
                 case 'g':
                     Console.WriteLine("checks email");
                     Speech.speakFully("Checking email.");
@@ -109,6 +121,9 @@ namespace VirtualMorse.States
                         "Failed to check emails."
                     );
                     break;
+
+                //deletes email
+                //the email to be deleted is specified by a number in current word
                 case 'd':
                     Console.WriteLine("deletes email");
                     Speech.speakFully("Deleting email.");
@@ -121,6 +136,10 @@ namespace VirtualMorse.States
                         "Failed to delete email."
                     );
                     break;
+
+                //reads the email header
+                //the email to be read is specified by a number in current word
+                //reads the sender's address, sender's name, sent date, and subject line
                 case 'h':
                     Console.WriteLine("read email headers");
                     Speech.speakFully("Reading email header.");
@@ -139,6 +158,10 @@ namespace VirtualMorse.States
                         "Failed to read email header."
                     );
                     break;
+
+                //reads entire email
+                //the email to be read is specified by a number in current word
+                //reads the sender's address, sender's name, sent date, subject line, and email body
                 case 'r':
                     Console.WriteLine("reads email");
                     Speech.speakFully("Reading email.");
@@ -157,6 +180,9 @@ namespace VirtualMorse.States
                         "Failed to read email."
                     );
                     break;
+
+                //send email
+                //Current word stores the email address and the current document stores the email contents
                 case 'e':
                     Console.WriteLine("create/send email");
                     Speech.speakFully("Sending email.");
@@ -171,6 +197,9 @@ namespace VirtualMorse.States
                         "Failed to send email."
                     );
                     break;
+
+                //reply to email
+                //Current word stores a number corresponding to the reply email address and the current document stores the email contents
                 case 'y':
                     Console.WriteLine("reply to email");
                     Speech.speakFully("Replying to email.");
@@ -213,12 +242,18 @@ namespace VirtualMorse.States
                     context.clearMorse();
                     context.clearWord();
                     return;
+
+                //add nickname
+                //stores a nickname to be added to the address book
                 case 'n':
                     Console.WriteLine("adds email address nickname");
                     string nickname = context.getCurrentWord();
                     Function.createNickname(nickname);
                     Speech.speakFully("Nickname " + nickname);
                     break;
+                
+                //add email address to nickname
+                //Ties email address and nickname together and adds them to the address book
                 case 'a':
                     Console.WriteLine("ties email address to nickname");
                     tryEmailFunction(
@@ -230,6 +265,8 @@ namespace VirtualMorse.States
                         "Failed to add email as a nickname."
                     );
                     break;
+
+                //invalid command
                 default:
                     Console.WriteLine("invalid command");
                     sayUnprogrammedError();

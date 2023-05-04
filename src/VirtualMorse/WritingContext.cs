@@ -1,3 +1,6 @@
+//writing context
+//implements the state machine for Virtual Morse
+//implements the GUI for Virtual Morse
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -16,8 +19,10 @@ namespace VirtualMorse
         FunctionKeyInput functionKeys;
         ArduinoComms Board;
 
+        //current state of the machine
         State state;
 
+        //current letter and word
         public string currentMorse = "";
         public string currentWord = "";
         public char lastLetter = '\0';
@@ -26,16 +31,19 @@ namespace VirtualMorse
 
         public WritingContext()
         {
+            //create textbox
             textBox = new RichTextBox();
             textBox.Dock = DockStyle.Fill;
             textBox.AutoWordSelection = false;
             textBox.Font = new Font("Arial", 16, FontStyle.Regular);
             textBox.ForeColor = Color.Black;
 
+            //set up function keys
             functionKeys = new FunctionKeyInput();
             functionKeys.KeyPressed += Handler_InputReceived;
             textBox.KeyDown += functionKeys.TextBox_KeyDown;
 
+            //connect to the arduino board
             try
             {
                 Board = new ArduinoComms(textBox);
@@ -50,6 +58,8 @@ namespace VirtualMorse
             state = new TypingState(this);
         }
 
+        //handles inputs from arduino and function keys
+        //determines which state machine input to use
         private void Handler_InputReceived(object sender, SwitchInputEventArgs e)
         {
             if (Speech.isBlockingInputs())
@@ -70,6 +80,7 @@ namespace VirtualMorse
             return textBox;
         }
 
+        //move states
         public void transitionToState(State state)
         {
             this.state = state;
@@ -105,6 +116,7 @@ namespace VirtualMorse
             textFileName = textFile;
         }
 
+        //loads file into text document
         public void loadFromTextFile()
         {
             using (var reader = new StreamReader(Path.Combine(Program.fileDirectory, textFileName)))
@@ -113,6 +125,7 @@ namespace VirtualMorse
             }
         }
 
+        //overrides the current document with a given string
         public void setDocument(string text)
         {
             textBox.Focus();
@@ -121,6 +134,7 @@ namespace VirtualMorse
             textBox.SelectedText = text;
         }
 
+        //adds word to document
         public void appendToDocument(string text)
         {
             textBox.Focus();
@@ -129,6 +143,7 @@ namespace VirtualMorse
             textBox.SelectedText = text;
         }
 
+        //deletes last character in the document
         public void backspaceDocument()
         {
             if (textBox.TextLength > 0)
@@ -140,6 +155,7 @@ namespace VirtualMorse
             }
         }
 
+        //saves current document
         public void saveDocumentFile()
         {
             File.WriteAllText(Path.Combine(Program.fileDirectory, textFileName), getDocument());
