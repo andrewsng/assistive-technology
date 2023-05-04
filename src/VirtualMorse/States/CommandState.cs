@@ -101,10 +101,9 @@ namespace VirtualMorse.States
                     Speech.speakFully("Checking email.");
                     tryEmailFunction(
                         context => {
-                            List<int> email_count = Function.getEmailCounts();
-                            return $"You have {email_count[0]} new emails.\n" +
-                                   $"You have {email_count[1]} unread emails.\n" +
-                                   $"You have {email_count[2]} total emails.";
+                            Function.EmailCounts emailCount = Function.getEmailCounts();
+                            return $"You have {emailCount.Unread} unread emails.\n" +
+                                   $"You have {emailCount.Total} total emails.";
                         },
                         "Failed to check emails."
                     );

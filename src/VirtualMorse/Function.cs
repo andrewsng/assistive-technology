@@ -231,9 +231,16 @@ namespace VirtualMorse
             return message;
         }
 
-        public static List<int> getEmailCounts()
+        public class EmailCounts
         {
-            List<int> emailCounts = new List<int>();
+            public int New { get; set; }
+            public int Unread { get; set; }
+            public int Total { get; set; }
+        }
+
+        public static EmailCounts getEmailCounts()
+        {
+            EmailCounts emailCounts = new EmailCounts();
             using (var client = new ImapClient())
             {
                 connectImapClient(client);
@@ -243,9 +250,9 @@ namespace VirtualMorse
 
                 // FIXME: How to deal with threaded conversations within the inbox.
 
-                emailCounts.Add(inbox.Search(SearchQuery.New).Count());
-                emailCounts.Add(inbox.Search(SearchQuery.NotSeen).Count());
-                emailCounts.Add(inbox.Count);
+                emailCounts.New = inbox.Search(SearchQuery.New).Count();
+                emailCounts.Unread = inbox.Search(SearchQuery.NotSeen).Count();
+                emailCounts.Total = inbox.Count;
 
                 client.Disconnect(true);
             }
