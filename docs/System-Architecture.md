@@ -1,7 +1,5 @@
 ### Diagram
 
-> More details about the **Input Sources**, **Input System**, and **State Machine** are available via [Terminology](https://github.com/andrewsng/assistive-technology/wiki/Terminology) section.
-
 ![image](https://user-images.githubusercontent.com/43076320/236088252-cf3aedf0-7a0e-4cc9-9b35-c8b8badd3b48.png)
 
 ### Typing State
