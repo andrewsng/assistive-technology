@@ -156,9 +156,9 @@ namespace VirtualMorse.States
                             int emailIndex = parseIndex(context.getCurrentWord());
                             var message = Function.getEmail(emailIndex);
                             var sender = message.Sender ?? message.From.Mailboxes.FirstOrDefault();
-                            return $"Email {context.getCurrentWord()} " +
-                                   $"is from {sender.Name} " +
-                                   $"with address {sender.Address} " +
+                            return $"Email {context.getCurrentWord()}, " +
+                                   $"is from {sender.Name}, " +
+                                   $"with address {sender.Address}, " +
                                    $"on {message.Date.Date.ToString("d")}.\n" +
                                    $"Subject: {message.Subject}.\n";
 
@@ -178,9 +178,9 @@ namespace VirtualMorse.States
                             int emailIndex = parseIndex(context.getCurrentWord());
                             var message = Function.getEmail(emailIndex, true);
                             var sender = message.Sender ?? message.From.Mailboxes.FirstOrDefault();
-                            return $"Email {context.getCurrentWord()} " +
-                                   $"is from {sender.Name} " +
-                                   $"with address {sender.Address} " +
+                            return $"Email {context.getCurrentWord()}, " +
+                                   $"is from {sender.Name}, " +
+                                   $"with address {sender.Address}, " +
                                    $"on {message.Date.Date.ToString("d")}.\n" +
                                    $"Subject: {message.Subject}\n" +
                                    $"Email Contents:\n{message.TextBody}\n";
