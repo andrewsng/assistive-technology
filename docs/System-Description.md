@@ -1,4 +1,4 @@
-> This page references information also available via our [System Architecture](https://github.com/andrewsng/assistive-technology/wiki/System-Architecture) diagram.
+> This page references information also available via our [System Architecture](System-Architecture.md) diagram.
 
 
 ## Definitions 
