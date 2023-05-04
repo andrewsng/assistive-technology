@@ -22,6 +22,7 @@ namespace VirtualMorse
         public static string programName = "Virtual Morse";
         public static string programVersion = "2023";
         public static string fileDirectory;
+        public static Font textFont = new Font("Arial", 16, FontStyle.Regular);
 
         public Program()
         {
@@ -29,7 +30,7 @@ namespace VirtualMorse
             RichTextBox textBox = new RichTextBox();
             textBox.Dock = DockStyle.Fill;
             textBox.AutoWordSelection = false;
-            textBox.Font = new Font("Arial", 16, FontStyle.Regular);
+            textBox.Font = textFont;
             textBox.ForeColor = Color.Black;
 
             // Initialize Form (Window)
@@ -66,6 +67,7 @@ namespace VirtualMorse
         [STAThread]
         public static void Main(string[] args)
         {
+            DotNetEnv.Env.TraversePath().Load();
             Speech.speakFully(programName + " " + programVersion);
             Application.EnableVisualStyles();
             Application.Run(new Program());
