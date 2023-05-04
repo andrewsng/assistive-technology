@@ -1,4 +1,10 @@
-﻿using System;
+﻿// class Program
+// Derived from base class Form
+// Contains the Main function where the program starts.
+// Creates a window containing a text box, and initializes 
+//   a WritingContext with Arduino and function key inputs.
+
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;

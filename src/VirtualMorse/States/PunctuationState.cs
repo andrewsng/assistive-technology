@@ -1,5 +1,6 @@
-//punctuation state
-//used to quickly add punctuation characters to the current word
+// class PunctuationState
+// Derived from base class State
+// Used to quickly add punctuation characters to the current word
 using System;
 using System.Collections.Generic;
 using System.Speech.Synthesis;

@@ -1,5 +1,6 @@
-//Command state
-//used for email, printing, and other functions
+// class CommandState
+// Derived from base class State
+// Used for email, printing, and other functions
 using MimeKit;
 using System;
 using System.Collections.Generic;

@@ -1,6 +1,6 @@
-﻿//Function.cs
-//The purpose of this file is to implement functionality that would otherwise be out of place in the other files
-//Right now, it implements reading morse code and email functions
+﻿// static class Function.cs
+// The purpose of this file is to implement functionality that would otherwise be out of place in the other files
+// Right now, it implements reading morse code and email functions
 
 using System;
 using System.Collections.Generic;

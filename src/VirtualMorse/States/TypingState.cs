@@ -1,5 +1,6 @@
-//typing state
-//has the implementation for the typing state, in which morse code input will be translated to the screen
+// class TypingState
+// Derived from base class State
+// Has the implementation for the typing state, in which morse code input will be translated to the screen
 using System;
 using System.Collections.Generic;
 using System.IO;

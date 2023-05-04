@@ -1,6 +1,7 @@
-//writing context
-//implements the state machine for Virtual Morse
-//implements the GUI for Virtual Morse
+// class WritingContext
+// Implements the context that the Virtual Morse
+//   state machine States refer back to.
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -8,7 +9,6 @@ using System.Windows.Forms;
 using VirtualMorse.States;
 using VirtualMorse.Input;
 using System.IO;
-using System.Speech.Synthesis;
 
 namespace VirtualMorse
 {
@@ -34,8 +34,9 @@ namespace VirtualMorse
             state = new TypingState(this);
         }
 
-        //handles inputs from arduino and function keys
-        //determines which state machine input to use
+        // Event handler that receives switch values and calls
+        //   the respond function for the current state with that switch value.
+        // Does nothing if Speech class is blocking inputs.
         void Handler_InputReceived(object sender, SwitchInputEventArgs e)
         {
             if (Speech.isBlockingInputs())
@@ -89,7 +90,7 @@ namespace VirtualMorse
 
         public void addInputSource(InputSource inputSource)
         {
-            inputSource.switchActivated += Handler_InputReceived;
+            inputSource.switchActivated += Handler_InputReceived;  // Subscribe to switchActivated event
             inputSources.Add(inputSource);
         }
 

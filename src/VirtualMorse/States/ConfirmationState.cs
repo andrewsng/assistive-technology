@@ -1,6 +1,8 @@
-﻿//confirmation state
-//used to confirm certain actions
-//space is confirm, backspace is cancel
+﻿// class ConfirmationState
+// Derived from base class State
+// Used to confirm an Action (a function with no parameters or return value)
+// Space is confirm, backspace is cancel
+
 using System;
 using System.Collections.Generic;
 using VirtualMorse.Input;

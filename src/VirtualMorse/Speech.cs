@@ -1,4 +1,12 @@
-﻿using System;
+﻿// static class Speech
+// Maintains a single instance of the .NET SpeechSynthesizer.
+// Offers functions to speak a message made with a string or a PromptBuilder.
+// This class implements behavior where all spoken messages cancel the previous message,
+//   but function 'speakFully' allows a spoken message to block inputs and other speech.
+//   This is done using a Queue for message prompts, where the front of the queue is
+//   checked if it is interruptible when adding a new message.
+
+using System;
 using System.Collections.Generic;
 using System.Speech.Synthesis;
 
@@ -7,7 +15,7 @@ namespace VirtualMorse
     public static class Speech
     {
         static SpeechSynthesizer speaker;
-        static int speechRate = -2;  // Possible values [-10, 10]
+        static int speechRate = -2;  // Variable for controlling speech rate - possible values [-10, 10]
         static Queue<(Prompt, bool)> messageQueue = new Queue<(Prompt, bool)>();
 
         static Speech()
@@ -36,6 +44,8 @@ namespace VirtualMorse
             queuePrompt(new Prompt(message), true);
         }
 
+        // Cancels current speech if the prompt at the front of
+        //   the queue is not blocking inputs.
         public static void cancelSpeech()
         {
             if (!isBlockingInputs())
