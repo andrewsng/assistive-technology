@@ -6,30 +6,24 @@ using System.IO.Ports; //access to SerialPort Class
 
 namespace VirtualMorse.Input
 {
-    public class ArduinoComms
+    public class ArduinoComms : InputSource
     {
-        RichTextBox textBox;
         SerialPort _serialPort;
 
         //Constructors
-        public ArduinoComms(RichTextBox textBox)
+        public ArduinoComms(RichTextBox textBox) : base(textBox)
         {
-            this.textBox = textBox;
             _serialPort = new SerialPort("COM4", 9600, Parity.None, 8, StopBits.One);
             _serialPort.Open();
             _serialPort.DataReceived += DataHandler;
         }
 
-        public ArduinoComms(RichTextBox textBox, string portName, int baudRate)
+        public ArduinoComms(RichTextBox textBox, string portName, int baudRate) : base(textBox)
         {
-            this.textBox = textBox;
             _serialPort = new SerialPort(portName, baudRate, Parity.None, 8, StopBits.One);
             _serialPort.Open();
             _serialPort.DataReceived += DataHandler;
         }
-
-        //Event to Detect when a button is pressed 
-        public event EventHandler<SwitchInputEventArgs> buttonPressed;
 
         //Dictionary holding all button presses, and associated switches
         public Dictionary<string, Switch> targetKeys = new Dictionary<string, Switch>()
@@ -57,7 +51,7 @@ namespace VirtualMorse.Input
                 if (targetKeys.ContainsKey(str))
                 {
                     Action action = delegate () {
-                        buttonPressed?.Invoke(this, new SwitchInputEventArgs(targetKeys[str]));
+                        OnSwitchActivated(new SwitchInputEventArgs(targetKeys[str]));
                     };
                     textBox.Invoke(action);  // Event must be handled on the text box's thread.
                 }

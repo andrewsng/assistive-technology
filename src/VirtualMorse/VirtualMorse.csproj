@@ -238,6 +238,7 @@
     <Compile Include="Function.cs" />
     <Compile Include="Input\ArduinoComms.cs" />
     <Compile Include="Input\FunctionKeyInput.cs" />
+    <Compile Include="Input\InputSource.cs" />
     <Compile Include="Program.cs">
       <SubType>Form</SubType>
     </Compile>

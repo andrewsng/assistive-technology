@@ -12,10 +12,7 @@ namespace VirtualMorse
     public class WritingContext
     {
         RichTextBox textBox;
-
-        FunctionKeyInput functionKeys;
-        ArduinoComms Board;
-
+        List<InputSource> inputSources;
         State state;
 
         public string currentMorse = "";
@@ -24,33 +21,16 @@ namespace VirtualMorse
 
         string textFileName;
 
-        public WritingContext()
+        public WritingContext(RichTextBox textBox)
         {
-            textBox = new RichTextBox();
-            textBox.Dock = DockStyle.Fill;
-            textBox.AutoWordSelection = false;
-            textBox.Font = new Font("Arial", 16, FontStyle.Regular);
-            textBox.ForeColor = Color.Black;
+            this.textBox = textBox;
 
-            functionKeys = new FunctionKeyInput();
-            functionKeys.KeyPressed += Handler_InputReceived;
-            textBox.KeyDown += functionKeys.TextBox_KeyDown;
-
-            try
-            {
-                Board = new ArduinoComms(textBox);
-                Board.buttonPressed += Handler_InputReceived;
-            }
-            catch
-            {
-                Console.WriteLine("Error opening serial port");
-                // TODO: Throw here or not?
-            }
+            inputSources = new List<InputSource>();
 
             state = new TypingState(this);
         }
 
-        private void Handler_InputReceived(object sender, SwitchInputEventArgs e)
+        void Handler_InputReceived(object sender, SwitchInputEventArgs e)
         {
             if (Speech.isBlockingInputs())
             {
@@ -98,6 +78,12 @@ namespace VirtualMorse
         public void clearWord()
         {
             currentWord = "";
+        }
+
+        public void addInputSource(InputSource inputSource)
+        {
+            inputSource.switchActivated += Handler_InputReceived;
+            inputSources.Add(inputSource);
         }
 
         public void setTextFile(string textFile)

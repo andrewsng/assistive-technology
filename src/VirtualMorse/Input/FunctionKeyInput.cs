@@ -6,10 +6,8 @@ using System.Windows.Forms;
 
 namespace VirtualMorse.Input
 {
-    public class FunctionKeyInput
+    public class FunctionKeyInput : InputSource
     {
-        public event EventHandler<SwitchInputEventArgs> KeyPressed;
-
         public Dictionary<Keys, Switch> targetKeys = new Dictionary<Keys, Switch>()
         {
             { Keys.F1, Switch.Switch1 },
@@ -24,6 +22,11 @@ namespace VirtualMorse.Input
             { Keys.F10, Switch.Switch10 },
         };
 
+        public FunctionKeyInput(RichTextBox textBox) : base(textBox)
+        {
+            this.textBox.KeyDown += TextBox_KeyDown;
+        }
+
         public void TextBox_KeyDown(object sender, KeyEventArgs e)
         {
             if (targetKeys.ContainsKey(e.KeyCode))
@@ -32,7 +35,7 @@ namespace VirtualMorse.Input
                 {
                     e.SuppressKeyPress = true;
                 }
-                KeyPressed?.Invoke(this, new SwitchInputEventArgs(targetKeys[e.KeyCode]));
+                OnSwitchActivated(new SwitchInputEventArgs(targetKeys[e.KeyCode]));
             }
         }
     }
