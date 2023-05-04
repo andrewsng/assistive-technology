@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Speech.Synthesis;
 using VirtualMorse.Input;
 
@@ -152,7 +153,7 @@ namespace VirtualMorse.States
             Console.WriteLine("save text doc as is");
 			try
             {
-                context.saveDocumentFile();
+                context.saveDocumentFile(Path.Combine(Program.fileDirectory, context.getTextFile()));
             }
             catch (Exception ex)
             {

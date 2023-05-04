@@ -105,6 +105,11 @@ namespace VirtualMorse
             textFileName = textFile;
         }
 
+        public string getTextFile()
+        {
+            return textFileName;
+        }
+
         public void loadFromTextFile()
         {
             using (var reader = new StreamReader(Path.Combine(Program.fileDirectory, textFileName)))
@@ -140,9 +145,10 @@ namespace VirtualMorse
             }
         }
 
-        public void saveDocumentFile()
+        public void saveDocumentFile(string filePath)
         {
-            File.WriteAllText(Path.Combine(Program.fileDirectory, textFileName), getDocument());
+            Console.WriteLine($"Saving document to {filePath}");
+            File.WriteAllText(filePath, getDocument());
         }
     }
 }

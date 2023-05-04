@@ -2,6 +2,7 @@ using MimeKit;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using VirtualMorse.Input;
@@ -58,7 +59,15 @@ namespace VirtualMorse.States
                 new ConfirmationState(
                     context,
                     () => {
+                        string clearedDocsDirectory = Path.Combine(Program.fileDirectory, "ClearedDocuments");
+                        Directory.CreateDirectory(clearedDocsDirectory);
+
+                        DateTime dateTime = DateTime.Now;
+                        string fileName = dateTime.ToString("yyyy-MM-dd__THH-mm-ss") + ".txt";
+                        context.saveDocumentFile(Path.Combine(clearedDocsDirectory, fileName));
+
                         context.setDocument("");
+
                         Speech.speak("Document cleared.");
                     }
                 )
