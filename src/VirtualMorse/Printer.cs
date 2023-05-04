@@ -1,4 +1,8 @@
-﻿using System;
+﻿// static class Printer
+// Contains function for printing a given string
+// Printer name is obtained through environment variable PRINTER__NAME
+
+using System;
 using System.IO;
 using System.Drawing;
 using System.Drawing.Printing;

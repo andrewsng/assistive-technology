@@ -239,12 +239,12 @@
     <Compile Include="Input\ArduinoComms.cs" />
     <Compile Include="Input\FunctionKeyInput.cs" />
     <Compile Include="Input\InputSource.cs" />
+    <Compile Include="Printer.cs" />
     <Compile Include="Program.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Speech.cs" />
-    <Compile Include="States\PrintingState.cs" />
     <Compile Include="States\CommandState.cs" />
     <Compile Include="States\ConfirmationState.cs" />
     <Compile Include="States\PunctuationState.cs" />
