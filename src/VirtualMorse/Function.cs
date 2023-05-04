@@ -123,7 +123,8 @@ namespace VirtualMorse
         {
             var message = new MimeMessage();
 
-            message.From.Add(new MailboxAddress("Sender Name", DotNetEnv.Env.GetString("EMAIL__ACCOUNT") + "@gmail.com"));
+            string senderName = DotNetEnv.Env.GetString("SENDER__NAME") ?? "Sender Name";
+            message.From.Add(new MailboxAddress(senderName, DotNetEnv.Env.GetString("EMAIL__ACCOUNT") + "@gmail.com"));
             message.To.Add(new MailboxAddress("Receiver Name", address));
             message.Subject = "This message sent with Virtual Morse " + Program.programVersion;
 
@@ -140,7 +141,8 @@ namespace VirtualMorse
         {
             var reply = new MimeMessage();
 
-            reply.From.Add(new MailboxAddress("Sender Name", DotNetEnv.Env.GetString("EMAIL__ACCOUNT") + "@gmail.com"));
+            string senderName = DotNetEnv.Env.GetString("SENDER__NAME") ?? "Sender Name";
+            reply.From.Add(new MailboxAddress(senderName, DotNetEnv.Env.GetString("EMAIL__ACCOUNT") + "@gmail.com"));
             
             if (message.ReplyTo.Count > 0)
             {
