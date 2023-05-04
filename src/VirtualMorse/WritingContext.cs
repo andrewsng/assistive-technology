@@ -1,3 +1,6 @@
+//writing context
+//implements the state machine for Virtual Morse
+//implements the GUI for Virtual Morse
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -13,8 +16,9 @@ namespace VirtualMorse
     {
         RichTextBox textBox;
         List<InputSource> inputSources;
-        State state;
+        State state;  //current state of the machine
 
+        //current letter and word
         public string currentMorse = "";
         public string currentWord = "";
         public char lastLetter = '\0';
@@ -30,6 +34,8 @@ namespace VirtualMorse
             state = new TypingState(this);
         }
 
+        //handles inputs from arduino and function keys
+        //determines which state machine input to use
         void Handler_InputReceived(object sender, SwitchInputEventArgs e)
         {
             if (Speech.isBlockingInputs())
@@ -50,6 +56,7 @@ namespace VirtualMorse
             return textBox;
         }
 
+        //move states
         public void transitionToState(State state)
         {
             this.state = state;
@@ -96,6 +103,7 @@ namespace VirtualMorse
             return textFileName;
         }
 
+        //loads file into text document
         public void loadFromTextFile()
         {
             using (var reader = new StreamReader(Path.Combine(Program.fileDirectory, textFileName)))
@@ -104,6 +112,7 @@ namespace VirtualMorse
             }
         }
 
+        //overrides the current document with a given string
         public void setDocument(string text)
         {
             textBox.Focus();
@@ -112,6 +121,7 @@ namespace VirtualMorse
             textBox.SelectedText = text;
         }
 
+        //adds word to document
         public void appendToDocument(string text)
         {
             textBox.Focus();
@@ -120,6 +130,7 @@ namespace VirtualMorse
             textBox.SelectedText = text;
         }
 
+        //deletes last character in the document
         public void backspaceDocument()
         {
             if (textBox.TextLength > 0)
@@ -131,6 +142,7 @@ namespace VirtualMorse
             }
         }
 
+        //saves current document
         public void saveDocumentFile(string filePath)
         {
             Console.WriteLine($"Saving document to {filePath}");

@@ -1,4 +1,7 @@
-﻿using System;
+﻿//confirmation state
+//used to confirm certain actions
+//space is confirm, backspace is cancel
+using System;
 using System.Collections.Generic;
 using VirtualMorse.Input;
 

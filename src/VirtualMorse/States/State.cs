@@ -1,4 +1,7 @@
-﻿using System;
+﻿//base class State machine
+//when implementing new states, make sure they extend from this base class
+//EX: public class NewState : State {}
+using System;
 using VirtualMorse.Input;
 
 namespace VirtualMorse.States

@@ -1,4 +1,8 @@
-﻿using System;
+﻿//Function.cs
+//The purpose of this file is to implement functionality that would otherwise be out of place in the other files
+//Right now, it implements reading morse code and email functions
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -15,6 +19,9 @@ using MimeKit.Encodings;
 
 namespace VirtualMorse
 {
+
+    //Address book
+    //Class used to represent one line in the address book
     public class AddressBook
     {
         public string Nickname { get; set; }
@@ -90,6 +97,8 @@ namespace VirtualMorse
             {"..--", '@'}
         };
 
+
+        //translates a morse string into a character
         public static char morseToText(string morse)
         {
             if (morse_map.ContainsKey(morse))
@@ -98,6 +107,8 @@ namespace VirtualMorse
                 return '\0';
         }
 
+
+        //returns the last sentance in the current text document
         public static string getLastSentence(string document)
         {
             char[] chars = { '.', '!', '?' };
@@ -118,7 +129,9 @@ namespace VirtualMorse
             }
             return sentences.Last();
         }
-
+        
+        //creates a Mailkit email object
+        //The object has the address, subject, and email contents in a single place
         public static MimeMessage createEmail(string address, string contents)
         {
             var message = new MimeMessage();
@@ -136,6 +149,7 @@ namespace VirtualMorse
             return message;
         }
 
+        // create a reply to a given email
         // https://github.com/jstedfast/MailKit/blob/master/FAQ.md#reply-message
         public static MimeMessage createReply(MimeMessage message, string contents)
         {
@@ -195,6 +209,7 @@ namespace VirtualMorse
             return reply;
         }
 
+        //sends an email using Mailkit
         public static void sendEmail(MimeMessage message)
         {
             using (var client = new SmtpClient())
@@ -207,6 +222,7 @@ namespace VirtualMorse
             }
         }
 
+        //retrieves an email based on a given index
         public static MimeMessage getEmail(int index, bool markAsRead = false)
         {
             MimeMessage message;
@@ -240,6 +256,7 @@ namespace VirtualMorse
             public int Total { get; set; }
         }
 
+        //returns the number of new emails, unopened emails, and total emails as a list
         public static EmailCounts getEmailCounts()
         {
             EmailCounts emailCounts = new EmailCounts();
@@ -260,7 +277,9 @@ namespace VirtualMorse
             }
             return emailCounts;
         }
-
+        
+        //delete email
+        //email to be deleted is based of its index
         public static void deleteEmail(int index)
         {
             using (var client = new ImapClient())
@@ -286,6 +305,7 @@ namespace VirtualMorse
             Function.nickname = nickname;
         }
 
+        //returns a list of all entries in the address book as a list of nickname / address pairs
         public static List<AddressBook> readAddressBook()
         {
             List<AddressBook> records = new List<AddressBook>();
@@ -307,6 +327,7 @@ namespace VirtualMorse
             return records;
         }
 
+        //adds a given email / nickname pair to the address book
         public static void addEmailToBook(string email)
         {
             var records = readAddressBook();
@@ -320,6 +341,10 @@ namespace VirtualMorse
             }
         }
 
+        //checks to see if a given string is a nickname
+        //if the string is in the address book, it is a nickname
+        //      return the address corresponding to the nickname
+        //otherwise return the string
         public static string checkNickname(string address)
         {
             string email = address;
@@ -334,6 +359,7 @@ namespace VirtualMorse
             return email;
         }
 
+        //connects to MailKit servers
         static void connectMailService(MailService mailService, string host, int port, string errorMessage)
         {
             try
@@ -349,12 +375,16 @@ namespace VirtualMorse
             }
         }
 
+        //connect to SMTP client
+        //used for email
         static void connectSmtpClient(SmtpClient smtpClient)
         {
             connectMailService(smtpClient, "smtp.gmail.com", 465,
                 "Error connecting or authenticating SMTP client.");
         }
 
+        //connect to IMAP client
+        //used for email
         static void connectImapClient(ImapClient imapClient)
         {
             connectMailService(imapClient, "imap.gmail.com", 993,

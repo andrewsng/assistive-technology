@@ -1,3 +1,5 @@
+//punctuation state
+//used to quickly add punctuation characters to the current word
 using System;
 using System.Collections.Generic;
 using System.Speech.Synthesis;
@@ -54,6 +56,7 @@ namespace VirtualMorse.States
             };
         }
 
+        //move to typing state
         void command()
         {
             context.transitionToState(new TypingState(context));
