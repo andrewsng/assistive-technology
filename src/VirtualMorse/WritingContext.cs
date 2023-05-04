@@ -1,64 +1,48 @@
+// class WritingContext
+// Implements the context that the Virtual Morse
+//   state machine States refer back to.
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using VirtualMorse.States;
 using VirtualMorse.Input;
+using System.IO;
 
 namespace VirtualMorse
 {
     public class WritingContext
     {
         RichTextBox textBox;
+        List<InputSource> inputSources;
+        State state;  //current state of the machine
 
-        FunctionKeyInput functionKeys;
-        ArduinoComms Board;
-
-        State state;
-
+        //current letter and word
         public string currentMorse = "";
         public string currentWord = "";
         public char lastLetter = '\0';
 
-        string directory;
-        string file = "test.txt";
+        string textFileName;
 
-        public WritingContext()
+        public WritingContext(RichTextBox textBox)
         {
-            textBox = new RichTextBox();
-            textBox.Dock = DockStyle.Fill;
-            textBox.AutoWordSelection = false;
-            textBox.Font = new Font("Arial", 16, FontStyle.Regular);
-            textBox.ForeColor = Color.Black;
+            this.textBox = textBox;
 
-            functionKeys = new FunctionKeyInput();
-            functionKeys.KeyPressed += Handler_InputReceived;
-            textBox.KeyDown += functionKeys.TextBox_KeyDown;
-
-            try
-            {
-                Board = new ArduinoComms(textBox);
-                Board.buttonPressed += Handler_InputReceived;
-            }
-            catch
-            {
-                Console.WriteLine("Error opening serial port");
-                // TODO: Throw here or not?
-            }
+            inputSources = new List<InputSource>();
 
             state = new TypingState(this);
-
-            directory = AppDomain.CurrentDomain.BaseDirectory;
-            directory = directory.Replace("bin\\Debug\\", "Text_documents\\");
-            List<string> fileContents = Function.readFullFile(directory, file);
-            if (fileContents.Count > 0)
-            {
-                setDocument((Function.readFullFile(directory, file))[0]);
-            }
         }
 
-        private void Handler_InputReceived(object sender, SwitchInputEventArgs e)
+        // Event handler that receives switch values and calls
+        //   the respond function for the current state with that switch value.
+        // Does nothing if Speech class is blocking inputs.
+        void Handler_InputReceived(object sender, SwitchInputEventArgs e)
         {
+            if (Speech.isBlockingInputs())
+            {
+                return;
+            }
             state.respond(e.switchInput);
             Console.WriteLine("current letter: '" + getCurrentMorse() + "'");
             Console.WriteLine("current word: '" + getCurrentWord() + "'");
@@ -73,6 +57,7 @@ namespace VirtualMorse
             return textBox;
         }
 
+        //move states
         public void transitionToState(State state)
         {
             this.state = state;
@@ -103,6 +88,32 @@ namespace VirtualMorse
             currentWord = "";
         }
 
+        public void addInputSource(InputSource inputSource)
+        {
+            inputSource.switchActivated += Handler_InputReceived;  // Subscribe to switchActivated event
+            inputSources.Add(inputSource);
+        }
+
+        public void setTextFile(string textFile)
+        {
+            textFileName = textFile;
+        }
+
+        public string getTextFile()
+        {
+            return textFileName;
+        }
+
+        //loads file into text document
+        public void loadFromTextFile()
+        {
+            using (var reader = new StreamReader(Path.Combine(Program.fileDirectory, textFileName)))
+            {
+                setDocument(reader.ReadToEnd());
+            }
+        }
+
+        //overrides the current document with a given string
         public void setDocument(string text)
         {
             textBox.Focus();
@@ -111,6 +122,7 @@ namespace VirtualMorse
             textBox.SelectedText = text;
         }
 
+        //adds word to document
         public void appendToDocument(string text)
         {
             textBox.Focus();
@@ -119,6 +131,7 @@ namespace VirtualMorse
             textBox.SelectedText = text;
         }
 
+        //deletes last character in the document
         public void backspaceDocument()
         {
             if (textBox.TextLength > 0)
@@ -130,9 +143,11 @@ namespace VirtualMorse
             }
         }
 
-        public void saveDocumentFile()
+        //saves current document
+        public void saveDocumentFile(string filePath)
         {
-            Function.addToFile(directory, file, getDocument());
+            Console.WriteLine($"Saving document to {filePath}");
+            File.WriteAllText(filePath, getDocument());
         }
     }
 }

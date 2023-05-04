@@ -1,38 +1,37 @@
+// class ArduinoComms
+// Derived from base class InputSource
+// Maintains a serial port connection
+// Function SerialPort_DataReceived runs whenever the
+//   SerialPort.DataReceived event is raised.
+
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using System.IO.Ports; //access to SerialPort Class 
 
-
 namespace VirtualMorse.Input
 {
-    public class ArduinoComms
+    public class ArduinoComms : InputSource
     {
-        RichTextBox textBox;
         SerialPort _serialPort;
 
         //Constructors
-        public ArduinoComms(RichTextBox textBox)
+        public ArduinoComms(RichTextBox textBox) : base(textBox)
         {
-            this.textBox = textBox;
             _serialPort = new SerialPort("COM4", 9600, Parity.None, 8, StopBits.One);
             _serialPort.Open();
-            _serialPort.DataReceived += DataHandler;
+            _serialPort.DataReceived += SerialPort_DataReceived;  // Subscribe to DataReceived event
         }
 
-        public ArduinoComms(RichTextBox textBox, string portName, int baudRate)
+        public ArduinoComms(RichTextBox textBox, string portName, int baudRate) : base(textBox)
         {
-            this.textBox = textBox;
             _serialPort = new SerialPort(portName, baudRate, Parity.None, 8, StopBits.One);
             _serialPort.Open();
-            _serialPort.DataReceived += DataHandler;
+            _serialPort.DataReceived += SerialPort_DataReceived;  // Subscribe to DataReceived event
         }
 
-        //Event to Detect when a button is pressed 
-        public event EventHandler<SwitchInputEventArgs> buttonPressed;
-
-        //Dictionary holding all button presses, and associated switches
-        public Dictionary<string, Switch> targetKeys = new Dictionary<string, Switch>()
+        //Dictionary holding switches associated with strings read from serial input
+        public Dictionary<string, Switch> serialInputMap = new Dictionary<string, Switch>()
         {
             {  "0", Switch.Switch1 },
             {  "1", Switch.Switch2 },
@@ -46,7 +45,7 @@ namespace VirtualMorse.Input
             {  "9", Switch.Switch10 },
         };
 
-        private void DataHandler(object sender, SerialDataReceivedEventArgs button)
+        private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs button)
         {
             try //Error may occur when opening a Serial Port 
             {
@@ -54,12 +53,18 @@ namespace VirtualMorse.Input
                 SerialPort sp = (SerialPort)sender;
                 string str = sp.ReadLine();
                 str = str.Trim();
-                if (targetKeys.ContainsKey(str))
+                if (serialInputMap.ContainsKey(str))
                 {
+                    // This SerialPort event handler runs automatically on a separate thread
+                    //   (because the SerialPort is constantly waiting for data to come in).
+                    // Calling OnSwitchActivated might make changes to the textBox which are only
+                    //   allowed on the main thread that the textBox runs on. We create an Action
+                    //   then invoke that Action through the textBox so it runs on it's own thread.
+                    // See Remarks here https://learn.microsoft.com/en-us/dotnet/api/system.io.ports.serialport.datareceived
                     Action action = delegate () {
-                        buttonPressed?.Invoke(this, new SwitchInputEventArgs(targetKeys[str]));
+                        OnSwitchActivated(new SwitchInputEventArgs(serialInputMap[str]));
                     };
-                    textBox.Invoke(action);  // Event must be handled on the text box's thread.
+                    textBox.Invoke(action);  // Action must be run on the text box's thread.
                 }
             }
             catch (Exception e)

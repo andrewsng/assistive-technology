@@ -1,4 +1,7 @@
-﻿using System;
+﻿// enum Switch
+// Basic enum type for switch values
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
