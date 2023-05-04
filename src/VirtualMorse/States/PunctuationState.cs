@@ -1,5 +1,9 @@
+// class PunctuationState
+// Derived from base class State
+// Used to quickly add punctuation characters to the current word
 using System;
 using System.Collections.Generic;
+using System.Speech.Synthesis;
 using VirtualMorse.Input;
 
 namespace VirtualMorse.States
@@ -12,13 +16,13 @@ namespace VirtualMorse.States
         {
             switchResponses = new Dictionary<Switch, Action>(){
                 { Switch.Switch1,  command },
-                { Switch.Switch2,  enterPunctuation("'",  "apostrophe") },
-                { Switch.Switch3,  enterPunctuation("\"", "quotation mark") },
-                { Switch.Switch4,  enterPunctuation("!",  "exclamation mark") },
-                { Switch.Switch5,  enterPunctuation(".",  "period") },
-                { Switch.Switch6,  enterPunctuation(",",  "comma") },
-                { Switch.Switch7,  enterPunctuation("?",  "question mark") },
-                { Switch.Switch8,  enterPunctuation("-",  "hyphen") },
+                { Switch.Switch2,  enterPunctuation("'") },
+                { Switch.Switch3,  enterPunctuation("\"") },
+                { Switch.Switch4,  enterPunctuation("!") },
+                { Switch.Switch5,  enterPunctuation(".") },
+                { Switch.Switch6,  enterPunctuation(",") },
+                { Switch.Switch7,  enterPunctuation("?") },
+                { Switch.Switch8,  enterPunctuation("-") },
                 { Switch.Switch9,  command },
                 { Switch.Switch10, command },
             };
@@ -32,22 +36,33 @@ namespace VirtualMorse.States
             }
         }
 
-        Action enterPunctuation(string punctuation, string spokenMessage)
+        Action enterPunctuation(string punctuation)
         {
             return () =>
             {
-                context.appendToDocument(punctuation);
-                Function.speak(spokenMessage);
+                if (context.currentWord != "")
+                {
+                    context.currentWord += punctuation;
+                }
+                else
+                {
+                    context.appendToDocument(punctuation);
+                }
+                PromptBuilder spokenMessage = new PromptBuilder();
+                spokenMessage.AppendTextWithHint(punctuation, SayAs.SpellOut);
+                spokenMessage.AppendText(".");
+                Speech.speak(spokenMessage);
                 context.transitionToState(new TypingState(context));
                 Console.WriteLine("Move to typing state.");
             };
         }
 
+        //move to typing state
         void command()
         {
             context.transitionToState(new TypingState(context));
-            Console.WriteLine("Move to punctuation state.");
-            Function.speak("Command off.");
+            Console.WriteLine("Move to typing state.");
+            Speech.speak("Typing Mode.");
         }
     }
 }

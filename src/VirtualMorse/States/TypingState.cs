@@ -1,6 +1,10 @@
+// class TypingState
+// Derived from base class State
+// Has the implementation for the typing state, in which morse code input will be translated to the screen
 using System;
 using System.Collections.Generic;
-using System.Windows.Forms;
+using System.IO;
+using System.Speech.Synthesis;
 using VirtualMorse.Input;
 
 namespace VirtualMorse.States
@@ -36,42 +40,58 @@ namespace VirtualMorse.States
             }
         }
 
+		//adds a dot to the current word
         void dot()
 		{
 			Console.WriteLine("storing dot");
             context.currentMorse += '.';
         }
 
+		//adds a dash to the current word
 		void dash()
 		{
 			Console.WriteLine("storing dash");
             context.currentMorse += '-';
         }
 
+		//if there is a current word, add word to the document
+		//if there is not a current word, add a space to the document
 		void space()
 		{
 			if (context.currentWord != "")
 			{
 				context.appendToDocument(context.currentWord);
 				Console.WriteLine("added word to file: " + context.currentWord);
-				Function.speak(context.currentWord);
+				Speech.speak(context.currentWord);
                 context.clearWord();
             }
 			else
 			{
 				context.appendToDocument(" ");
 				Console.WriteLine("SPACE added to file");
-				Function.speak("Space.");
+				Speech.speak("Space.");
 			}
 		}
 
+		//toggles capitalization
 		void shift()
 		{
+			if (isCapitalized)
+			{
+                Speech.speak("Shift cancelled.");
+            }
+			else
+			{
+				Speech.speak("Shift.");
+			}
             isCapitalized = !isCapitalized;
             Console.WriteLine("capitalization set to: " + isCapitalized);
-			Function.speak("shift");
 		}
 
+		//translates current morse code letter
+		//if it is a valid letter, add it to the current word
+		//if it isn't valid, alert user
+		//if adding the letter results in TTT, read current document and clear current word
 		void enter()
 		{
 			string morseString = context.currentMorse;
@@ -90,7 +110,7 @@ namespace VirtualMorse.States
 				}
 			}
 
-            string spokenMessage;
+            PromptBuilder spokenMessage = new PromptBuilder();
             if (nextLetter != '\0')
 			{
                 context.currentWord += nextLetter;
@@ -100,59 +120,70 @@ namespace VirtualMorse.States
 				if (context.currentWord == "ttt")
 				{
 					context.clearWord();
-					spokenMessage = context.getDocument();
-					if (spokenMessage == "")
-					{
-						spokenMessage = "This page is blank.";
-					}
+					string document = context.getDocument();
+					spokenMessage.AppendText((document != "") ? document : "This page is blank.");
                     Console.WriteLine("\"ttt\" entered - reading entire page");
                 }
 				else
                 {
-                    spokenMessage = nextLetter.ToString();
-                    if (char.IsUpper(nextLetter))
+					if (char.IsUpper(nextLetter))
                     {
-                        spokenMessage = "Capital " + spokenMessage;
+                        spokenMessage.AppendText("Capital ");
                     }
+                    spokenMessage.AppendTextWithHint(nextLetter.ToString(), SayAs.SpellOut);
+                    spokenMessage.AppendText(".");
                 }
-			}
+            }
 			else
 			{
 				context.clearMorse();
 				Console.WriteLine("not a valid letter, try again");
-				spokenMessage = "Try again";
-			}
-			Function.speak(spokenMessage);
+				spokenMessage.AppendText("Try again");
+            }
+            Speech.speak(spokenMessage);
 		}
 
+		//if a morse letter is in progress, delete all of it
+		//if not, remove last character
 		void backspace()
 		{
 			if (context.currentWord.Length > 0)
 			{
 				context.currentWord = context.currentWord.Remove(context.currentWord.Length - 1, 1);
 				Console.WriteLine("Delete");
-				Function.speak("Delete.");
+				Speech.speak("Delete.");
 			}
 			else
 			{
 				context.backspaceDocument();
 				Console.WriteLine("Backspace");
-				Function.speak("Backspace.");
+				Speech.speak("Backspace.");
 			}
 		}
 
+		//save text file
 		void save()
-		{
-			Console.WriteLine("save text doc as is");
-			context.saveDocumentFile();
-			Function.speak("Now saving.");
+        {
+            Speech.speak("Now saving.");
+            Console.WriteLine("save text doc as is");
+			try
+            {
+                context.saveDocumentFile(Path.Combine(Program.fileDirectory, context.getTextFile()));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error saving file");
+                Speech.speak("Error saving file");
+                Console.WriteLine(ex.Message);
+            }
 		}
 
+		//move to  command state
 		void command()
 		{
 			context.transitionToState(new CommandState(context));
             Console.WriteLine("move to command state");
-			Function.speak("Command Level 1.");
+			Speech.speak("Command Mode.");
         }
 	}
 }

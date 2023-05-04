@@ -1,4 +1,9 @@
-﻿using System;
+﻿// class ConfirmationState
+// Derived from base class State
+// Used to confirm an Action (a function with no parameters or return value)
+// Space is confirm, backspace is cancel
+
+using System;
 using System.Collections.Generic;
 using VirtualMorse.Input;
 
@@ -7,6 +12,7 @@ namespace VirtualMorse.States
     public class ConfirmationState : State
     {
         Action actionToConfirm;
+        static string instructions = "Press space to confirm or backspace to cancel.";
 
         Dictionary<Switch, Action> switchResponses;
 
@@ -18,6 +24,8 @@ namespace VirtualMorse.States
                 { Switch.Switch4,  confirm },
                 { Switch.Switch8,  cancel },
             };
+
+            Speech.speak(instructions);
         }
 
         public override void respond(Switch input)
@@ -26,10 +34,15 @@ namespace VirtualMorse.States
             {
                 switchResponses[input]();
             }
+            else
+            {
+                Speech.speak("Invalid entry. " + instructions);
+            }
         }
 
         void confirm()
         {
+            Speech.speakFully("Confirmed.");
             actionToConfirm();
             context.transitionToState(new TypingState(context));
             Console.WriteLine("Move to typing state.");
@@ -37,9 +50,9 @@ namespace VirtualMorse.States
 
         void cancel()
         {
+            Speech.speakFully("Cancelled.");
             context.transitionToState(new TypingState(context));
             Console.WriteLine("Move to typing state.");
-            Function.speak("Operation cancelled.");
         }
     }
 }
