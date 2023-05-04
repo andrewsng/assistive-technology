@@ -33,11 +33,6 @@ namespace VirtualMorse
         static string addressBook = "AddressBook.csv";
         static string nickname = "";
 
-        static Function()
-        {
-            DotNetEnv.Env.TraversePath().Load();
-        }
-
         static Dictionary<string, char> morse_map = new Dictionary<string, char>() {
             // Letters
             {".-", 'a'},

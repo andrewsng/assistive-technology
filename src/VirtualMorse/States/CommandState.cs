@@ -5,6 +5,7 @@ using MimeKit;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Drawing.Printing;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -53,8 +54,25 @@ namespace VirtualMorse.States
         void printPage()
         {
             Console.WriteLine("Print page");
+            Speech.speakFully("Printing page");
+            try
+            {
+                Printer.printString(context.getDocument());
+            }
+            catch (Exception ex)
+            {
+                string error = "Error printing page.";
+                Console.WriteLine(error);
+                Speech.speak(error);
+                Console.WriteLine(ex.Message);
+                Console.WriteLine("-- Available printer names --");
+                foreach (var printer in PrinterSettings.InstalledPrinters)
+                {
+                    Console.WriteLine(printer.ToString());
+                }
+                Console.WriteLine("-----------------------------");
+            }
             moveToTypingState();
-            Speech.speak("Printing page");
         }
 
         //Erases the current text document

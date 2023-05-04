@@ -4,70 +4,43 @@ using System.Drawing;
 using System.Drawing.Printing;
 using System.Windows.Forms;
 
-public class PrintingExample
+namespace VirtualMorse
 {
-    private Font printFont;
-    private StreamReader streamToPrint;
-    static string filePath;
-
-    public PrintingExample()
+    public static class Printer
     {
-        Printing();
-    }
+        static Font printFont;
+        static StringReader stringToPrint;
 
-    // The PrintPage event is raised for each page to be printed.
-    private void pd_PrintPage(object sender, PrintPageEventArgs ev)
-    {
-        float linesPerPage = 0;
-        float yPos = 0;
-        int count = 0;
-        float leftMargin = ev.MarginBounds.Left;
-        float topMargin = ev.MarginBounds.Top;
-        String line = null;
-
-        // Calculate the number of lines per page.
-        linesPerPage = ev.MarginBounds.Height /
-           printFont.GetHeight(ev.Graphics);
-
-        // Iterate over the file, printing each line.
-        while (count < linesPerPage &&
-           ((line = streamToPrint.ReadLine()) != null))
+        // The PrintPage event is raised for each page to be printed.
+        private static void pd_PrintPage(object sender, PrintPageEventArgs ev)
         {
-            yPos = topMargin + (count * printFont.GetHeight(ev.Graphics));
-            ev.Graphics.DrawString(line, printFont, Brushes.Black,
-               leftMargin, yPos, new StringFormat());
-            count++;
+            ev.Graphics.DrawString(stringToPrint.ReadToEnd(), printFont, Brushes.Black,
+                   ev.MarginBounds, new StringFormat());
         }
 
-        // If more lines exist, print another page.
-        if (line != null)
-            ev.HasMorePages = true;
-        else
-            ev.HasMorePages = false;
-    }
-
-    // Print the file.
-    public void Printing()
-    {
-        try
+        // Print the given string
+        public static void printString(string text)
         {
-            streamToPrint = new StreamReader(filePath);
+            stringToPrint = new StringReader(text);
             try
             {
-                printFont = new Font("Arial", 16);
+                printFont = Program.textFont;
                 PrintDocument pd = new PrintDocument();
                 pd.PrintPage += new PrintPageEventHandler(pd_PrintPage);
-                // Print the document.
-                pd.Print();
+                pd.PrinterSettings.PrinterName = DotNetEnv.Env.GetString("PRINTER__NAME") ?? "";
+                if (pd.PrinterSettings.IsValid)
+                {
+                    pd.Print();
+                }
+                else
+                {
+                    throw new InvalidPrinterException(pd.PrinterSettings);
+                }
             }
             finally
             {
-                streamToPrint.Close();
+                stringToPrint.Close();
             }
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show(ex.Message);
         }
     }
 }
