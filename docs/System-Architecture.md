@@ -10,8 +10,8 @@
 ### Command / Confirmation State
 ![image](https://user-images.githubusercontent.com/43076320/236088067-975a6af7-bb5e-4ea1-8769-fec8f1445970.png)
 
-
 ### Punctuation State
 ![image](https://user-images.githubusercontent.com/43076320/236088106-9104bec0-174a-4850-9812-c01a9200a2e4.png)
 
-
+### Arduino Schematic
+![image](Josh_Arduino_Board_final.svg)
